@@ -34,12 +34,14 @@
 #######################################################################
 
 add_subdirectory(lightswitch)
+add_subdirectory(python)
 add_subdirectory(rover)
 add_subdirectory(shopping)
 add_subdirectory(simplerobot)
 
+
 # ROS connection components
-option(WITH_ROS "Use ROS plugin" OFF)
-if(WITH_ROS)
-  add_subdirectory(turtlesim)
-endif(WITH_ROS)
+#option(WITH_ROS "Use ROS plugin" OFF)
+#if(WITH_ROS)
+#  add_subdirectory(turtlesim)
+#endif(WITH_ROS)

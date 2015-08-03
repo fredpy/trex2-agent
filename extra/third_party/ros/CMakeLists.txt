@@ -53,38 +53,44 @@ else(ROS_NO_CHECK)
       message(SEND_ERROR "Failed to find roscpp")
     endif(ROS_roscpp_PACKAGE_PATH)
 
-    find_ros_pkg(actionlib)
-    if(ROS_actionlib_PACKAGE_PATH)
-      include_directories(${ROS_actionlib_INCLUDE_DIRS})
-      add_definitions(${ROS_actionlib_CFLAGS})
-    else(ROS_actionlib_PACKAGE_PATH)
-      message(SEND_ERROR "Failed to find actionlib")
-    endif(ROS_actionlib_PACKAGE_PATH)
-    
+    find_ros_pkg(roslib)
+    if(ROS_roslib_PACKAGE_PATH)
+      include_directories(${ROS_roslib_INCLUDE_DIRS})
+      add_definitions(${ROS_roslib_CFLAGS})
+    else(ROS_roslib_PACKAGE_PATH)
+      message(SEND_ERROR "Failed to find roslib")
+    endif(ROS_roslib_PACKAGE_PATH)
+
   else(ROS_CONFIG)
     message(SEND_ERROR "Failed to loacte ROS configuration file.")
   endif(ROS_CONFIG)
 endif(ROS_NO_CHECK)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}
+  ${PYTHON_INCLUDE_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}/trex/ros)
 link_directories(${ROS_actionlib_LINK_PATH} ${ROS_roscpp_LINK_PATH})
 
 add_library(TREXros SHARED
-  # source 
-  ros_reactor.cc 
+  # source
+  cpp_topic.cc
+  python_topic.cc
+  roscpp_inject.cc
   ros_clock.cc
+  ros_reactor.cc
   ros_timeline.cc
-  ros_client.cc
   # header
+  python_topic.hh
   ros_reactor.hh
-  trex/ros/ros_client.hh
+  trex/ros/roscpp_inject.hh
   trex/ros/ros_clock.hh
-  trex/ros/ros_convert_traits.hh
   trex/ros/ros_error.hh
-  trex/ros/ros_subscriber.hh
-  trex/ros/ros_action.hh
-  trex/ros/bits/ros_timeline.hh)
+  trex/ros/msg_cvt_traits.hh
+  trex/ros/cpp_topic.hh
+  trex/ros/bits/cpp_topic_base.hh
+  trex/ros/bits/handle_proxy.hh
+  trex/ros/bits/ros_timeline.hh
+)
 
 install(DIRECTORY trex/ DESTINATION include/trex/
   FILES_MATCHING PATTERN "*.hh" PATTERN "*.tcc"
@@ -94,8 +100,8 @@ install(DIRECTORY trex/ DESTINATION include/trex/
 target_link_libraries(TREXros ${ROS_roscpp_LINK_FLAGS} 
   ${ROS_actionlib_LINK_FLAGS} 
   ${ROS_roscpp_LINK_LIBS} 
-  ${ROS_actionlib_LINK_LIBS} 
-  TREXagent)
+  ${ROS_roslib_LINK_LIBS}
+  TREXagent TREXpython)
 
 install(TARGETS TREXros DESTINATION lib)
 trex_lib(TREXros extra)
@@ -103,6 +109,8 @@ trex_lib(TREXros extra)
 
 
 # The plugin placeholder : also initialize ros on load
-trex_plugin(ros ros_init.cc)
-target_link_libraries(ros_pg TREXros)
+trex_plugin(ros ros_init.cc
+  msg_point.cc
+  msg_clock.cc)
+target_link_libraries(ros_pg ${PYTHON_LIBRARIES} TREXros)
 

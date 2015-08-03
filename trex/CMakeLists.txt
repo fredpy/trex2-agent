@@ -64,17 +64,26 @@ endif(NOT HAVE_SETPRIORITY)
 configure_file(cmds/nice_flags.h.in
   ${CMAKE_CURRENT_BINARY_DIR}/nice_flags.h @ONLY)
 
+if(WITH_PYTHON)
+  include_directories(${PYTHON_INCLUDE_DIR})
+  set(extra_libs ${LINK_NO_AS_NEEDED} ${py_libs})
+else(WITH_PYTHON)
+  set(extra_libs "")
+endif(WITH_PYTHON)
+
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 add_executable(amc cmds/AMC.cc)
-target_link_libraries(amc TREXagent ${Boost_PROGRAM_OPTIONS_LIBRARY})
+target_link_libraries(amc TREXagent ${Boost_PROGRAM_OPTIONS_LIBRARY} ${extra_libs})
 add_dependencies(core amc)
 install(TARGETS amc DESTINATION bin)
 
 trex_add_path_filter(amc cmds)
 trex_cmd(amc)
 
+include_directories(${PYTHON_INCLUDE_DIR})
+
 add_executable(sim cmds/Sim.cc)
-target_link_libraries(sim TREXagent ${Boost_PROGRAM_OPTIONS_LIBRARY})
+target_link_libraries(sim TREXagent ${Boost_PROGRAM_OPTIONS_LIBRARY} ${extra_libs})
 add_dependencies(core sim)
 install(TARGETS sim DESTINATION bin)
 

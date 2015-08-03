@@ -1,13 +1,13 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
- * 
- *  Copyright (c) 2012, MBARI.
+ *
+ *  Copyright (c) 2015, Frederic Py.
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions
  *  are met:
- * 
+ *
  *   * Redistributions of source code must retain the above copyright
  *     notice, this list of conditions and the following disclaimer.
  *   * Redistributions in binary form must reproduce the above
@@ -17,7 +17,7 @@
  *   * Neither the name of the TREX Project nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -31,97 +31,127 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#include "bits/ros_timeline.hh"
 #include "ros_reactor.hh"
+#include "trex/ros/ros_error.hh"
 
-using namespace TREX::ROS;
-using namespace TREX;
+using namespace TREX::ROS::details;
+using namespace TREX::utils;
+using namespace TREX::transaction;
 
-using TREX::utils::Symbol;
+using TREX::ROS::ros_reactor;
+using TREX::ROS::ros_error;
 
 /*
  * class TREX::ROS::details::ros_timeline
  */
-details::ros_timeline::ros_timeline(details::ros_timeline::xml_arg arg, bool control)
-  :m_reactor(*arg.second), m_name(utils::parse_attr<Symbol>(xml_factory::node(arg), "timeline")),
-   m_controlable(control),
-   m_init(utils::parse_attr(false, xml_factory::node(arg), "init")),
-   m_updated(false) {
+
+// statics
+
+ros_timeline::id_type ros_timeline::get_id(ros_timeline::base_type const &elem) {
+  if( elem )
+    return elem->name();
+  return id_type();
+}
+
+
+// structors
+
+ros_timeline::ros_timeline(ros_timeline::xml_arg const &arg, bool control)
+:m_reactor(*(arg.second)), m_name(parse_attr<Symbol>(xml_factory::node(arg), "name")),
+m_controllable(control),
+m_init(utils::parse_attr<bool>(false, xml_factory::node(arg), "init")),
+m_updated(false) {
   init_timeline();
 }
 
-details::ros_timeline::ros_timeline(ros_reactor *r, Symbol const &tl, bool control, bool init)
-  :m_reactor(*r), m_name(tl), m_controlable(control), m_init(init), m_updated(false) {
+ros_timeline::ros_timeline(ros_reactor *r, Symbol const &tl, bool init, bool control)
+:m_reactor(*r), m_name(tl), m_controllable(control), m_init(init), m_updated(false) {
   init_timeline();
 }
 
-details::ros_timeline::~ros_timeline() {
+ros_timeline::~ros_timeline() {
   m_reactor.unprovide(name());
 }
 
-void details::ros_timeline::init_timeline() {
+
+// manipulators
+
+void ros_timeline::init_timeline() {
   std::ostringstream oss;
+  
   if( m_reactor.isInternal(name()) ) {
-    oss<<"Attempted to provide \""<<name()<<"\" which is already owned.";
-    throw TREX::transaction::ReactorException(m_reactor, oss.str());
+    oss<<"Attempted to re-provide "<<name();
+    throw ReactorException(m_reactor, oss.str());
   } else {
-    m_reactor.provide(name(), controlable());
+    m_reactor.provide(name(), controllable());
     if( !m_reactor.isInternal(name()) ) {
-      oss<<"Failed to declare  \""<<name()<<"\" as Internal.";
-      throw TREX::transaction::ReactorException(m_reactor, oss.str());
+      oss<<"Failed to provide "<<name()<<" as Internal";
+      throw ReactorException(m_reactor, oss.str());
     }
-    if( !m_init ) {
-      // Initialize the observation to undefined
-      notify(new_obs(TREX::transaction::Predicate::undefined_pred()));
-    }
+  }
+  if( !m_init )
+    notify(new_obs(Predicate::undefined_pred()));
+}
+
+log::stream ros_timeline::syslog(log::id_type const &kind) const {
+  return m_reactor.syslog(name(), kind);
+}
+
+
+priority_strand &ros_timeline::strand() {
+  return m_reactor.m_ros->strand();
+}
+
+TREX::ROS::roscpp_initializer &ros_timeline::ros() {
+  return *(m_reactor.m_ros);
+}
+
+
+// modifiers
+
+void ros_timeline::notify(transaction::Observation const &obs) {
+  if( obs.object()!=name() ) {
+    syslog(log::error)<<"Attempted to post an observation which does not belong "
+    "to this timeline:\n  "<<obs;
+  } else {
+    m_undefined = (obs.predicate()==Predicate::undefined_pred());
+    m_reactor.postObservation(obs);
+    m_updated = true;
   }
 }
 
-void details::ros_timeline::do_init() {
+// callbacks
+
+void ros_timeline::do_init() {
+  handle_init();
+  
   if( m_init ) {
-    // Wait for new obs here
-    syslog()<<"Waiting for first ROS update on \""<<name()<<"\""; 
+    syslog(log::info)<<"Waiting for first update from ROS";
     do {
       boost::this_thread::yield();
     } while( !m_updated );
   }
 }
 
-void details::ros_timeline::do_synchronize() {
-  // syslog()<<name()<<" - Updated="<<m_updated;
+void ros_timeline::do_synchronize() {
   synchronize(m_reactor.getCurrentTick());
-  m_updated = m_undefined;  
+  m_updated = m_undefined;
 }
 
-
-::ros::NodeHandle &details::ros_timeline::node() {
-  return m_reactor.m_ros;
-}
-
-void details::ros_timeline::notify(transaction::Observation const &obs) {
-  if( obs.object()!=m_name ) {
-    syslog(utils::log::error)<<"Attempted to post an observation which does not belong to "<<m_name<<":\n\t"<<obs;
-  } else {
-    // Probably need to be protected by some mutex....
-    m_undefined = (obs.predicate()==TREX::transaction::Predicate::undefined_pred());
-    m_reactor.postObservation(obs);
-    m_updated = true;
-  }
-}
-
-utils::log::stream details::ros_timeline::syslog(Symbol const &kind) {
-  return m_reactor.syslog(m_name, kind);
-}
-
-bool details::ros_timeline::request(TREX::transaction::goal_id g) {
+bool ros_timeline::request(goal_id g) {
   if( g->object()!=name() )
-    syslog(utils::log::error)<<"Goal "<<g<<" is not on "<<name();
-  else if( controlable() )
+    syslog(log::error)<<"Goal "<<g<<" is not on "<<name();
+  else if( controllable() )
     return handle_request(g);
   return false;
 }
 
-void details::ros_timeline::recall(TREX::transaction::goal_id g) {
-  if( controlable() )
+void ros_timeline::recall(goal_id g) {
+  if( controllable() )
     handle_recall(g);
 }
+
+
+
+
+

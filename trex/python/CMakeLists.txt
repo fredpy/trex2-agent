@@ -2,7 +2,7 @@
 #######################################################################
 # Software License Agreement (BSD License)                            #
 #                                                                     #
-#  Copyright (c) 2015, Frederic Py.                                         #
+#  Copyright (c) 2015, Frederic Py.                                   #
 #  All rights reserved.                                               #
 #                                                                     #
 #  Redistribution and use in source and binary forms, with or without #
@@ -43,17 +43,21 @@ if(WITH_PYTHON)
     find_package(PythonLibs REQUIRED)
     include_directories(${PYTHON_INCLUDE_DIR})
     message(STATUS "Enabling TREX python adapters.")
-    
+    set(py_libs "${PYTHON_LIBRARIES}" CACHE INTERNAL "Python Libraries" FORCE)
+
     # First we need the library that define trex python_reactor class
     add_library(TREXpython SHARED 
       # C++ source
       exception_helper.cc
       python_reactor.cc
       python_thread.cc
+      python_env.cc
       # headers
       python_reactor.hh
       python_thread.hh
-      exception_helper.hh)
+      exception_helper.hh
+      python_env.hh
+      )
     target_link_libraries(TREXpython TREXtransaction ${Boost_PYTHON_LIBRARY} ${PYTHON_LIBRARIES})
     trex_lib(TREXpython core)
 
@@ -64,7 +68,7 @@ if(WITH_PYTHON)
       agent_decls.cc
       )
     add_dependencies(core trex)
-    target_link_libraries(trex TREXagent TREXpython)
+    target_link_libraries(trex  ${PYTHON_LIBRARIES} TREXagent TREXpython ${LINK_NO_AS_NEEDED} TREXutils)
     trex_py(trex)
     
   else(Boost_PYTHON_LIBRARY)

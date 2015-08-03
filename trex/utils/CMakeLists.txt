@@ -71,6 +71,8 @@ add_library(TREXutils SHARED
   ptree_io.cc
   asio_runner.cc
   asio_fstream.cc
+  priority_strand.cc
+  private/priority_strand_impl.cc
   log/entry.cc
   log/text_log.cc
   cpu_clock.cc
@@ -92,8 +94,11 @@ add_library(TREXutils SHARED
   LogManager.hh
   Plugin.hh
   PluginLoader.hh
+  priority_strand.hh
+  private/priority_strand_impl.hh
   SharedVar.hh
   SingletonUse.hh
+  bits/async_result.hh
   bits/SingletonDummy.hh
   bits/SingletonServer_fwd.hh
   bits/SingletonWrapper.hh
@@ -120,8 +125,10 @@ add_library(TREXutils SHARED
   platform/chrono.hh 
   platform/memory.hh
   platform/cpp11_deleted.hh
+  platform/system_error.hh
   # template source code
   bits/Factory.tcc
+  bits/priority_strand.tcc
   bits/SingletonUse.tcc
   bits/SingletonWrapper.tcc
   bits/Symbol.tcc
@@ -184,5 +191,4 @@ set_property(SOURCE Pdlfcn.cc
 
 install(DIRECTORY . DESTINATION include/trex/utils
   FILES_MATCHING PATTERN "*.hh" PATTERN "*.tcc"
-  PATTERN "private" EXCLUDE
-  PATTERN ".svn" EXCLUDE)
+  PATTERN "private" EXCLUDE)

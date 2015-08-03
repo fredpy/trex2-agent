@@ -128,6 +128,7 @@ namespace TREX {
     class exception_table:boost::noncopyable {
     public:
       void unwrap_py_error();
+      std::ostream &unwrap_py_error(std::ostream &out, bool rethrow=false);
       
       template<class Except>
       void attach(PyObject *type) {

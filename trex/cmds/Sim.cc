@@ -1,7 +1,7 @@
 /** @defgroup simcmd sim command
  * @brief A simple debug agent command
  *
- * This module embeds all the code related to the @c sim program 
+ * This module embeds all the code related to the @c sim program
  *
  * @author Conor McGann @& Frederic Py <fpy@mbari.org>
  * @ingroup commands
@@ -17,14 +17,14 @@
  */
 /*********************************************************************
  * Software License Agreement (BSD License)
- * 
+ *
  *  Copyright (c) 2011, MBARI.
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions
  *  are met:
- * 
+ *
  *   * Redistributions of source code must retain the above copyright
  *     notice, this list of conditions and the following disclaimer.
  *   * Redistributions in binary form must reproduce the above
@@ -34,7 +34,7 @@
  *   * Neither the name of the TREX Project nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -66,17 +66,17 @@ namespace po=boost::program_options;
 namespace pco=po::command_line_style;
 
 namespace {
-
+  
   /** @brief entry point to TREX system log */
   SingletonUse<LogManager> s_log;
-
+  
   UNIQ_PTR<Agent> my_agent;
-
+  
   po::options_description opt("Usage:\n"
                               "  sim <mission>[.cfg] [options]\n\n"
                               "Allowed options");
-
-
+  
+  
   /** @brief @c sim help message
    *
    * This method is invoked each time the user type an
@@ -85,17 +85,17 @@ namespace {
    */
   void printHelp() {
     std::cout<<"Options:\n"
-	     <<"  Q :- quit\n"
-	     <<"  N :- next tick\n"
-	     <<"  G :- goto tick (e.g. g100)\n"
-	     <<"  P :- post the goals from the attached file\n"
-	     <<"       (e.g P goal.req)\n"
-	     <<"  K :- kill one reactor (e.g K foo)\n"      
-	     // <<"  W :- wrap the agent to tick 0\n"
-	     <<"  H :- print this help message"
-	     <<std::endl;
+    <<"  Q :- quit\n"
+    <<"  N :- next tick\n"
+    <<"  G :- goto tick (e.g. g100)\n"
+    <<"  P :- post the goals from the attached file\n"
+    <<"       (e.g P goal.req)\n"
+    <<"  K :- kill one reactor (e.g K foo)\n"
+    // <<"  W :- wrap the agent to tick 0\n"
+    <<"  H :- print this help message"
+    <<std::endl;
   }
-
+  
   /** @brief Load goals from a file
    * @param name The name of the file
    *
@@ -122,47 +122,47 @@ namespace {
   bool parseGoals(Agent &trex, std::string const &name) {
     bool found;
     std::string file = s_log->locate(name, found).string();
-
+    
     if( !found ) {
       // try to add the .req extension
       file = s_log->use(name+".req", found);
     } else {
       s_log->use(file, found);
     }
-
+    
     if( !found ) {
       std::cerr<<"Unable to locate file \""<<name<<"\""<<std::endl;
       s_log->syslog("sim", warn)<<"Unable to find request file \""<<name<<'\"';
       return false;
     } else {
       try {
-	std::cout<<"Loading \""<<file<<"\"... "<<std::flush;
-	boost::property_tree::ptree config;
-
-	s_log->syslog("sim", info)<<"Loading request file \""<<name<<'\"';
-	read_xml(file, config, xml::no_comments|xml::trim_whitespace);
-	
-	if( config.empty() )
-	  std::cout<<"empty file"<<std::endl;
-	else {
-	  std::cout<<"done\nExtracting goals:"<<std::endl;
-	  if( config.size()==1 && !is_tag(config.front(), "Goal") )
-	    config = config.front().second;
-	  trex.sendRequests(config);
-	}
-	return true;
+        std::cout<<"Loading \""<<file<<"\"... "<<std::flush;
+        boost::property_tree::ptree config;
+        
+        s_log->syslog("sim", info)<<"Loading request file \""<<name<<'\"';
+        read_xml(file, config, xml::no_comments|xml::trim_whitespace);
+        
+        if( config.empty() )
+          std::cout<<"empty file"<<std::endl;
+        else {
+          std::cout<<"done\nExtracting goals:"<<std::endl;
+          if( config.size()==1 && !is_tag(config.front(), "Goal") )
+            config = config.front().second;
+          trex.sendRequests(config);
+        }
+        return true;
       } catch(Exception const &te) {
-	s_log->syslog("sim", error)<<"TREX error while loading \""<<name
-				   <<"\": "<<te;
-	std::cerr<<"TREX error "<<te<<std::endl;
+        s_log->syslog("sim", error)<<"TREX error while loading \""<<name
+        <<"\": "<<te;
+        std::cerr<<"TREX error "<<te<<std::endl;
       } catch( std::exception const &e ) {
-	s_log->syslog("sim", error)<<"Exception while loading \""<<name
-				   <<"\": "<<e.what();
-	std::cerr<<"exception: "<<e.what()<<std::endl;
+        s_log->syslog("sim", error)<<"Exception while loading \""<<name
+        <<"\": "<<e.what();
+        std::cerr<<"exception: "<<e.what()<<std::endl;
       } catch(...) {
-	s_log->syslog("sim", error)<<"Unknwon exception while loading \""
-				   <<name<<"\"";
-	std::cerr<<"Unknown error"<<std::endl;
+        s_log->syslog("sim", error)<<"Unknwon exception while loading \""
+        <<name<<"\"";
+        std::cerr<<"Unknown error"<<std::endl;
       }
       return false;
     }
@@ -172,29 +172,29 @@ namespace {
 extern "C" {
   void sim_cleanup(int sig) {
     s_log->syslog("sim", info)<<"============================================";
-    s_log->syslog("sim", info)<<"Received signal "<<sig; 
+    s_log->syslog("sim", info)<<"Received signal "<<sig;
     s_log->syslog("sim", info)<<"============================================";
     std::cout<<"Received signal "<<sig<<std::endl;
     my_agent.reset();
     std::cout<<"Goodbye"<<std::endl;
     exit(1);
   }
-
-
+  
+  
   void sim_abort(int) {
     s_log->syslog("sim", error)<<"============================================";
-    s_log->syslog("sim", error)<<"Received SIGABRT"; 
+    s_log->syslog("sim", error)<<"Received SIGABRT";
     s_log->syslog("sim", error)<<"============================================";
     std::cout<<"Received abort."<<std::endl;
     my_agent.reset();
     exit(1);
-  } 
-
+  }
+  
   void sim_terminate() {
     std::cerr<<"Program terminated."<<std::endl;
     abort();
   }
-
+  
 }
 
 
@@ -243,7 +243,7 @@ int main(int argc, char **argv) {
   // Handling of command line arguments
   std::string mission_cfg;
   po::options_description hidden("Hidden options"), cmd_line;
-
+  
   opt.add_options()
   ("help,h", "produce help message and exit")
   ("version,v", "print trex version and exit")
@@ -258,10 +258,10 @@ int main(int argc, char **argv) {
                        "The name of the mission file");
   po::positional_options_description p;
   p.add("mission", 1); // Only 1 mission file
-
+  
   cmd_line.add(opt).add(hidden);
   po::variables_map opt_val;
-
+  
   // Extract command line options
   try {
     po::store(po::command_line_parser(argc, argv).style(pco::default_style|pco::allow_long_disguise).options(cmd_line).positional(p).run(),
@@ -272,7 +272,7 @@ int main(int argc, char **argv) {
     <<opt<<std::endl;
     return 1;
   }
-
+  
   // Deal with informative options
   if( opt_val.count("help") ) {
     std::cout<<"TREX \"interractive debug shell\"\n"<<opt<<"\nExample:\n  "
@@ -312,7 +312,7 @@ int main(int argc, char **argv) {
         s_log->syslog("sim", info)<<"Added \""<<*i<<"\" to search path";
     }
   }
-
+  
   std::set_terminate(sim_terminate);
   
   // Clean-up the agent on interruptions
@@ -335,73 +335,73 @@ int main(int argc, char **argv) {
     
     while(true) {
       if( my_agent->missionCompleted() ) {
-	std::cout<<"Mission completed."<<std::endl;
-	s_log->syslog("sim", info)<<"Mission completed.";
-	break;
+        std::cout<<"Mission completed."<<std::endl;
+        s_log->syslog("sim", info)<<"Mission completed.";
+        break;
       }
       TICK tick = my_agent->getCurrentTick();
       std::cout<<'['<<my_agent->getName()<<':'<<tick<<"]> ";
       std::string cmdString;
       std::cin>>cmdString;
-     
+      
       char const cmd = std::toupper(cmdString[0]);
       if( 'Q'==cmd ) {
-	std::cout<<"Goodbye"<<std::endl;
-	s_log->syslog("sim", info)<<"User requested exit.";
-	break;
+        std::cout<<"Goodbye"<<std::endl;
+        s_log->syslog("sim", info)<<"User requested exit.";
+        break;
       } else if( 'N'==cmd ) {
-	while( my_agent->getCurrentTick()==tick && !my_agent->missionCompleted() ) {
-	  my_agent->doNext();
+        while( my_agent->getCurrentTick()==tick && !my_agent->missionCompleted() ) {
+          my_agent->doNext();
           s_log->flush();
         }
       } else if( 'G'==cmd ) {
-	try {
-	  TICK targetTick = string_cast<TICK>(cmdString.substr(1));
-	  
-	  if( targetTick<=tick )
-	    std::cout<<"Tick "<<targetTick<<" is in the past."
+        try {
+          TICK targetTick = string_cast<TICK>(cmdString.substr(1));
+          
+          if( targetTick<=tick )
+            std::cout<<"Tick "<<targetTick<<" is in the past."
             // <<"\nYou can use W to wrap the agent to its initial tick."
             <<std::endl;
-	  else {
-	    while( my_agent->getCurrentTick()<targetTick &&
+          else {
+            while( my_agent->getCurrentTick()<targetTick &&
                   !my_agent->missionCompleted() ) {
-	      my_agent->doNext();
+              my_agent->doNext();
               s_log->flush();
             }
-	  }
-	}catch(bad_string_cast const &e) {
-	  std::cout<<"Ill-formed g command"<<std::endl;
-	}
+          }
+        }catch(bad_string_cast const &e) {
+          std::cout<<"Ill-formed g command"<<std::endl;
+        }
       } else if( 'P'==cmd ) {
-	std::string file;
-	std::cin>>file;
-	while( !file.empty() && std::isspace(file[0]) )
-	  file = file.substr(1);
-	if( file.empty() ) {
-	  std::cerr<<"Missing file name"<<std::endl;
-	  printHelp();
-	} else if( !parseGoals(*my_agent, file) )
-	  printHelp();
+        std::string file;
+        std::cin>>file;
+        while( !file.empty() && std::isspace(file[0]) )
+          file = file.substr(1);
+        if( file.empty() ) {
+          std::cerr<<"Missing file name"<<std::endl;
+          printHelp();
+        } else if( !parseGoals(*my_agent, file) )
+          printHelp();
       } else if( 'K'==cmd ) {
-	std::string name;
-	std::cin>>name;
-	while( !name.empty() && std::isspace(name[0]) )
-	  name = name.substr(1);
-	if( name.empty() ) {
-	  std::cerr<<"Missing reactor name"<<std::endl;
-	  printHelp();
-	} else {
-	  Agent::reactor_iterator pos = my_agent->find_reactor(name);
-	  if( my_agent->reactor_end()==pos )
-	    std::cerr<<"Reactor \""<<name<<"\" not found."<<std::endl;
-	  else {
-	    my_agent->kill_reactor(*pos);
-	    std::cout<<"Reactor \""<<name<<"\" killed."<<std::endl;
-	  }
-	}
+        std::string name;
+        std::cin>>name;
+        while( !name.empty() && std::isspace(name[0]) )
+          name = name.substr(1);
+        if( name.empty() ) {
+          std::cerr<<"Missing reactor name"<<std::endl;
+          printHelp();
+        } else {
+          Agent::reactor_iterator pos = my_agent->find_reactor(name);
+          if( my_agent->reactor_end()==pos )
+            std::cerr<<"Reactor \""<<name<<"\" not found."<<std::endl;
+          else {
+            my_agent->kill_reactor(*pos);
+            std::cout<<"Reactor \""<<name<<"\" killed."<<std::endl;
+          }
+        }
       } else {
         std::cerr<<"Unknown command \""<<cmdString<<"\""<<std::endl;
-	printHelp();
+        printHelp();
       }
     }
   } catch(Exception const &e) {

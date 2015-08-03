@@ -1,7 +1,7 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
  * 
- *  Copyright (c) 2011, MBARI.
+ *  Copyright (c) 2015, Frederic Py.
  *  All rights reserved.
  * 
  *  Redistribution and use in source and binary forms, with or without
@@ -31,40 +31,65 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef H_trex_ros_ros_client
-# define H_trex_ros_ros_client
+#include "python_reactor.hh"
+#include <trex/utils/Plugin.hh>
+#include <trex/python/python_thread.hh>
 
-# include <ros/ros.h>
 
-# include <trex/utils/LogManager.hh>
-// # include <trex/utils/platform/memory.hh>
+using namespace TREX::example;
+using TREX::transaction::TeleoReactor;
+using TREX::python::scoped_gil_release;
+using namespace TREX::utils;
+namespace bp=boost::python;
 
-# include <boost/asio/deadline_timer.hpp>
+namespace {
+  SingletonUse<LogManager> s_log;
+
+  TeleoReactor::xml_factory::declare<python_reactor> decl("PythonExample");
+}
 
 namespace TREX {
-  namespace ROS {
-    
-    class ros_client :public boost::noncopyable {
-    public:
-      bool ok() const;
-      
-      ::ros::NodeHandle handle() const;
+  
+  void initPlugin() {
+    ::s_log->syslog("plugin.python", log::info)<<"Plugin loaded";
+  }
 
-      void start();
-      void stop();
-      
-    private:
-      ros_client();
-      ~ros_client();
-      
-      TREX::utils::SingletonUse<TREX::utils::LogManager> m_log;
-      UNIQ_PTR<ros::AsyncSpinner> m_spinner;
-      
-      friend class TREX::utils::SingletonWrapper<ros_client>;
-    }; // TREX::ROS::ros_client
-    
-    
-  } // TREX::ROS
-} // TREX
+}
 
-#endif // H_trex_ros_ros_client
+python_reactor::python_reactor(TeleoReactor::xml_arg_type arg)
+:TeleoReactor(arg, false) {}
+
+python_reactor::~python_reactor() {}
+
+void python_reactor::handleInit() {
+  try {
+    scoped_gil_release lock;
+    bp::import("trex");
+    my_var = bp::eval("-1");
+  } catch(bp::error_already_set const e) {
+    m_exc->unwrap_py_error();
+  }
+}
+
+bool python_reactor::synchronize() {
+  try {
+    scoped_gil_release lock;
+    my_var = my_var + 1;
+  
+    bp::str st(my_var);
+    bp::str val(my_var.attr("__str__")());
+    syslog()<<boost::python::extract<char const *>(val)<<" "
+    <<boost::python::extract<char const *>(st);
+    return true;
+  }catch(bp::error_already_set const e) {
+    m_exc->unwrap_py_error();
+  }
+  return false;
+}
+
+
+
+
+
+
+

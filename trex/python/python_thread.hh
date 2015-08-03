@@ -35,6 +35,7 @@
 # define H_trex_python_python_thread
 
 # include <boost/python.hpp>
+# include "python_env.hh"
 
 namespace TREX {
   namespace python {
@@ -46,6 +47,7 @@ namespace TREX {
       
     private:
       PyGILState_STATE m_state;
+      utils::SingletonUse<python_env> m_python;
     };
     
   } // TREX::python

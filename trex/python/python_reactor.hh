@@ -36,6 +36,7 @@
 
 # include <trex/transaction/TeleoReactor.hh>
 # include "exception_helper.hh"
+# include "python_env.hh"
 
 # include <boost/python.hpp>
 
@@ -161,7 +162,8 @@ namespace TREX {
       void cancelledPlanToken(transaction::goal_id const &g);
       
       boost::python::object m_obj;
-      TREX::utils::SingletonUse<exception_table> m_exc;
+      utils::SingletonUse<exception_table> m_exc;
+      utils::SingletonUse<python_env> m_python;
       
       friend class reactor_proxy;
     };

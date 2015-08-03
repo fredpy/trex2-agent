@@ -55,10 +55,10 @@
 
 namespace TREX {
   namespace transaction {
-
+    
     class TeleoReactor;
     class graph;
-
+    
     /** @brief Graph Exception
      *
      * An exception due to a graph related issue
@@ -71,13 +71,13 @@ namespace TREX {
     public:
       GraphException(graph const &g, std::string const &msg) throw();
       virtual ~GraphException() throw() {}
-
+      
     protected:
       GraphException(graph const &g, std::string const &who,
-		     std::string const &msg) throw();
+                     std::string const &msg) throw();
     }; // TREX::transaction::GraphException
-
-
+    
+    
     /** @brief TeleoReactor related exception
      *
      * An exception produced while manipulating a reactor.
@@ -100,9 +100,9 @@ namespace TREX {
       ReactorException(TeleoReactor const &r, std::string const &msg) throw();
       /** @brief Destructor */
       virtual ~ReactorException() throw() {}
-
+      
     }; // TREX::transaction::ReactorException
-
+    
     /** @brief Implementation details for transaction
      *
      * This namespace embed all the components that support the implementation
@@ -117,7 +117,7 @@ namespace TREX {
      * @ingroup transaction
      */
     namespace details {
-
+      
       /** @brief ID traits for TeleoReactor
        *
        * Gives a way to acces to the name of a reactor
@@ -128,31 +128,31 @@ namespace TREX {
        */
       template<class PtrType = TeleoReactor *>
       struct reactor_id_traits {
-	typedef PtrType base_type;
-	typedef utils::Symbol id_type;
-
-	/** @brief ID extraction function
-	 *
-	 * @param[in] A reference to a TeleoReactor
-	 *
-	 * Extract the name of the reactor @p r to be used as a
-	 * sorting identifier
-	 *
-	 * @pre @p r is not @c NULL
-	 *
-	 * @sa class TREX::utils::list_set
-	 *
-	 * @return The name of @p r
-	 * @relates reactor_set
-	 */
-	static id_type const &get_id(base_type r) {
-	  return r->getName();
-	}
+        typedef PtrType base_type;
+        typedef utils::Symbol id_type;
+        
+        /** @brief ID extraction function
+         *
+         * @param[in] A reference to a TeleoReactor
+         *
+         * Extract the name of the reactor @p r to be used as a
+         * sorting identifier
+         *
+         * @pre @p r is not @c NULL
+         *
+         * @sa class TREX::utils::list_set
+         *
+         * @return The name of @p r
+         * @relates reactor_set
+         */
+        static id_type const &get_id(base_type r) {
+          return r->getName();
+        }
       }; // TREX::transaction::details::reactor_id_traits
-
+      
       typedef reactor_id_traits<>::base_type reactor_id;
-
-
+      
+      
       /** @brief A set of reactors
        *
        * This type stores reactors in an list ordered by reactor names
@@ -160,9 +160,9 @@ namespace TREX {
        * @sa class TREX::utils::list_set
        */
       typedef utils::list_set<
-	reactor_id_traits< SHARED_PTR<TeleoReactor> > > reactor_set;
-
-
+      reactor_id_traits< SHARED_PTR<TeleoReactor> > > reactor_set;
+      
+      
       /** @brief timeline client helper
        *
        * An helper used to define a set of timeline clients.
@@ -186,7 +186,7 @@ namespace TREX {
        * @sa TREX::utils::relation::accept_goals() const
        */
       typedef utils::map_id_traits<reactor_id_traits<>, transaction_flags> client_id_traits;
-
+      
       /** @brief Set of clients
        *
        * This type is usded to store and maintin the set of client to a timeline.
@@ -196,9 +196,9 @@ namespace TREX {
        * @relates class timeline
        */
       typedef utils::list_set<client_id_traits> client_set;
-
+      
     } // TREX::transaction::details
-
+    
   } // TREX::transaction
 } // TREX
 

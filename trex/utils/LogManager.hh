@@ -1,7 +1,7 @@
 /** @file "trex/utils/LogManager.hh"
  * @brief LogManager class definition
- * 
- * This header defines the LogManager utility alogn with several macro and 
+ *
+ * This header defines the LogManager utility alogn with several macro and
  * functiona that eases file management in TREX
  *
  * @author Frederic Py <fpy@mbari.org>
@@ -9,14 +9,14 @@
  */
 /*********************************************************************
  * Software License Agreement (BSD License)
- * 
+ *
  *  Copyright (c) 2011, MBARI.
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions
  *  are met:
- * 
+ *
  *   * Redistributions of source code must retain the above copyright
  *     notice, this list of conditions and the following disclaimer.
  *   * Redistributions in binary form must reproduce the above
@@ -26,7 +26,7 @@
  *   * Neither the name of the TREX Project nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -65,10 +65,10 @@
 # define TREX_LOG_FILE "TREX.log"
 
 /** @brief Home environment variable
- * 
- * The name of the environment variable that indicates where TREX is located. 
- * If valid, the value of this variable will be automatically added to the 
- * search path used by LogManager to @c locate new files 
+ *
+ * The name of the environment variable that indicates where TREX is located.
+ * If valid, the value of this variable will be automatically added to the
+ * search path used by LogManager to @c locate new files
  *
  *
  * @relates TREX::utils::LogManager
@@ -78,9 +78,9 @@
 # define TREX_ENV    "TREX_HOME"
 
 /** @brief Search path environment variable
- * 
+ *
  * The name of the environment variable that indicates where TREX can search for
- * files to locate them. The format fro this variable is a list of directories 
+ * files to locate them. The format fro this variable is a list of directories
  * separated by a column (':')
  *
  * @relates TREX::utils::LogManager
@@ -92,7 +92,7 @@
 /** @brief log directory environment variable
  *
  * This macro gives the name of the environment variable to read
- * for knowing in what path the log files should be placed. 
+ * for knowing in what path the log files should be placed.
  *
  * @relates TREX::utils::LogManager
  * @author Frederic Py <fpy@mbari.org>
@@ -112,13 +112,13 @@
  *
  * This macro indicates how much attempt to create a new log directory
  * should be done before giving up and generating an error.
- * 
- * @note This value @b do @b not mean that TREX can only execute up to 
- *       @c MAX_LOG_ATTEMPT missions in a single day. Ifndeed if one look 
- *       at the code of LogManager::createLatest he will see that it makes this 
+ *
+ * @note This value @b do @b not mean that TREX can only execute up to
+ *       @c MAX_LOG_ATTEMPT missions in a single day. Ifndeed if one look
+ *       at the code of LogManager::createLatest he will see that it makes this
  *       number of attempt stariung from the directory referred by @c LATEST_DIR
- *       link. Such behavior should really happen if the symbolic link 
- *       @c LATEST_DIR is not set properly. 
+ *       link. Such behavior should really happen if the symbolic link
+ *       @c LATEST_DIR is not set properly.
  *
  * @relates TREX::utils::LogManager
  * @author Frederic Py <fpy@mbari.org>
@@ -138,15 +138,15 @@ namespace TREX {
   namespace utils {
     
     /** @brief Centralized logging and files management.
-     * 
-     * This class is a core component on TREX logging and file management. 
+     *
+     * This class is a core component on TREX logging and file management.
      * It provides a transparent one-stop shopping to :
      * @li Locate and load files
      * @li produce text log messages toward a singfle log directory
-     * This class manages in a cntral way all this while ensuring 
-     * that files that are used by an agent are easily accessed and stored 
-     * in a single log directory giving the ability to knbow exactly what 
-     * files were used on a specific run. 
+     * This class manages in a cntral way all this while ensuring
+     * that files that are used by an agent are easily accessed and stored
+     * in a single log directory giving the ability to knbow exactly what
+     * files were used on a specific run.
      *
      * It provides utilities that will create a log directory and the
      * default TextLog file so other components can produce messages
@@ -224,11 +224,11 @@ namespace TREX {
        * @note This function uses @c locate method to look for the file
        * in the current  directory and the search path
        *
-       * @throw  ErrnoExcept A problem occured while trying to copy @p file 
+       * @throw  ErrnoExcept A problem occured while trying to copy @p file
        * @throw  ErrnoExcept A problem occured while trying to create log
        * directory
-       * @return A complete name of @p file_name along with the path where it 
-       was located 
+       * @return A complete name of @p file_name along with the path where it
+       was located
        * @sa logPath()
        * @sa file_name(std::string const &)
        * @sa std::string locate(std::string const &, bool &) const
@@ -238,14 +238,14 @@ namespace TREX {
       log::text_log &syslog() {
         return m_syslog;
       }
-      log::stream syslog(log::id_type const &who, 
+      log::stream syslog(log::id_type const &who,
                          log::id_type const &kind=log::null) {
-	return m_syslog(who, kind);
+        return m_syslog(who, kind);
       }
       log::stream syslog(log::entry::date_type const &when,
-                         log::id_type const &who, 
+                         log::id_type const &who,
                          log::id_type const &kind=log::null) {
-	return m_syslog(when, who, kind);
+        return m_syslog(when, who, kind);
       }
       void flush();
       
@@ -265,15 +265,15 @@ namespace TREX {
       }
       
       size_t thread_count() const {
-	return m_io.thread_count();
+        return m_io.thread_count();
       }
       size_t thread_count(size_t n, bool override_hw=false) {
         return m_io.thread_count(n, override_hw);
       }
       boost::asio::io_service &service() {
-	return m_io.service();
+        return m_io.service();
       }
-
+      
       
       /** @brief Current verbosity level
        * @return the current verbosity level
@@ -332,15 +332,15 @@ namespace TREX {
       bool addSearchPath(std::string const &path);
       
       /** @brief TREX_PATH iterator
-       * 
-       * An iterator used to go through all the path used by LogManager to 
+       *
+       * An iterator used to go through all the path used by LogManager to
        * locate a file
-       * 
+       *
        * @sa locate(std::string const &,bool &) const
        */
       typedef std::list<path_type>::const_iterator path_iterator;
       /** @brief First path
-       * 
+       *
        * @return An iterator refering to the first element of TREX_PATH
        * @sa setLogPath(std::string const &)
        * @sa end() const
@@ -349,7 +349,7 @@ namespace TREX {
         return m_searchPath.begin();
       }
       /** @brief End of searh path
-       * 
+       *
        * @return An iterator refering to the ebnd of TREX_PATH
        * @sa setLogPath(std::string const &)
        * @sa begin() const
@@ -358,7 +358,7 @@ namespace TREX {
         return m_searchPath.end();
       }
       
-      /** @brief Locate a file 
+      /** @brief Locate a file
        * @param[in] file   A file name
        * @param[out] found Indicator of success/failure
        *
@@ -366,8 +366,8 @@ namespace TREX {
        * it first attempt to see if @p file exists by its own.
        * If it is not the case and @p file do not starts with a @c '/',
        * it iterates through the search path and tries to locate the file.
-       * 
-       * @retval @p file if @a found is @c false which indicates that it was 
+       *
+       * @retval @p file if @a found is @c false which indicates that it was
        *         unable to locate this file
        * @retval A valid symbolic name for @a file if @a found is @c true
        *
@@ -391,7 +391,7 @@ namespace TREX {
        */
       SharedVar<bool> m_inited;
       asio_runner  m_io;
-            
+      
       /** @brief syslog text log file */
       log::text_log   m_syslog;
       SHARED_PTR<log::out_file> m_trex_log;
@@ -406,7 +406,7 @@ namespace TREX {
       ~LogManager();
       
       /** @brief latest symbolic link creation.
-       * 
+       *
        * This method creates a symbolic link with the
        * name given by @c LATEST_DIR that refers to the
        * log directory. It also manage the creation of the log
@@ -440,7 +440,7 @@ namespace TREX {
       friend class SingletonWrapper<LogManager>;
     }; // TREX::utils::LogManager
     
-  } // TREX::utils 
+  } // TREX::utils
 } // TREX
 
 #endif // H_LogManager

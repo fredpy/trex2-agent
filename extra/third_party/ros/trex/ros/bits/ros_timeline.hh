@@ -1,7 +1,7 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2012, MBARI.
+ *  Copyright (c) 2015, Frederic Py.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -34,30 +34,33 @@
 #ifndef H_trex_ros_bits_ros_timeline
 # define H_trex_ros_bits_ros_timeline
 
-# include <ros/ros.h>
-
 # include <trex/utils/platform/cpp11_deleted.hh>
-# include <trex/utils/XmlFactory.hh>
-# include <trex/utils/log/stream.hh>
-
-# include <trex/transaction/Observation.hh>
+# include <trex/utils/platform/memory.hh>
 # include <trex/transaction/Goal.hh>
-
-# include "../ros_error.hh"
+# include <trex/transaction/Observation.hh>
+# include <trex/utils/log/stream.hh>
+# include <trex/utils/priority_strand.hh>
+# include <trex/utils/id_mapper.hh>
 
 namespace TREX {
   namespace ROS {
     
     class ros_reactor;
+    class roscpp_initializer;
     
     namespace details {
       
-      class ros_timeline :boost::noncopyable {
+      class ros_timeline :boost::noncopyable,
+      public ENABLE_SHARED_FROM_THIS<ros_timeline> {
       public:
-        typedef boost::shared_ptr<ros_timeline> pointer;
+        typedef SHARED_PTR<ros_timeline> pointer;
+        // TODO: find a way to replace ros_reactor * by WEAK_PTR
+        typedef utils::XmlFactory<ros_timeline, pointer, ros_reactor *> xml_factory;
+        typedef xml_factory::argument_type                              xml_arg;
         
-        typedef TREX::utils::XmlFactory<ros_timeline, pointer, ros_reactor *> xml_factory;
-        typedef xml_factory::argument_type                                    xml_arg;
+        typedef pointer       base_type;
+        typedef utils::Symbol id_type;
+        static id_type get_id(base_type const &elem);
         
         
         virtual ~ros_timeline();
@@ -65,62 +68,62 @@ namespace TREX {
         utils::Symbol const &name() const {
           return m_name;
         }
-        bool controlable() const {
-          return m_controlable;
+        bool controllable() const {
+          return m_controllable;
         }
         
-        bool request(TREX::transaction::goal_id g);
-        void recall(TREX::transaction::goal_id g);
+        bool request(transaction::goal_id g);
+        void recall(transaction::goal_id g);
         void do_init();
         void do_synchronize();
+        
+        utils::priority_strand &strand();
+        
       protected:
-        ros_timeline(xml_arg arg, bool control);
-        ros_timeline(ros_reactor *r, utils::Symbol const &tl, bool init, bool control);
+        ros_timeline(xml_arg const &arg, bool control);
+        ros_timeline(ros_reactor *r, utils::Symbol const &tl,
+                     bool init, bool control);
         
-        virtual bool handle_request(TREX::transaction::goal_id g) =0;
-        virtual void handle_recall(TREX::transaction::goal_id g) {}
+        virtual void handle_init() {}
+        virtual bool handle_request(transaction::goal_id g) =0;
+        virtual void handle_recall(transaction::goal_id g) {}
         
-        virtual void synchronize(transaction::TICK date) {}
+        virtual void synchronize(transaction::TICK date) =0;
         
         bool updated() const {
           return m_updated;
         }
-        
-        ::ros::NodeHandle &node();
-        template<typename Msg>
-        ::ros::Publisher advertise(std::string const &name) {
-          ::ros::NodeHandle &n = node();
-          return n.advertise<Msg>(name, 10, true);
-        }
-        
         void notify(transaction::Observation const &obs);
-        TREX::utils::log::stream syslog(TREX::utils::Symbol const &kind=TREX::utils::log::null);
-        TREX::transaction::Observation new_obs(TREX::utils::Symbol const &pred) const {
-          return TREX::transaction::Observation(name(), pred);
+        
+        utils::log::stream syslog(utils::log::id_type const &kind=utils::log::null) const;
+        
+        transaction::Observation new_obs(utils::Symbol const &pred) const {
+          return transaction::Observation(name(), pred);
         }
+        
+        ros_reactor &reactor() {
+          return m_reactor;
+        }
+        roscpp_initializer &ros();
         
       private:
         void init_timeline();
         
-        ros_reactor &m_reactor;
-        utils::Symbol const m_name;
-        bool const m_controlable;
+        ros_reactor  &m_reactor;
+        utils::Symbol m_name;
+        bool const m_controllable;
         bool const m_init;
-        
         bool m_undefined, m_updated;
         
-# ifndef DOXYGEN
-        ros_timeline() DELETED; // Non default constructible
-# endif // DOXYGEN
+        ros_timeline() DELETED;
         
         friend class ros_reactor;
-      }; // TREX:ROS::details::ros_timeline
+      };
       
-    } // TREX::ROS::details
+    }
     
     typedef details::ros_timeline::xml_factory ros_factory;
-    
-  } // TREX::ROS
-} // TREX
+  }
+}
 
 #endif // H_trex_ros_bits_ros_timeline

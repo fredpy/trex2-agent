@@ -518,7 +518,11 @@ bool Agent::missionCompleted() {
     syslog(null, info)<<"No reactor left.";
     return true;
   }
-  return getCurrentTick()>m_finalTick;
+  if( getCurrentTick()>m_finalTick ) {
+    syslog(null, info)<<"Last tick (cur="<<getCurrentTick()<<">"<<m_finalTick<<")";
+    return true;
+  }
+  return false;
 }
 
 void Agent::internal_check(reactor_id r,

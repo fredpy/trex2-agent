@@ -2,24 +2,24 @@
 /** @file "StringDomain.hh"
  * @brief string values enumeration domain
  *
- * This file defines the StringDamain class. 
+ * This file defines the StringDamain class.
  *
  * The StringDomain is a specialization in order to declare domains
- * based on string values. 
+ * based on string values.
  *
  * @author Frederic Py <fpy@mbari.org>
  * @ingroup domains
  */
 /*********************************************************************
  * Software License Agreement (BSD License)
- * 
+ *
  *  Copyright (c) 2011, MBARI.
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions
  *  are met:
- * 
+ *
  *   * Redistributions of source code must retain the above copyright
  *     notice, this list of conditions and the following disclaimer.
  *   * Redistributions in binary form must reproduce the above
@@ -29,7 +29,7 @@
  *   * Neither the name of the TREX Project nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -50,28 +50,28 @@
 
 namespace TREX {
   namespace transaction {
-
+    
     /** @brief String domain
      *
      * This class implements a simple representation of strings domain.
      * The representation is based on an EnumeratedDomain that enumerates all
      * the possible values for this string.
      *
-     * @author Frederic Py <fpy@mbari.org> 
+     * @author Frederic Py <fpy@mbari.org>
      * @ingroup domains
      */
-    class StringDomain 
-      :public TREX::transaction::EnumeratedDomain<std::string> {
+    class StringDomain
+    :public TREX::transaction::EnumeratedDomain<std::string> {
     public:
       static TREX::utils::Symbol const type_name;
-      /** @brief Default Constructor 
-       * 
+      /** @brief Default Constructor
+       *
        * Creates a new full string domain.
        */
-      StringDomain() 
-	:TREX::transaction::EnumeratedDomain<std::string>(type_name) {}
+      StringDomain()
+      :TREX::transaction::EnumeratedDomain<std::string>(type_name) {}
       /** @brief Constructor
-       * 
+       *
        * @tparam a C++ iterator type
        * @param from an iterator
        * @param to an iterator
@@ -84,15 +84,15 @@ namespace TREX {
        * @throw EmptyDomainthe created domain is empty
        */
       template<class Iter>
-      StringDomain(Iter from, Iter to) 
-	:TREX::transaction::EnumeratedDomain<std::string>(type_name, from, to) {}
+      StringDomain(Iter from, Iter to)
+      :TREX::transaction::EnumeratedDomain<std::string>(type_name, from, to) {}
       /** @brief Constructor
        * @param val a value
        *
        * Create a new domain with the single value @e val
        */
-      StringDomain(std::string const &val) 
-	:TREX::transaction::EnumeratedDomain<std::string>(type_name, val) {}
+      StringDomain(std::string const &val)
+      :TREX::transaction::EnumeratedDomain<std::string>(type_name, val) {}
       /** @brief XML parsing constructor
        *
        * @param node an XML node
@@ -113,24 +113,24 @@ namespace TREX {
        * </string>
        *@endcode
        */
-      explicit StringDomain(boost::property_tree::ptree::value_type &node) 
-	:TREX::transaction::EnumeratedDomain<std::string>(node) {}
-
+      explicit StringDomain(boost::property_tree::ptree::value_type &node)
+      :TREX::transaction::EnumeratedDomain<std::string>(node) {}
+      
       /** @brief Destructor */
       ~StringDomain() {}
-
+      
       /** @brief Copy operator
        *
        * Allocates a new copy of current instance
        */
       DomainBase *copy() const {
-	return new StringDomain(begin(), end());
+        return new StringDomain(begin(), end());
       }
     }; // TREX::transaction::StringDomain
-
-
+    
+    
   } // TREX::transaction
 } // TREX
-      
-      
+
+
 #endif  // H_StringDomain

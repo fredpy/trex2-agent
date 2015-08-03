@@ -34,7 +34,7 @@
 #include "exception_helper.hh"
 
 #include <boost/scope_exit.hpp>
-
+#include <pyerrors.h>
 
 using namespace TREX::python::details;
 using namespace TREX::python;
@@ -110,6 +110,21 @@ void exception_table::unwrap_py_error() {
       // send a python_error with <null> type (should never occur ???)
       throw python_error("<null>");
   }
+}
+
+std::ostream &exception_table::unwrap_py_error(std::ostream &out, bool rethrow) {
+  try {
+    unwrap_py_error();
+  } catch(std::exception const &e) {
+    out<<e.what();
+    if( rethrow )
+      throw;
+  } catch(...) {
+    out<<"unknown exception";
+    if( rethrow )
+      throw;
+  }
+  return out;
 }
 
 
