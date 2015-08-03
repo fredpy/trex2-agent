@@ -33,25 +33,25 @@
  */
 #include "trex/ros/roscpp_inject.hh"
 #include <trex/python/python_thread.hh>
+#include <boost/date_time/posix_time/ptime.hpp>
 
 using namespace TREX::ROS;
 using namespace TREX::python;
 using namespace TREX::utils;
 namespace bp=boost::python;
+namespace bpt=boost::posix_time;
 
 
 // structors
 
-roscpp_initializer::roscpp_initializer() {
-  strand().send(boost::bind(&roscpp_initializer::init_rospy, this), init_p);
+roscpp_initializer::roscpp_initializer():m_timer(m_python->strand().strand().get_io_service()) {
 }
 
 roscpp_initializer::~roscpp_initializer() {
-  if( m_spin ) {
+  if( ros::ok() ) {
+    m_timer.cancel();
     m_log->syslog("ros", log::info)<<"Shutting down ros c++";
-    m_spin->stop();
     ros::shutdown();
-    m_spin.reset();
     ros::waitForShutdown();
     m_log->syslog("ros", log::info)<<"C++ ROS is dead";
   }
@@ -73,47 +73,56 @@ roscpp_initializer::~roscpp_initializer() {
 // Observers
 
 bool roscpp_initializer::is_shutdown() {
-  return strand().post(boost::bind(&roscpp_initializer::test_shutdown, this)).get();
-}
-
-
-bool roscpp_initializer::test_shutdown() const {
-  try {
-    scoped_gil_release lock;
-    
-    return bp::extract<bool>(m_rospy.attr("is_shutdown")());
-  } catch(bp::error_already_set const &e) {
-    m_err->unwrap_py_error();
-  }
-  return true;
+  return !ros::ok();
 }
 
 
 // Manipulators
 
+bp::object &roscpp_initializer::rospy() {
+  if( !m_rospy ) {
+    boost::packaged_task<void> fn(boost::bind(&roscpp_initializer::init_rospy, this));
+    boost::shared_future<void> ret = fn.get_future().share();
+    
+    strand().strand().dispatch(boost::bind(&boost::packaged_task<void>::operator(), &fn));
+    
+    ret.get();
+  }
+  return m_rospy;
+}
+
+
 ros::NodeHandle &roscpp_initializer::handle() {
   if( !m_handle ) {
-    strand().post(boost::bind(&roscpp_initializer::init_cpp, this),
-                  roscpp_initializer::init_p).get();
+    boost::packaged_task<void> fn(boost::bind(&roscpp_initializer::init_cpp, this));
+    boost::shared_future<void> ret = fn.get_future().share();
+    
+    strand().strand().dispatch(boost::bind(&boost::packaged_task<void>::operator(), &fn));
+    
+    ret.get();
   }
   return *m_handle;
 }
 
 
 void roscpp_initializer::init_rospy() {
-  try {
-    scoped_gil_release lock;
-    // Load ROS Python API
-    m_rospy = m_python->import("rospy");
+  if( !m_rospy ) {
+    m_log->syslog("ros", log::info)<<"Initialize python ros client";
+
+    try {
+      scoped_gil_release lock;
+      // Load ROS Python API
+      m_rospy = m_python->import("rospy");
     
-    // Initialize ROS client node through Python API
-    m_rospy.attr("init_node")("trex_py", bp::object(), true,
-                              bp::object(), false, false,
-                              true);
-  } catch(bp::error_already_set const &e) {
-    m_err->unwrap_py_error();
+      // Initialize ROS client node through Python API
+      m_rospy.attr("init_node")("trex_py", bp::object(), true,
+                                bp::object(), false, false,
+                                true);
+    } catch(bp::error_already_set const &e) {
+      m_err->unwrap_py_error();
+    }
+    m_active = true;
   }
-  m_active = true;
 }
 
 void roscpp_initializer::init_cpp() {
@@ -125,24 +134,41 @@ void roscpp_initializer::init_cpp() {
     ros::init(argc, argv, "trex_cpp",
               ::ros::init_options::AnonymousName|::ros::init_options::NoSigintHandler);
     m_handle.reset(new ros::NodeHandle);
-    m_cpp = new ros::CallbackQueue;
-    m_handle->setCallbackQueue(m_cpp);
-    m_spin.reset(new ros::AsyncSpinner(1, m_cpp));
-    m_spin->start();
+    m_timer.expires_from_now(bpt::millisec(50));
+    m_timer.async_wait(boost::bind(&roscpp_initializer::async_poll, this, _1));
   }
 }
 
 
 void roscpp_initializer::do_shutdown() {
-  try {
-    scoped_gil_release lock;
-
-    m_log->syslog("ros", log::info)<<"Send shutdown to rospy";
-    rospy().attr("signal_shutdown")("end of TREX");
-  } catch(bp::error_already_set const &e) {
-    m_err->unwrap_py_error(m_log->syslog("ros", log::error)<<"Exception during ROS shutdown: ");
+  if( m_rospy ) {
+    try {
+      scoped_gil_release lock;
+      
+      m_log->syslog("ros", log::info)<<"Send shutdown to rospy";
+      rospy().attr("signal_shutdown")("end of TREX");
+    } catch(bp::error_already_set const &e) {
+      m_err->unwrap_py_error(m_log->syslog("ros", log::error)<<"Exception during ROS shutdown: ");
+    }
+    m_log->syslog("ros", log::info)<<"Shutdown completed";
   }
-  m_log->syslog("ros", log::info)<<"Shutdown completed";
 }
+
+void roscpp_initializer::async_poll(boost::system::error_code const &ec) {
+  if( !ec )
+    try {
+      if( ::ros::ok() ) {
+        m_log->syslog("ros", log::info)<<"poll";
+        ::ros::spinOnce();
+        if( ::ros::ok() ) {
+          m_timer.expires_from_now(bpt::millisec(50));
+          m_timer.async_wait(boost::bind(&roscpp_initializer::async_poll, this, _1));
+        }
+      }
+    } catch(ros::Exception const &e) {
+      m_log->syslog("ros", log::error)<<"ROS exception during poll: "<<e.what();
+    }
+}
+
 
 

@@ -86,7 +86,7 @@ bp::object python_env::add_module(bp::object scope, std::string const &name) {
     return scope.attr(name.c_str());
   else {
     bp::scope cur(scope);
-    m_log->syslog("ros", tlog::info)<<"Creating python module "
+    m_log->syslog("python", tlog::info)<<"Creating python module "
     <<bp::extract<char const *>(bp::str(scope))<<"."<<name;
     
     return bp::object(bp::handle<>(bp::borrowed(PyImport_AddModule(name.c_str()))));

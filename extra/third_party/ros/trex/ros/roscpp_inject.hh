@@ -39,6 +39,8 @@
 # include <trex/python/python_env.hh>
 # include <trex/python/exception_helper.hh>
 
+# include <boost/asio/deadline_timer.hpp>
+
 # include <ros/ros.h>
 # include <ros/callback_queue.h>
 
@@ -53,9 +55,7 @@ namespace TREX {
         default_p
       };
       
-      boost::python::object &rospy() {
-        return m_rospy;
-      }
+      boost::python::object &rospy();
       
       bool is_shutdown();
       
@@ -77,15 +77,18 @@ namespace TREX {
       roscpp_initializer();
       ~roscpp_initializer();
       
-      boost::scoped_ptr<ros::NodeHandle> m_handle;
-      SHARED_PTR<ros::AsyncSpinner> m_spin;
-      ros::CallbackQueue *m_cpp;
+      void async_poll(boost::system::error_code const &ec);
+      
       
       utils::SingletonUse<utils::LogManager>  m_log;
       utils::SingletonUse<python::python_env> m_python;
       utils::SingletonUse<python::exception_table> m_err;
       
       boost::python::object          m_rospy;
+
+      boost::scoped_ptr<ros::NodeHandle> m_handle;
+      boost::asio::deadline_timer m_timer;
+      
       
       friend utils::SingletonWrapper<roscpp_initializer>;
       friend class lock;
