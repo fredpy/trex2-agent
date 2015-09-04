@@ -52,9 +52,9 @@ namespace {
   
   bp::ptree trex_version(rest_request const &req) {
     bp::ptree ret;
-    ret.put("version_major", TREX::version::major());
-    ret.put("version_minor", TREX::version::minor());
-    ret.put("version_release", TREX::version::release());
+    ret.put("version_major", TREX::version::major_number());
+    ret.put("version_minor", TREX::version::minor_number());
+    ret.put("version_release", TREX::version::release_number());
     if( TREX::version::is_release_candidate() ) {
       ret.put("version_rc", TREX::version::rc_number());
     }
