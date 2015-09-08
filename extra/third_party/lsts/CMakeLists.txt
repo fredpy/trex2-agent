@@ -57,8 +57,8 @@ include_directories(${CMAKE_SOURCE_DIR}/extra/europa ${CMAKE_BINARY_DIR}/trex/eu
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/shared)
 
 install(FILES ${DUNE_CORE_LIB} DESTINATION lib)
-pic_protect(${DUNE_CORE_LIB})
-message(STATUS "PIC protection: ${DUNE_CORE_LIB}")
+#pic_protect(${DUNE_CORE_LIB})
+#message(STATUS "PIC protection: ${DUNE_CORE_LIB}")
 
 
 add_subdirectory(shared)
