@@ -69,7 +69,7 @@ namespace TREX {
       utils::SingletonUse<utils::LogManager> m_log;
       utils::priority_strand m_strand;
 
-      friend TREX::utils::SingletonWrapper<python_env>;
+      friend class TREX::utils::SingletonWrapper<python_env>;
     };
     
   }

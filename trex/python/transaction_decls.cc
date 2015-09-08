@@ -78,10 +78,10 @@ namespace {
   }
   
   observation_id obs_from_xml(boost::property_tree::ptree::value_type &node) {
-    return MAKE_SHARED<Observation>(node);
+    return observation_id(MAKE_SHARED<Observation>(SHARED_NS::ref(node)));
   }
   goal_id goal_from_xml(boost::property_tree::ptree::value_type &node) {
-    return MAKE_SHARED<Goal>(node);
+    return goal_id(MAKE_SHARED<Goal>(SHARED_NS::ref(node)));
   }
 
 }
