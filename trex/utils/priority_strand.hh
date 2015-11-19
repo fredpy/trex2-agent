@@ -84,7 +84,7 @@ namespace TREX {
       private:
         boost::optional<priority> m_level;
         
-        friend priority_strand;
+        friend class priority_strand;
       };
       
       typedef task::priority priority_type;

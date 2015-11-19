@@ -334,8 +334,6 @@ namespace TREX {
        * tokens shares the same domain and predicate and the intersection of all
        * their domains is not empty.
        *
-       
-       
        * @retval true if @p other can be merged
        * @retval false otherwise
        *
@@ -343,6 +341,11 @@ namespace TREX {
        * duration and end).
        */
       bool consistentWith(Predicate const &other) const;
+      
+      bool identicalTo(Predicate const &other) const;
+      bool operator==(Predicate const &other) const {
+        return identicalTo(other);
+      }
       
       
     protected:
