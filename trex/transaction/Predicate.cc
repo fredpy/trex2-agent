@@ -198,3 +198,36 @@ bool Predicate::consistentWith(Predicate const &other) const {
     return true;
   }
 }
+
+bool Predicate::identicalTo(Predicate const &other) const {
+  if( object()!=other.object()
+     || predicate()!=other.predicate() )
+    return false;
+  else {
+    const_iterator i = begin(), j=other.begin();
+    while( end()!=i && other.end()!=j ) {
+      if( i->first < j->first ) {
+        if( i->second.isComplete() && !i->second.domain().isFull() )
+          return false;
+        ++i;
+      } else if( j->first<i->first ) {
+        if( j->second.isComplete() && !j->second.domain().isFull() )
+          return false;
+        ++j;
+      } else {
+        if( !i->second.domain().equals(j->second.domain()) )
+          return false;
+        ++i; ++j;
+      }
+    }
+    // Check remainder if any
+    for( ; end()!=i; ++i)
+      if( i->second.isComplete() && !i->second.domain().isFull() )
+        return false;
+    for( ; other.end()!=j; ++j)
+      if( j->second.isComplete() && !j->second.domain().isFull() )
+        return false;
+    return true;
+  }
+}
+

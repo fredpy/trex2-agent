@@ -78,10 +78,10 @@ namespace {
   }
   
   observation_id obs_from_xml(boost::property_tree::ptree::value_type &node) {
-    return observation_id(MAKE_SHARED<Observation>(SHARED_NS::ref(node)));
+    return observation_id(new Observation(node));
   }
   goal_id goal_from_xml(boost::property_tree::ptree::value_type &node) {
-    return goal_id(MAKE_SHARED<Goal>(SHARED_NS::ref(node)));
+    return goal_id(new Goal(node));
   }
 
 }
@@ -130,6 +130,10 @@ void export_transactions() {
   .add_property("name", bp::make_function(&Predicate::predicate, bp::
                                           return_internal_reference<>()),
                 "The name (or type) of this predicate")
+  .def(bp::self==bp::self)
+  .def("consistent_with", &Predicate::consistentWith, bp::args("self", "other"),
+       "Check if this predicate could be merged with other withotu generating\n"
+       " an empty domain")
   .def("has_attribute", &Predicate::hasAttribute, (bp::args("self", "name")),
        "Check if this predicate has the attribute name.\n"
        "NOTE: In Trex, having an attribute only means that this attribute\n"
