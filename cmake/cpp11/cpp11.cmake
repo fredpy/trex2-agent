@@ -55,7 +55,7 @@ function(cpp11_feature_detection FEATURE_NAME)
   else(CPP11_COMPILED_${FEATURE_NAME})
     file(WRITE has_${FEATURE_NAME}.comp ${COMP_OUT})
     message(WARNING "Failed to compile test for c++11 ${FEATURE_NAME}"
-      "compilation output is in ${has_${FEATURE_NAME}.comp")
+      "compilation output is in ${has_${FEATURE_NAME}}.comp")
   endif(CPP11_COMPILED_${FEATURE_NAME})
 
   message(STATUS "Detecting support for c++11 feature '${FEATURE_NAME}': ${CPP11_HAS_${FEATURE_NAME}}")
