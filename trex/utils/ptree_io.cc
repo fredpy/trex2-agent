@@ -38,6 +38,7 @@
 
 # include <boost/property_tree/json_parser.hpp>
 # include <boost/property_tree/xml_parser.hpp>
+# include <boost/version.hpp>
 
 namespace bp=boost::property_tree;
 namespace xml=boost::property_tree::xml_parser;
