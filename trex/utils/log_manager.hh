@@ -58,22 +58,6 @@
 namespace TREX {
   namespace utils {
 
-    namespace details {
-      /** @brief log_manager implementation details
-       *
-       * This class impelement most of the main functionalities of 
-       * log_manager class. Its interface and implementation are 
-       * hidden from the rest of the API so any modification at 
-       * implementation level has a  limited impact on other components 
-       * using log_manager
-       *
-       * @relates TREX::utils::log_manager
-       * @author Frederic Py <fredpy@gmail.com>
-       */
-      class log_mgmt_impl;
-    } // TREX::utils::details
-    
-    
     /** @brief Logging and file access management for trex
      *
      * This class is a gloabl utility for trex components in order 
@@ -98,6 +82,8 @@ namespace TREX {
      * @author Frederic Py <fredpy@gmail.com>
      */
     class log_manager :boost::noncopyable {
+      class pimpl;
+      
     public:
       /** @brief File path type
        *
@@ -341,7 +327,7 @@ namespace TREX {
       log_manager();
       ~log_manager();
       
-      UNIQ_PTR<details::log_mgmt_impl> m_impl;
+      UNIQ_PTR<pimpl> m_impl;
       
       friend class singleton::wrapper<log_manager>;
     };

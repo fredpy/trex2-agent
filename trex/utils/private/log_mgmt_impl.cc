@@ -54,12 +54,12 @@ using bpt::ptime;
 
 // structors
 
-details::log_mgmt_impl::log_mgmt_impl()
+log_manager::pimpl::pimpl()
 :m_inited(false), m_syslog(m_io.service()), m_strand(m_io.service()) {
   m_io.thread_count(2);
 }
 
-details::log_mgmt_impl::~log_mgmt_impl() {
+log_manager::pimpl::~pimpl() {
   ptime now(bpt::second_clock::universal_time());
   m_syslog(log::null, log::info)<<">>> End of log at "
                                 <<bpt::to_simple_string(now)<<" UTC <<<";
@@ -67,7 +67,7 @@ details::log_mgmt_impl::~log_mgmt_impl() {
 
 // observers
 
-std::string details::log_mgmt_impl::search_path() const {
+std::string log_manager::pimpl::search_path() const {
   std::ostringstream oss;
   bool first = true;
   
@@ -84,7 +84,7 @@ std::string details::log_mgmt_impl::search_path() const {
 
 // modifiers
 
-bool details::log_mgmt_impl::set_log_path(log_manager::path_type p) {
+bool log_manager::pimpl::set_log_path(log_manager::path_type p) {
   if( !m_inited ) {
     m_path = p;
     m_path.make_preferred();
@@ -92,7 +92,7 @@ bool details::log_mgmt_impl::set_log_path(log_manager::path_type p) {
   return !m_inited;
 }
 
-bool details::log_mgmt_impl::add_search_path(log_manager::path_type p) {
+bool log_manager::pimpl::add_search_path(log_manager::path_type p) {
   if( !p.empty() ) {
     p.make_preferred();
     if( p.is_relative() || fs::is_directory(p) ||
@@ -104,14 +104,14 @@ bool details::log_mgmt_impl::add_search_path(log_manager::path_type p) {
   return false;
 }
 
-log_manager::path_type details::log_mgmt_impl::init() {
+log_manager::path_type log_manager::pimpl::init() {
   if( !m_inited ) {
     if( m_path.empty() )
       create_latest();
     else if( !fs::is_directory(m_path) )
       fs::create_directory(m_path);
     load_search_path();
-    strand().post(boost::bind(&log_mgmt_impl::init_complete, this));
+    strand().post(boost::bind(&pimpl::init_complete, this));
     m_inited = true;
   }
   return m_path;
@@ -119,13 +119,13 @@ log_manager::path_type details::log_mgmt_impl::init() {
 
 // manipulators
 
-void details::log_mgmt_impl::flush() {
+void log_manager::pimpl::flush() {
   if( m_trex_log )
     m_trex_log->flush();
 }
 
-bool details::log_mgmt_impl::locate(std::string const &name,
-                                    log_manager::path_type &dest) {
+bool log_manager::pimpl::locate(std::string const &name,
+                                log_manager::path_type &dest) {
   log_manager::path_type loc(name), real_loc;
   bool found;
   
@@ -170,7 +170,7 @@ bool details::log_mgmt_impl::locate(std::string const &name,
   return found;
 }
 
-void details::log_mgmt_impl::create_latest() {
+void log_manager::pimpl::create_latest() {
   char *base_dir_name = getenv(LOG_DIR_ENV);
   std::string dir_base;
 
@@ -218,7 +218,7 @@ void details::log_mgmt_impl::create_latest() {
   throw SYSTEM_ERROR(ec, "Too many attempts: clean up your log directory");
 }
 
-void details::log_mgmt_impl::load_search_path() {
+void log_manager::pimpl::load_search_path() {
   char *path = getenv(SEARCH_ENV);
   if( NULL!=path ) {
     std::string path_str(path);
@@ -230,7 +230,7 @@ void details::log_mgmt_impl::load_search_path() {
   }
 }
 
-void details::log_mgmt_impl::init_complete() {
+void log_manager::pimpl::init_complete() {
   log_manager::path_type cfg(m_path), trex(m_path);
   cfg /= "cfg";
   fs::create_directory(cfg);

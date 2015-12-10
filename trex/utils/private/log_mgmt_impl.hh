@@ -39,51 +39,51 @@
 
 namespace TREX {
   namespace utils {
-    namespace details {
+    
+    
+    
+    class log_manager::pimpl :boost::noncopyable {
+    public:
+      pimpl();
+      ~pimpl();
       
-      class log_mgmt_impl :boost::noncopyable {
-      public:
-        log_mgmt_impl();
-        ~log_mgmt_impl();
-        
-        log::text_log &syslog() {
-          return m_syslog;
-        }
-        void flush();
-        asio_runner &asio() {
-          return m_io;
-        }
-        boost::asio::strand &strand() {
-          return m_strand;
-        }
-        
-        bool set_log_path(log_manager::path_type p);
-        bool add_search_path(log_manager::path_type p);
-        
-        log_manager::path_type init();
-        bool locate(std::string const &name,
-                    log_manager::path_type &dest);
-        std::string search_path() const;
-        
-      private:
-        void create_latest();
-        void load_search_path();
-        
-        bool                   m_inited;
-        log_manager::path_type m_path;
-        asio_runner            m_io;
-        log::text_log          m_syslog;
-        boost::asio::strand    m_strand;
-        
-        SHARED_PTR<log::out_file>         m_trex_log;
-        
-        typedef std::list<log_manager::path_type> path_set;
-        path_set m_search_path;
-        
-        void init_complete();
-      }; // TREX::utils::details::log_mgmt_impl
+      log::text_log &syslog() {
+        return m_syslog;
+      }
+      void flush();
+      asio_runner &asio() {
+        return m_io;
+      }
+      boost::asio::strand &strand() {
+        return m_strand;
+      }
       
-    } // TREX::utils::details
+      bool set_log_path(log_manager::path_type p);
+      bool add_search_path(log_manager::path_type p);
+      
+      log_manager::path_type init();
+      bool locate(std::string const &name,
+                  log_manager::path_type &dest);
+      std::string search_path() const;
+      
+    private:
+      void create_latest();
+      void load_search_path();
+      
+      bool                   m_inited;
+      log_manager::path_type m_path;
+      asio_runner            m_io;
+      log::text_log          m_syslog;
+      boost::asio::strand    m_strand;
+      
+      SHARED_PTR<log::out_file>         m_trex_log;
+      
+      typedef std::list<log_manager::path_type> path_set;
+      path_set m_search_path;
+      
+      void init_complete();
+    }; // TREX::utils::details::log_mgmt_impl
+    
   } // TREX::utils
 } // TREX
 

@@ -57,31 +57,31 @@ using namespace TREX::utils;
  * class LogManager
  */
 
-log_manager::log_manager():m_impl(new details::log_mgmt_impl) { }
+log_manager::log_manager():m_impl(new pimpl) { }
 
 log_manager::~log_manager() {}
 
 log_manager::path_type log_manager::log_path() {
-  boost::function<path_type ()> fn = boost::bind(&details::log_mgmt_impl::init, m_impl.get());
+  boost::function<path_type ()> fn = boost::bind(&pimpl::init, m_impl.get());
   return strand_run(m_impl->strand(), fn);
 }
 
 bool log_manager::log_path(std::string const &path) {
   path_type p(path);
-  boost::function<bool ()> fn(boost::bind(&details::log_mgmt_impl::set_log_path,
+  boost::function<bool ()> fn(boost::bind(&pimpl::set_log_path,
                                           m_impl.get(), p));
   return strand_run(m_impl->strand(), fn);
 }
 
 bool log_manager::add_search_path(std::string const &path) {
   path_type p(path);
-  boost::function<bool ()> fn(boost::bind(&details::log_mgmt_impl::add_search_path,
+  boost::function<bool ()> fn(boost::bind(&pimpl::add_search_path,
                                           m_impl.get(), p));
   return strand_run(m_impl->strand(), fn);
 }
 
 std::string log_manager::search_path() {
-  boost::function<std::string ()> fn(boost::bind(&details::log_mgmt_impl::search_path,
+  boost::function<std::string ()> fn(boost::bind(&pimpl::search_path,
                                                  m_impl.get()));
   return strand_run(m_impl->strand(), fn);
 }
@@ -110,7 +110,7 @@ boost::asio::io_service &log_manager::service() {
 log_manager::path_type log_manager::locate(std::string const &file_name,
                                             bool &found) {
   path_type ret;
-  boost::function<bool ()> fn(boost::bind(&details::log_mgmt_impl::locate,
+  boost::function<bool ()> fn(boost::bind(&pimpl::locate,
                                           m_impl.get(),
                                           file_name, boost::ref(ret)));
   found = strand_run(m_impl->strand(), fn);
@@ -120,7 +120,7 @@ log_manager::path_type log_manager::locate(std::string const &file_name,
 log_manager::path_type log_manager::use(std::string const &file_name,
                                          bool &found) {
   path_type ret = cfg_path();
-  boost::function<bool ()> fn(boost::bind(&details::log_mgmt_impl::locate,
+  boost::function<bool ()> fn(boost::bind(&pimpl::locate,
                                           m_impl.get(),
                                           file_name, boost::ref(ret)));
   found = strand_run(m_impl->strand(), fn);
