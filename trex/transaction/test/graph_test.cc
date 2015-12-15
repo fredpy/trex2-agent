@@ -8,9 +8,9 @@
 
 #include <trex/utils/timing/asio_tick_timer.hh>
 
-using namespace TREX::transaction;
-namespace utils=TREX::utils;
-namespace tlog = TREX::utils::log;
+using namespace trex::transaction;
+namespace utils=trex::utils;
+namespace tlog = trex::utils::log;
 namespace bpt=boost::property_tree;
 
 

@@ -44,7 +44,7 @@
 # include "bits/async_result.hh"
 
 
-namespace TREX {
+namespace trex {
   namespace utils {
     
     /** @brief Priority based strand

@@ -40,7 +40,7 @@
 #ifndef FWD_trex_utils_singleton_bits_server
 # define FWD_trex_utils_singleton_bits_server
 
-namespace TREX {
+namespace trex {
   namespace utils {
     namespace singleton {
       namespace internal {

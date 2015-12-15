@@ -41,7 +41,7 @@
 #ifndef FWD_DomainVisitor
 # define FWD_DomainVisitor
 
-namespace TREX {
+namespace trex {
   namespace transaction {
 
     class domain_visitor;

@@ -43,7 +43,7 @@
 # include <boost/signals2/signal.hpp>
 # include <boost/asio/io_service.hpp>
 
-namespace TREX {
+namespace trex {
   namespace transaction {
     namespace details {
 

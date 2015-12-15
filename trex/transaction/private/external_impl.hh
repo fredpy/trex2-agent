@@ -36,7 +36,7 @@
 
 # include "internal_impl.hh"
 
-namespace TREX {
+namespace trex {
   namespace transaction {
     namespace details {
       

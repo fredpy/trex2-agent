@@ -49,7 +49,7 @@
 # include <boost/asio/io_service.hpp>
 # include <boost/asio/strand.hpp>
 
-namespace TREX {
+namespace trex {
   namespace utils {
     /** @brief Thread safe log management
      *

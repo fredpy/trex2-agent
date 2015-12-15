@@ -48,7 +48,7 @@
 
 # include <trex/domain/token.hh>
 
-namespace TREX {
+namespace trex {
   namespace transaction {
     
     class reactor:boost::noncopyable, public ENABLE_SHARED_FROM_THIS<reactor> {

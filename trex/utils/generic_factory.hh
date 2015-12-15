@@ -57,7 +57,7 @@
 # include <trex/config/cpp11_deleted.hh>
 # include "factory_error.hh"
 
-namespace TREX {
+namespace trex {
   namespace utils {
 		
     

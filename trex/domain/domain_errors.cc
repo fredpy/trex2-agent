@@ -34,7 +34,7 @@
 #include "domain_errors.hh"
 #include <string>
 
-using namespace TREX::transaction;
+using namespace trex::transaction;
 
 namespace {
   
@@ -72,7 +72,7 @@ namespace {
 
 }
 
-ERROR_CODE TREX::transaction::domain_error_code(domain_error::domain_error_t e) {
+ERROR_CODE trex::transaction::domain_error_code(domain_error::domain_error_t e) {
   return ERROR_CODE(static_cast<int>(e), domain_category_impl());
 }
 

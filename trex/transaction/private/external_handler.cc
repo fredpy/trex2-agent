@@ -36,8 +36,8 @@
 #include "../reactor_error.hh"
 #include "../graph_error.hh"
 
-using namespace TREX::transaction;
-namespace utils=TREX::utils;
+using namespace trex::transaction;
+namespace utils=trex::utils;
 namespace tlog=utils::log;
 
 using details::external_handler;

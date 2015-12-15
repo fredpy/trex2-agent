@@ -42,7 +42,7 @@
 #include <iomanip>
 
 
-using namespace TREX::utils;
+using namespace trex::utils;
 namespace fs=boost::filesystem;
 namespace bpt=boost::posix_time;
 

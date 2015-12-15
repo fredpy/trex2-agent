@@ -10,14 +10,14 @@
  */
 /*********************************************************************
  * Software License Agreement (BSD License)
- * 
+ *
  *  Copyright (c) 2011, MBARI.
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions
  *  are met:
- * 
+ *
  *   * Redistributions of source code must retain the above copyright
  *     notice, this list of conditions and the following disclaimer.
  *   * Redistributions in binary form must reproduce the above
@@ -27,7 +27,7 @@
  *   * Neither the name of the TREX Project nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -41,16 +41,16 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef H_IntervalDomain 
+#ifndef H_IntervalDomain
 # define H_IntervalDomain
 
 # include <cctype>
 
 # include "basic_interval.hh"
 
-namespace TREX {
+namespace trex {
   namespace transaction {
-
+    
     /** @brief Interval based domains
      *
      * @param Ty type of the elements
@@ -76,7 +76,7 @@ namespace TREX {
     public:
       /** @brief subjacent type for interval */
       typedef Ty base_type;
-
+      
       /** @brief interval bounds extension of @e Ty
        * @relates IntervalDomain
        *
@@ -89,250 +89,250 @@ namespace TREX {
        */
       class bound {
       public:
-	/** @brief constructor
-	 *
-	 * @param val A value
-	 *
-	 * Convert @e val into an interval bound
-	 */
-	bound(Ty const &val = Ty())
-	  :m_inf(false), m_value(val) {}
-	/** @brief Copy constructor
-	 *
-	 * @param other Instance to copy
-	 *
-	 * Creates a copy of @e other
-	 */
-	bound(bound const &other) 
-	  :m_inf(other.m_inf), m_pos(other.m_pos),
-	   m_value(other.m_value) {}
-	/** @brief Destructor */
-	~bound() {}
-
-	/** @brief Assignment
-	 *
-	 * @param other another instance
-	 *
-	 * Assign @e other to the current instance
-	 *
-	 * @return @c *this after the operation
-	 */
-	bound &operator= (bound const &other) {
-	  m_inf = other.m_inf;
-	  m_pos = other.m_pos;
-	  m_value = other.m_value;
-	  return *this;
-	}
-	/** @brief Assignment
-	 *
-	 * @param val A Ty value
-	 *
-	 * Assign the value @e val to current instance
-	 *
-	 * @return @c *this after the operation
-	 */
-	bound &operator= (Ty const &val) {
-	  m_inf = false;
-	  m_value = val;
-	  return *this;
-	}
-
-	/** @brief Check for infinity
-	 *
-	 * Checks if current instance is an infinity bound
-	 *
-	 * @retval true if the value is +inf or -inf
-	 * @retval false if the value is of type @e Ty
-	 */
-	bool is_infinity() const {
-	  return m_inf;
-	}
-	/** Finite bound value
-	 * @pre This bound is not infinite
-	 * @return the value associated to this instance
-	 *
-	 * @sa bool isInfinity() const
-	 */
-	Ty const &value() const {
-	  return m_value;
-	}
-	/** @brief less than operator
-	 *
-	 * @param other value to compare
-	 *
-	 * Test if current instance is less than @e other.
-	 * In this test @c -inf is smaller than any other value
-	 * and @c +inf greater than any other value.
-	 *
-	 * @retval true if @c *this<other
-	 * @retval false otherwise
-	 */
-	bool operator< (bound const &other) const {
-	  if( m_inf ) 
-	    return !m_pos && ( other.m_pos || !other.m_inf );
-	  else if( other.m_inf )
-	    return other.m_pos;
-	  else {
-	    return s_cmp(m_value, other.m_value); 
-	  }
-	}
-	/** @brief Equality test
-	 *
-	 * @param other value to compare
-	 *
-	 * Test if current instance is equal to @e other.
-	 *
-	 * @note To ensure genericity this test relies on @e Comp instead
-	 * of basic subjacent equality test of @e Ty. This has two side
-	 * effects :
-	 * @li The test may be inneficient as it relies on the fact that
-	 * @c a==b is equivalent to @c !(a<b || b<a). Whivch may require
-	 * more computation when used with a simple ordering between basic
-	 * C types
-	 * @li For the reasonds mentionned above one need to make sure
-	 * that @e Comp is a complete order
-	 *
-	 * @retval true if @c *this==other
-	 * @retval false otherwise
-	 */
-	bool operator==(bound const &other) const {
-	  if( m_inf ) 
-	    return other.m_inf && (m_pos==other.m_pos);
-	  else 
-	    return !( other.m_inf || 
-		      s_cmp(m_value, other.m_value) ||
-		      s_cmp(other.m_value, m_value) );
-	}
-	/** brief Difference test
-	 * @param other Another instance
-	 * @retval true if @c *this!=other
-	 * @retval false otherwise
-	 * @sa bool operator==(bound const &other) const
-	 */
-	bool operator!=(bound const &other) const {
-	  return !operator==(other);
-	}
-	/** brief Greater than test
-	 * @param other Another instance
-	 * @retval true if @c *this>other
-	 * @retval false otherwise
-	 * @sa bool operator<(bound const &other) const
-	 */
-	bool operator> (bound const &other) const {
-	  return other.operator< (*this);
-	}
-	/** brief Less or equal to test
-	 * @param other Another instance
-	 * @retval true if @c *this<=other
-	 * @retval false otherwise
-	 * @sa bool operator<(bound const &other) const
-	 */
-	bool operator<=(bound const &other) const {
-	  return !operator> (other);
-	}
-	/** brief Greater or equal to test
-	 * @param other Another instance
-	 * @retval true if @c *this>=other
-	 * @retval false otherwise
-	 * @sa bool operator<(bound const &other) const
-	 */
-	bool operator>=(bound const &other) const {
-	  return !operator< (other);
-	}
-	
-	/** @brief Minimum value
-	 *
-	 * @param other another instance
-	 *
-	 * @return the lowest value between @c *this and @e other
-	 * @sa bool operator<(bound const &other) const
-	 * @sa bound const &max(bound const &other) const
-	 */
-	bound const &min(bound const &other) const {
-	  if( operator< (other) )
-	    return *this;
-	  else
-	    return other;
-	}
-	/** @brief Maximum value
-	 *
-	 * @param other another instance
-	 *
-	 * @return the highest value between @c *this and @e other
-	 * @sa bool operator<(bound const &other) const
-	 * @sa bound const &min(bound const &other) const
-	 */
-	bound const &max(bound const &other) const {
-	  if( operator< (other) )
-	    return other;
-	  else
-	    return *this;
-	}
-
-	/** @brief addition
-	 *
-	 * @param other another instance
-	 * @param onInf value to return if one is infinite
-	 *
-	 * Compute the sum of current instance with @e other.
-	 *
-	 * @retval onInf if this instance or @a other is an infinite bound
-	 * @retval the sum of the value of these two instances otherwise
-	 *
-	 * @sa bound minus(bound const &other, bound const &) const
-	 */
-	bound plus(bound const &other, bound const &onInf) const;
-	/** @brief substraction
-	 *
-	 * @param other another instance
-	 * @param onInf value if infinity
-	 *
-	 * Compute the differenc between current instance and @e other.
-	 *
-	 * @param onInf value to return if one is infinite
-	 * @retval the sum of the value of these two instances otherwise
-	 *
-	 * @sa bound plus(bound const &other, bound const &) const
-	 */
-	bound minus(bound const &other, bound const &onInf) const;
-	  
+        /** @brief constructor
+         *
+         * @param val A value
+         *
+         * Convert @e val into an interval bound
+         */
+        bound(Ty const &val = Ty())
+        :m_inf(false), m_value(val) {}
+        /** @brief Copy constructor
+         *
+         * @param other Instance to copy
+         *
+         * Creates a copy of @e other
+         */
+        bound(bound const &other)
+        :m_inf(other.m_inf), m_pos(other.m_pos),
+        m_value(other.m_value) {}
+        /** @brief Destructor */
+        ~bound() {}
+        
+        /** @brief Assignment
+         *
+         * @param other another instance
+         *
+         * Assign @e other to the current instance
+         *
+         * @return @c *this after the operation
+         */
+        bound &operator= (bound const &other) {
+          m_inf = other.m_inf;
+          m_pos = other.m_pos;
+          m_value = other.m_value;
+          return *this;
+        }
+        /** @brief Assignment
+         *
+         * @param val A Ty value
+         *
+         * Assign the value @e val to current instance
+         *
+         * @return @c *this after the operation
+         */
+        bound &operator= (Ty const &val) {
+          m_inf = false;
+          m_value = val;
+          return *this;
+        }
+        
+        /** @brief Check for infinity
+         *
+         * Checks if current instance is an infinity bound
+         *
+         * @retval true if the value is +inf or -inf
+         * @retval false if the value is of type @e Ty
+         */
+        bool is_infinity() const {
+          return m_inf;
+        }
+        /** Finite bound value
+         * @pre This bound is not infinite
+         * @return the value associated to this instance
+         *
+         * @sa bool isInfinity() const
+         */
+        Ty const &value() const {
+          return m_value;
+        }
+        /** @brief less than operator
+         *
+         * @param other value to compare
+         *
+         * Test if current instance is less than @e other.
+         * In this test @c -inf is smaller than any other value
+         * and @c +inf greater than any other value.
+         *
+         * @retval true if @c *this<other
+         * @retval false otherwise
+         */
+        bool operator< (bound const &other) const {
+          if( m_inf )
+            return !m_pos && ( other.m_pos || !other.m_inf );
+          else if( other.m_inf )
+            return other.m_pos;
+          else {
+            return s_cmp(m_value, other.m_value);
+          }
+        }
+        /** @brief Equality test
+         *
+         * @param other value to compare
+         *
+         * Test if current instance is equal to @e other.
+         *
+         * @note To ensure genericity this test relies on @e Comp instead
+         * of basic subjacent equality test of @e Ty. This has two side
+         * effects :
+         * @li The test may be inneficient as it relies on the fact that
+         * @c a==b is equivalent to @c !(a<b || b<a). Whivch may require
+         * more computation when used with a simple ordering between basic
+         * C types
+         * @li For the reasonds mentionned above one need to make sure
+         * that @e Comp is a complete order
+         *
+         * @retval true if @c *this==other
+         * @retval false otherwise
+         */
+        bool operator==(bound const &other) const {
+          if( m_inf )
+            return other.m_inf && (m_pos==other.m_pos);
+          else
+            return !( other.m_inf ||
+                     s_cmp(m_value, other.m_value) ||
+                     s_cmp(other.m_value, m_value) );
+        }
+        /** brief Difference test
+         * @param other Another instance
+         * @retval true if @c *this!=other
+         * @retval false otherwise
+         * @sa bool operator==(bound const &other) const
+         */
+        bool operator!=(bound const &other) const {
+          return !operator==(other);
+        }
+        /** brief Greater than test
+         * @param other Another instance
+         * @retval true if @c *this>other
+         * @retval false otherwise
+         * @sa bool operator<(bound const &other) const
+         */
+        bool operator> (bound const &other) const {
+          return other.operator< (*this);
+        }
+        /** brief Less or equal to test
+         * @param other Another instance
+         * @retval true if @c *this<=other
+         * @retval false otherwise
+         * @sa bool operator<(bound const &other) const
+         */
+        bool operator<=(bound const &other) const {
+          return !operator> (other);
+        }
+        /** brief Greater or equal to test
+         * @param other Another instance
+         * @retval true if @c *this>=other
+         * @retval false otherwise
+         * @sa bool operator<(bound const &other) const
+         */
+        bool operator>=(bound const &other) const {
+          return !operator< (other);
+        }
+        
+        /** @brief Minimum value
+         *
+         * @param other another instance
+         *
+         * @return the lowest value between @c *this and @e other
+         * @sa bool operator<(bound const &other) const
+         * @sa bound const &max(bound const &other) const
+         */
+        bound const &min(bound const &other) const {
+          if( operator< (other) )
+            return *this;
+          else
+            return other;
+        }
+        /** @brief Maximum value
+         *
+         * @param other another instance
+         *
+         * @return the highest value between @c *this and @e other
+         * @sa bool operator<(bound const &other) const
+         * @sa bound const &min(bound const &other) const
+         */
+        bound const &max(bound const &other) const {
+          if( operator< (other) )
+            return other;
+          else
+            return *this;
+        }
+        
+        /** @brief addition
+         *
+         * @param other another instance
+         * @param onInf value to return if one is infinite
+         *
+         * Compute the sum of current instance with @e other.
+         *
+         * @retval onInf if this instance or @a other is an infinite bound
+         * @retval the sum of the value of these two instances otherwise
+         *
+         * @sa bound minus(bound const &other, bound const &) const
+         */
+        bound plus(bound const &other, bound const &onInf) const;
+        /** @brief substraction
+         *
+         * @param other another instance
+         * @param onInf value if infinity
+         *
+         * Compute the differenc between current instance and @e other.
+         *
+         * @param onInf value to return if one is infinite
+         * @retval the sum of the value of these two instances otherwise
+         *
+         * @sa bound plus(bound const &other, bound const &) const
+         */
+        bound minus(bound const &other, bound const &onInf) const;
+        
       private:
-	/** @brief Comparator between Ty values */
-	static Comp s_cmp;
-	/** @brief Infinity flag
-	 *
-	 * This flag indicates whether this instance is an infinite value
-	 * or not. Depending on its value only one of m_pos and m_value is
-	 * relevant.
-	 */
-	bool m_inf;
-	/** @brief Sign flag
-	 *
-	 * This flag is relevant only if m_inf is true and indicates
-	 * whether the bound is plus infinity of minus infinity.
-	 */
-	bool m_pos;
-	/** @brief Numeric value
-	 *
-	 * This attribute is relevant only if m_inf is false and gives
-	 * the value of the bound.
-	 */
-	Ty  m_value;
-
-	/** @brief Infinity bound constructor
-	 * @param pos a sign flag
-	 *
-	 * Create a new infinity bound with the associated sign reflected by
-	 * @e pos. The extra parameters is here to help compiler identify
-	 * that we call this constructor and avoid conflict with other
-	 * constructors.
-	 */
-	bound(bool pos, bool) 
-	  :m_inf(true), m_pos(pos) {}
-
-	std::istream &read_from(std::istream &in);
-	std::ostream &print_to(std::ostream &out) const;
-
+        /** @brief Comparator between Ty values */
+        static Comp s_cmp;
+        /** @brief Infinity flag
+         *
+         * This flag indicates whether this instance is an infinite value
+         * or not. Depending on its value only one of m_pos and m_value is
+         * relevant.
+         */
+        bool m_inf;
+        /** @brief Sign flag
+         *
+         * This flag is relevant only if m_inf is true and indicates
+         * whether the bound is plus infinity of minus infinity.
+         */
+        bool m_pos;
+        /** @brief Numeric value
+         *
+         * This attribute is relevant only if m_inf is false and gives
+         * the value of the bound.
+         */
+        Ty  m_value;
+        
+        /** @brief Infinity bound constructor
+         * @param pos a sign flag
+         *
+         * Create a new infinity bound with the associated sign reflected by
+         * @e pos. The extra parameters is here to help compiler identify
+         * that we call this constructor and avoid conflict with other
+         * constructors.
+         */
+        bound(bool pos, bool)
+        :m_inf(true), m_pos(pos) {}
+        
+        std::istream &read_from(std::istream &in);
+        std::ostream &print_to(std::ostream &out) const;
+        
         friend std::istream &operator>>(std::istream &in, bound &b) {
           return b.read_from(in);
         }
@@ -340,9 +340,9 @@ namespace TREX {
           return b.print_to(out);
         }
         
-	friend class interval_domain<Ty, Prot, Comp>;
+        friend class interval_domain<Ty, Prot, Comp>;
       }; // IntervalDomain<>::bound
-
+      
       /** @brief Plus infinity bound
        *
        * This static attribute gives access to the plus infinity value
@@ -362,8 +362,8 @@ namespace TREX {
        *
        * Create a new instance withe as a full interval of type @e type
        */
-      explicit interval_domain(TREX::utils::symbol const &type)
-	:basic_interval(type), m_lower(minus_inf), m_upper(plus_inf) {}
+      explicit interval_domain(utils::symbol const &type)
+      :basic_interval(type), m_lower(minus_inf), m_upper(plus_inf) {}
       /** @brief Constructor
        * @param type A symbolic type name
        * @param lb A bound
@@ -375,13 +375,13 @@ namespace TREX {
        * @pre [lb, ub] is a valid interval (ie not empty)
        * @throw EmptyDomain the resulting domain is empty
        */
-      interval_domain(TREX::utils::symbol const &type,
-		     bound const &lb, bound const &ub)
-	:basic_interval(type), m_lower(lb), m_upper(ub) {
-	if( m_upper<m_lower || ( m_lower.is_infinity()
-				 && m_upper==m_lower ) ) {
+      interval_domain(utils::symbol const &type,
+                      bound const &lb, bound const &ub)
+      :basic_interval(type), m_lower(lb), m_upper(ub) {
+        if( m_upper<m_lower || ( m_lower.is_infinity()
+                                && m_upper==m_lower ) ) {
           throw SYSTEM_ERROR(domain_error_code(domain_error::empty_domain));
-	}
+        }
       }
       /** @brief Constructor
        * @param type A symbolic type name
@@ -391,8 +391,8 @@ namespace TREX {
        * @e val. in other terms the domain is represented by the interval
        * [val, val]
        */
-      interval_domain(TREX::utils::symbol const &type, Ty const &val)
-	:basic_interval(type), m_lower(val), m_upper(val) {}
+      interval_domain(utils::symbol const &type, Ty const &val)
+      :basic_interval(type), m_lower(val), m_upper(val) {}
       /** @brief Destructor */
       virtual ~interval_domain() {}
       
@@ -404,9 +404,9 @@ namespace TREX {
        * @retval false otherwise
        */
       bool contains(Ty const &val) const {
-	return val==closestTo(val);
+        return val==closestTo(val);
       }
-
+      
       /** @brief Closest value
        * @param val A value
        *
@@ -421,15 +421,15 @@ namespace TREX {
        * @retval val otherwise
        */
       Ty const &closest_to(Ty const &val) const {
-	bound me(val);
-	
-	if( m_lower>me )
-	  return m_lower.value();
-	if( m_upper<me ) 
-	  return m_upper.value();
-	return val;
+        bound me(val);
+        
+        if( m_lower>me )
+          return m_lower.value();
+        if( m_upper<me )
+          return m_upper.value();
+        return val;
       }
-
+      
       bool intersect(abstract_domain const &other) const;
       bool equals(abstract_domain const &other) const;
       /** @brief Restrict domain possible values
@@ -438,7 +438,7 @@ namespace TREX {
        *
        * This method restrict the domain of current instance to tits subset
        * included in [lo, hi]
-       * 
+       *
        * @pre [lo, hi] is a valid interval
        * @pre this domain intersect [lo, hi]
        * @retval true if the domain changed
@@ -448,7 +448,7 @@ namespace TREX {
       bool restrict_with(bound const &lo, bound const &hi, ERROR_CODE &ec);
       bool restrict_with(bound const &lo, bound const &hi);
       bool restrict_with(abstract_domain const &other, ERROR_CODE &ec);
-
+      
       /** @brief interval lower bound
        *
        * @return the lower bound of the interval for this domain
@@ -456,7 +456,7 @@ namespace TREX {
        * @sa void getBounds(bound &, bound&) vonst
        */
       bound const &lower_bound() const {
-	return m_lower;
+        return m_lower;
       }
       /** @brief interval upper bound
        *
@@ -465,25 +465,25 @@ namespace TREX {
        * @sa void getBounds(bound &, bound&) vonst
        */
       bound const &upper_bound() const {
-	return m_upper;
+        return m_upper;
       }
-
+      
       bool is_singleton() const {
-	return m_lower==m_upper;
+        return m_lower==m_upper;
       }
-
+      
       bool has_lower() const {
-	return !m_lower.is_infinity();
+        return !m_lower.is_infinity();
       }
       bool has_upper() const {
-	return !m_upper.is_infinity();
+        return !m_upper.is_infinity();
       }
-
+      
       boost::any get_lower() const {
-	return m_lower.value();
+        return m_lower.value();
       }
       boost::any get_upper() const {
-	return m_upper.value();
+        return m_upper.value();
       }
       
       /** @brief Get interval bounds
@@ -500,10 +500,10 @@ namespace TREX {
        * @sa bound const &upperBound() const
        */
       void get_bounds(bound &lo, bound &hi) const {
-	lo = m_lower;
-	hi = m_upper;
+        lo = m_lower;
+        hi = m_upper;
       }
-
+      
     protected:
       /** @brief Copy constructor
        * @param other another instance
@@ -511,7 +511,7 @@ namespace TREX {
        * Create a copy of @a other
        */
       interval_domain(interval_domain const &other)
-	:basic_interval(other), m_lower(other.m_lower), m_upper(other.m_upper) {}
+      :basic_interval(other), m_lower(other.m_lower), m_upper(other.m_upper) {}
       /** @brief XML parsing constructor
        *
        * @param node An XML node
@@ -530,35 +530,35 @@ namespace TREX {
        * @throw TREX::transaction::EmptyDomain the resulting interval is empty
        */
       explicit interval_domain(boost::property_tree::ptree::value_type &node)
-	:basic_interval(node), m_lower(minus_inf), m_upper(plus_inf) {
-	complete_parsing(node);
+      :basic_interval(node), m_lower(minus_inf), m_upper(plus_inf) {
+        complete_parsing(node);
       }
- 
+      
     private:
       bool json_protect() const {
         return Prot;
       }
-
+      
       /** @brief interval lower bound */
       bound m_lower;
       /** @brief interval upper bound */
       bound m_upper;
-
+      
       void parse_singleton(std::string const &val);
       void parse_lower(std::string const &val);
       void parse_upper(std::string const &val);
       std::ostream &print_lower(std::ostream &out) const {
-	return m_lower.print_to(out);
+        return m_lower.print_to(out);
       }
       std::ostream &print_upper(std::ostream &out) const {
-	return m_upper.print_to(out);
+        return m_upper.print_to(out);
       }
     }; // interval_domain<>
-
+    
 # define In_H_IntervalDomain
 #  include "bits/interval_domain.tcc"
 # undef In_H_IntervalDomain
-
+    
   }
 }
 #endif // H_IntervalDomain

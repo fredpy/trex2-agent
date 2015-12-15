@@ -34,7 +34,7 @@
 #include "graph_error.hh"
 #include <string>
 
-using namespace TREX::transaction;
+using namespace trex::transaction;
 
 namespace {
   
@@ -72,7 +72,7 @@ namespace {
   
 } // ::
 
-ERROR_CODE TREX::transaction::graph_error_code
+ERROR_CODE trex::transaction::graph_error_code
 (graph_error::graph_error_t e) {
   return ERROR_CODE(static_cast<int>(e), gr_error);
 }

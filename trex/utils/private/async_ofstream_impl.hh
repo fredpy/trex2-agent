@@ -40,7 +40,7 @@
 #include <trex/config/chrono.hh>
 #include <boost/optional.hpp>
 
-namespace TREX {
+namespace trex {
   namespace utils {
     
     class async_ofstream::pimpl
@@ -75,7 +75,7 @@ namespace TREX {
       boost::optional<clock::time_point> m_last;
     };
     
-  } // TREX::utils
-} // TREX
+  } // trex::utils
+} // trex
 
 #endif // H_trex_utils_private_async_ofstream_impl

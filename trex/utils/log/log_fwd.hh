@@ -43,7 +43,7 @@
 
 # include "../symbol.hh"
 
-namespace TREX {
+namespace trex {
   namespace utils {
     /** @brief Logging utilities
      *

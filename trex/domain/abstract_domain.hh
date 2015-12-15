@@ -1,14 +1,14 @@
 /* -*- C++ -*- */
 /*********************************************************************
  * Software License Agreement (BSD License)
- * 
+ *
  *  Copyright (c) 2011, MBARI.
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions
  *  are met:
- * 
+ *
  *   * Redistributions of source code must retain the above copyright
  *     notice, this list of conditions and the following disclaimer.
  *   * Redistributions in binary form must reproduce the above
@@ -18,7 +18,7 @@
  *   * Neither the name of the TREX Project nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -47,7 +47,7 @@
  * @author Frederic Py <fpy@mbari.org>
  * @ingroup domains
  */
-#ifndef H_DomainBase 
+#ifndef H_DomainBase
 # define H_DomainBase
 
 # include <boost/any.hpp>
@@ -59,13 +59,13 @@
 # include "domain_visitor_fwd.hh"
 # include "domain_errors.hh"
 
-namespace TREX {
+namespace trex {
   /** @brief TREX transaction framework
    *
    * This namespace embeds all objects and utilities used
    * for messaging between TREX reactors. It especially
    * defines basic data structures to describe goals and
-   * observations between reactors. 
+   * observations between reactors.
    *
    * People who want to implement a new reactor (based on
    * their own planning framework or whatever) should use
@@ -85,9 +85,9 @@ namespace TREX {
      * Variable
      *
      * @author Frederic Py <fpy@mbari.org>
-     * @ingroup domains 
+     * @ingroup domains
      */
-    class abstract_domain :public TREX::utils::ptree_convertible {
+    class abstract_domain :public utils::ptree_convertible {
     public:
       /** @brief Destructor */
       virtual ~abstract_domain() {}
@@ -100,7 +100,7 @@ namespace TREX {
        * @return The newly created instance
        */
       virtual abstract_domain *copy() const=0;
-
+      
       /** @brief Visiting method
        *
        * @param visitor A domain visitor
@@ -119,7 +119,7 @@ namespace TREX {
        * @sa DomainVisitor
        */
       virtual void accept(domain_visitor &visitor) const;
-
+      
       /** @brief Check for interval domain
        *
        * This method is used to identify if this domain is an interval
@@ -154,12 +154,12 @@ namespace TREX {
        *
        * @return the type associated to this domain
        */
-      TREX::utils::symbol const &type_name() const {
-	return m_type;
+      utils::symbol const &type_name() const {
+        return m_type;
       }
-
+      
       /** @brief check for common values
-       * 
+       *
        * @param other another instance
        *
        * This methods indicates if current instance share values with
@@ -216,12 +216,12 @@ namespace TREX {
        * @sa bool intersect(DomainBase const &) const
        */
       abstract_domain &operator*=(abstract_domain const &other) {
-	restrict_with(other);
+        restrict_with(other);
         return *this;
       }
-
+      
       /** @brief check for full domain
-       * 
+       *
        * This method identifies if current domain is full. A full domain
        * is adomain that includes al the possibles values for its type.
        *
@@ -229,17 +229,17 @@ namespace TREX {
        * @retval false otherwise
        */
       virtual bool is_full() const =0;
-
+      
       /** @brief check for singleton value
-       * 
+       *
        * This method identifies if current domain is a singleton. A singleton
        * domain is defined by one and only one value.
-       * 
-       * @retval true if current instance is a singleton 
+       *
+       * @retval true if current instance is a singleton
        * @retval false otherwise
        */
       virtual bool is_singleton() const =0;
-
+      
       /** @brief singleton value
        *
        * This methods give acces to the value of a singleton instance.
@@ -291,12 +291,12 @@ namespace TREX {
        *
        * @pre the instance is a singleton
        * @pre the type of the value manip[ulated by this domain should be
-       * convertible to @e Ty or @i exactly @e Ty is @e Safe is @c false 
+       * convertible to @e Ty or @i exactly @e Ty is @e Safe is @c false
        * @throw DomainAccess the insatnce was not a singleton
        * @throw boost::bad_string_cast @a Safe is @a true and the value of
        * the singleton cannot be parse into @a Ty
        * @throw boost::bad_string_cast @a Safe is @a false and the type of
-       * the singleton is not  @a Ty  
+       * the singleton is not  @a Ty
        * @return The singleton value of this domain
        *
        *
@@ -306,16 +306,16 @@ namespace TREX {
       template<class Ty, bool Safe>
       Ty get_typed_singleton() const {
         boost::any val = get_singleton();
-	if( Safe ) {
+        if( Safe ) {
           Ty *ret = boost::any_cast<Ty>(&val);
           if( NULL!=ret )
             return *ret;
           else
             return boost::lexical_cast<Ty>(get_singleton_as_string());
-	} else 
-	  return boost::any_cast<Ty>(val);
+        } else
+          return boost::any_cast<Ty>(val);
       }
-
+      
       boost::property_tree::ptree as_tree() const;
       
       
@@ -324,10 +324,10 @@ namespace TREX {
        * This type defines the factory that should be manipulated
        * for parsing domains from xml.
        */
-      typedef TREX::utils::xml_factory<abstract_domain,
-                                       SHARED_PTR<abstract_domain> > factory;
+      typedef utils::xml_factory<abstract_domain,
+      SHARED_PTR<abstract_domain> > factory;
       virtual boost::property_tree::ptree build_tree() const=0;
-
+      
     protected:
       
       /** @brief Constructor
@@ -336,14 +336,14 @@ namespace TREX {
        *
        * Create a new instance with associated domain type @e type
        */
-      explicit abstract_domain(TREX::utils::symbol const &type)
-	:m_type(type) {}
+      explicit abstract_domain(utils::symbol const &type)
+      :m_type(type) {}
       /** @brief XML parsing constructor
        *
-       * @param node An XML node 
+       * @param node An XML node
        *
        * Create a new instance from parsing @e node. This constructor
-       * is used by xml_factory to generate domains from XML. At this abstract 
+       * is used by xml_factory to generate domains from XML. At this abstract
        * level. The only operation donae is to extract the type of the domain
        * from the node tag.
        *
@@ -355,15 +355,15 @@ namespace TREX {
        * @sa xml_factory
        */
       explicit abstract_domain(boost::property_tree::ptree::value_type &node)
-	:m_type(node.first) {}   
+      :m_type(node.first) {}
       /** @brief Copy constructor
        * @param other Another instance
        *
        * Create a new instance similar to @e other
        */
       abstract_domain(abstract_domain const &other)
-	:m_type(other.m_type) {}
-
+      :m_type(other.m_type) {}
+      
       /** @brief Print domain
        *
        * @param out An output stream
@@ -379,7 +379,7 @@ namespace TREX {
        * @sa std::ostream &print_to(std::ostream &out) const
        */
       virtual std::ostream &print_domain(std::ostream &out) const =0;
-
+      
       /** @brief singleton value
        * This method is called by getSingleton() to get the actual value of
        * a singleton domain
@@ -405,17 +405,17 @@ namespace TREX {
        * @sa std::string getStringSingleton() const
        */
       virtual std::string string_singleton() const =0;
-
+      
     private:
       /** @brief type of the domain */
-      TREX::utils::symbol const m_type;
-
-
+      utils::symbol const m_type;
+      
+      
 # ifndef DOXYGEN
       // Following method have no code
       abstract_domain() DELETED;
 # endif
-
+      
       friend std::ostream &operator<<(std::ostream &out,
                                       abstract_domain const &d) {
         if( d.is_full() )
@@ -423,9 +423,9 @@ namespace TREX {
         else
           return d.print_domain(out);
       }
-
+      
     }; // TREX::transaction::abstract_domain
-
+    
     
   } // TREX::transaction
 } // TREX

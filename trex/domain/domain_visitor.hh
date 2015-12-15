@@ -47,7 +47,7 @@
 # include "basic_enumerated.hh"
 # include "basic_interval.hh"
 
-namespace TREX {
+namespace trex {
   namespace transaction {
 
     /** @brief abstract domain visitor interface

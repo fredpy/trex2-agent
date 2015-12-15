@@ -43,7 +43,7 @@
 # include <iostream>
 # include <memory>
 
-namespace TREX {
+namespace trex {
   namespace utils {
     namespace log {
       

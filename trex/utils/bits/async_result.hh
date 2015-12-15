@@ -39,7 +39,7 @@
 # include <boost/thread/future.hpp>
 # include <boost/utility/result_of.hpp>
 
-namespace TREX {
+namespace trex {
   namespace utils {
 
     namespace details {

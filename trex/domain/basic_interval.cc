@@ -40,7 +40,7 @@
  */
 #include "domain_visitor.hh"
 
-using namespace TREX::transaction;
+using namespace trex::transaction;
 namespace bpt=boost::property_tree;
 
 /*
@@ -52,13 +52,13 @@ namespace bpt=boost::property_tree;
 void basic_interval::complete_parsing(bpt::ptree::value_type &node) {
   // Try for a singleton first 
   boost::optional<std::string> 
-    val = TREX::utils::parse_attr< boost::optional<std::string> >(node.second, "value");
+    val = utils::parse_attr< boost::optional<std::string> >(node.second, "value");
   if( val ) {
     parse_singleton(*val);
   } else {
     boost::optional< std::string >
-      lo = TREX::utils::parse_attr< boost::optional<std::string> >(node.second, "min"),
-      hi = TREX::utils::parse_attr< boost::optional<std::string> >(node.second, "max");
+      lo = utils::parse_attr< boost::optional<std::string> >(node.second, "min"),
+      hi = utils::parse_attr< boost::optional<std::string> >(node.second, "max");
 
     if( lo ) 
       parse_lower(*lo);
@@ -95,12 +95,12 @@ std::ostream &basic_interval::print_domain(std::ostream &out) const {
 boost::property_tree::ptree basic_interval::build_tree() const {
   boost::property_tree::ptree info;
   if( is_singleton() )
-    TREX::utils::set_attr(info, "value", get_singleton_as_string());
+    utils::set_attr(info, "value", get_singleton_as_string());
   else {
     if( has_lower() )
-      TREX::utils::set_attr(info, "min", lower_as_string());
+      utils::set_attr(info, "min", lower_as_string());
     if( has_upper() )
-      TREX::utils::set_attr(info, "max", upper_as_string());
+      utils::set_attr(info, "max", upper_as_string());
   }
   return info;
 }

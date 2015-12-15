@@ -37,7 +37,7 @@
 # include "tick_clock.hh"
 # include "bits/asio_chrono_timer.hh"
 
-namespace TREX {
+namespace trex {
   namespace utils {
     
     template<class Clock>

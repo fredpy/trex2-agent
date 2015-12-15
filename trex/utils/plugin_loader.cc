@@ -42,8 +42,8 @@
 #include "private/dl_func.hh"
 #include "Plugin.hh"
 
-using namespace TREX::utils;
-using namespace TREX::utils::internals;
+using namespace trex::utils;
+using namespace trex::utils::internals;
 
 /*
  * class TREX::utils::plugin_loader

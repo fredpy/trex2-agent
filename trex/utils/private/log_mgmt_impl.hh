@@ -37,10 +37,8 @@
 # include "../log_manager.hh"
 # include "../asio_runner.hh"
 
-namespace TREX {
+namespace trex {
   namespace utils {
-    
-    
     
     class log_manager::pimpl :boost::noncopyable {
     public:

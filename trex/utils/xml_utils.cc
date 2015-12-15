@@ -40,11 +40,11 @@
  */
 #include "xml_utils.hh"
 
-using namespace TREX::utils;
+using namespace trex::utils;
 namespace xml = boost::property_tree::xml_parser;
 namespace bp = boost::property_tree;
 
-boost::optional<bp::ptree const &> TREX::utils::internals::find_attr(bp::ptree const &pt,
+boost::optional<bp::ptree const &> trex::utils::internals::find_attr(bp::ptree const &pt,
                                                                      std::string const &path) {
   boost::optional<bp::ptree const &> ret = pt.get_child_optional("<xmlattr>."+path);
   
@@ -58,7 +58,7 @@ namespace {
   singleton::use<log_manager> s_log;
 }
 
-void TREX::utils::ext_xml(boost::property_tree::ptree &tree, std::string const &conf, bool ahead) {
+void trex::utils::ext_xml(boost::property_tree::ptree &tree, std::string const &conf, bool ahead) {
   boost::optional<std::string> name = parse_attr< boost::optional<std::string> >(tree, conf);
   
   if( name ) {

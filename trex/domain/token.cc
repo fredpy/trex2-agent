@@ -33,8 +33,8 @@
  */
 #include "token.hh"
 
-using namespace TREX::transaction;
-namespace utils=TREX::utils;
+using namespace trex::transaction;
+namespace utils=trex::utils;
 using utils::symbol;
 
 namespace bpt=boost::property_tree;
@@ -517,7 +517,7 @@ void token::init_time() {
 
 // related
 
-std::ostream &TREX::transaction::operator<<(std::ostream &out, token const &tok) {
+std::ostream &trex::transaction::operator<<(std::ostream &out, token const &tok) {
   bool first = true;
   
   out<<tok.object()<<'.'<<tok.predicate();

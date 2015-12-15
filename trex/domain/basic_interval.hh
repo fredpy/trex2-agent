@@ -11,14 +11,14 @@
  */
 /*********************************************************************
  * Software License Agreement (BSD License)
- * 
+ *
  *  Copyright (c) 2011, MBARI.
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions
  *  are met:
- * 
+ *
  *   * Redistributions of source code must retain the above copyright
  *     notice, this list of conditions and the following disclaimer.
  *   * Redistributions in binary form must reproduce the above
@@ -28,7 +28,7 @@
  *   * Neither the name of the TREX Project nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -47,9 +47,9 @@
 
 # include "abstract_domain.hh"
 
-namespace TREX {
+namespace trex {
   namespace transaction {
-
+    
     /** @brief Interval Domain base class
      *
      * This class provide a unified abstract interface for implementing
@@ -63,86 +63,86 @@ namespace TREX {
     public:
       /** @brief Destructor */
       virtual ~basic_interval() {}
-
+      
       bool is_interval() const {
-	return true;
+        return true;
       }
       bool is_enumerated() const {
-	return false;
+        return false;
       }
-
+      
       virtual bool has_lower()  const =0;
       virtual bool has_upper()  const =0;
-
+      
       bool is_full() const {
-	return !( has_lower() || has_upper() );
+        return !( has_lower() || has_upper() );
       }
       
       virtual boost::any get_lower() const =0;
       virtual boost::any get_upper() const =0;
-
+      
       template<class Ty, bool Safe>
       Ty get_typed_lower() const {
         boost::any val = get_lower();
-	if( Safe ) {
+        if( Safe ) {
           Ty *ret = boost::any_cast<Ty>(&val);
           if( NULL!=ret )
             return *ret;
           else
             return boost::lexical_cast<Ty>(lower_as_string());
-	} else 
-	  return boost::any_cast<Ty>(val);
+        } else
+          return boost::any_cast<Ty>(val);
       }
-           
+      
       template<class Ty, bool Safe>
       Ty get_typed_upper() const {
         boost::any val = get_upper();
-	if( Safe ) { 
+        if( Safe ) {
           Ty *ret = boost::any_cast<Ty>(&val);
           if( NULL!=ret )
             return *ret;
           else
             return boost::lexical_cast<Ty>(upper_as_string());
-	} else 
-	  return boost::any_cast<Ty>(val);
+        } else
+          return boost::any_cast<Ty>(val);
       }
-           
+      
       virtual std::string lower_as_string() const;
       virtual std::string upper_as_string() const;
     protected:
-      explicit basic_interval(TREX::utils::symbol const &type)
-	:abstract_domain(type) {}
+      explicit basic_interval(utils::symbol const &type)
+      :abstract_domain(type) {}
       explicit basic_interval(boost::property_tree::ptree::value_type &node)
-	:abstract_domain(node) {}
-
+      :abstract_domain(node) {}
+      
       void complete_parsing(boost::property_tree::ptree::value_type &node);
-
+      
       
       virtual void parse_lower(std::string const &val) =0;
       virtual void parse_upper(std::string const &val) =0;
       virtual void parse_singleton(std::string const &val) =0;
       std::ostream &print_singleton(std::ostream &out) const {
-	return print_lower(out);
+        return print_lower(out);
       }
       virtual std::ostream &print_lower(std::ostream &out) const =0;
       virtual std::ostream &print_upper(std::ostream &out) const =0;
       
     protected:
       virtual boost::property_tree::ptree build_tree() const;
-
+      
     private:
       
       void accept(domain_visitor &visitor) const;
       std::ostream &print_domain(std::ostream &out) const;
       boost::any singleton() const {
-	return get_lower();
+        return get_lower();
       }
       std::string string_singleton() const {
-	return lower_as_string();
+        return lower_as_string();
       }
-   }; // TREX::transaction::basic_interval
-
-
+    }; // TREX::transaction::basic_interval
+    
+    
   } // TREX::transaction
 } // TREX 
 

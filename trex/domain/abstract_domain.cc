@@ -40,7 +40,7 @@
 #include <sstream>
 #include "domain_visitor.hh"
 
-using namespace TREX::transaction;
+using namespace trex::transaction;
 
 /*
  * class TREX::transaction::abstract_domain

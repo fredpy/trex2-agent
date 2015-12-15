@@ -53,7 +53,7 @@
 
 # include "log_manager.hh"
 
-namespace TREX {
+namespace trex {
   namespace utils {
     
     namespace internals {

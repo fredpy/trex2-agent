@@ -33,9 +33,9 @@
  */
 #include "bits/reactor_policies.hh"
 
-using namespace TREX::transaction;
+using namespace trex::transaction;
 namespace asio=boost::asio;
-namespace utils=TREX::utils;
+namespace utils=trex::utils;
 
 /*
  * class TREX::transaction::instance_scope_exec

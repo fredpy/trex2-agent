@@ -34,7 +34,7 @@
 #include "async_ofstream_impl.hh"
 
 namespace asio=boost::asio;
-using namespace TREX::utils;
+using namespace trex::utils;
 
 /*
  * class TREX::utils::async_ofstream::pimpl

@@ -46,7 +46,7 @@
 
 # include <boost/optional.hpp>
 
-namespace TREX {
+namespace trex {
   namespace utils {
     namespace log { 
 
@@ -86,7 +86,7 @@ namespace TREX {
 	 *
 	 * The type used for both that source and kind of the entry.
 	 */
-        typedef ::TREX::utils::log::id_type id_type;
+        typedef ::trex::utils::log::id_type id_type;
 	/** @brief Message content type
 	 *
 	 * The type used to store the message content.
@@ -185,7 +185,7 @@ namespace TREX {
         msg_type m_content;
         bool m_pending_nl;
                 
-        friend class TREX::utils::log::details::entry_sink;
+        friend class trex::utils::log::details::entry_sink;
         friend class log_pipe;
       }; // class TREX::utils::log::entry
             

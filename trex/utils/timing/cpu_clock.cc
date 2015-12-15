@@ -36,7 +36,7 @@
 # include <sys/time.h>
 # include <sys/resource.h>
 
-using namespace TREX::utils;
+using namespace trex::utils;
 
 cpu_clock::time_point cpu_clock::now() {
   struct rusage result;

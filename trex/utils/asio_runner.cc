@@ -33,7 +33,7 @@
  */
 #include "asio_runner.hh"
 
-using namespace TREX::utils;
+using namespace trex::utils;
 using namespace boost::asio;
 
 /*

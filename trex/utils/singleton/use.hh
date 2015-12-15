@@ -34,7 +34,7 @@
 #ifndef H_trex_utils_singleton_use
 # define H_trex_utils_singleton_use
 
-namespace TREX {
+namespace trex {
   namespace utils {
     namespace singleton {
       

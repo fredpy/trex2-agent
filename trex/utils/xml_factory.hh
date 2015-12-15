@@ -11,14 +11,14 @@
  */
 /*********************************************************************
  * Software License Agreement (BSD License)
- * 
+ *
  *  Copyright (c) 2011, MBARI.
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions
  *  are met:
- * 
+ *
  *   * Redistributions of source code must retain the above copyright
  *     notice, this list of conditions and the following disclaimer.
  *   * Redistributions in binary form must reproduce the above
@@ -28,7 +28,7 @@
  *   * Neither the name of the TREX Project nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -48,68 +48,68 @@
 # include <utility>
 # include <iostream>
 
-# include "xml_utils.hh" 
+# include "xml_utils.hh"
 # include "generic_factory.hh"
 # include "symbol.hh"
 
-namespace TREX {
+namespace trex {
   namespace utils {
-
+    
     namespace internals {
-
+      
       template<class Base, class Extra>
       struct xml_arg_helper {
       private:
 #ifndef DOXYGEN
-	typedef std::pair<Base *, Extra> computed_type;
-	typedef std::pair<boost::property_tree::ptree::value_type *, Extra> computed_node;
-#endif 
+        typedef std::pair<Base *, Extra> computed_type;
+        typedef std::pair<boost::property_tree::ptree::value_type *, Extra> computed_node;
+#endif
       public:
- 	typedef computed_type argument_type;
- 	typedef computed_node node_proxy;
-
-	static Base &xml(argument_type &arg) {
-	  return *(arg.first);
-	}
-	static argument_type build(Base &n, Extra &e) {
-	  return std::make_pair(&n, e);
-	}
-
-	static node_proxy build_node(boost::property_tree::ptree::value_type &n,
-				     argument_type &b) {
-	  boost::property_tree::ptree::value_type *p = &n;
-	  return std::make_pair(p, b.second);
-	}
+        typedef computed_type argument_type;
+        typedef computed_node node_proxy;
+        
+        static Base &xml(argument_type &arg) {
+          return *(arg.first);
+        }
+        static argument_type build(Base &n, Extra &e) {
+          return std::make_pair(&n, e);
+        }
+        
+        static node_proxy build_node(boost::property_tree::ptree::value_type &n,
+                                     argument_type &b) {
+          boost::property_tree::ptree::value_type *p = &n;
+          return std::make_pair(p, b.second);
+        }
       }; // TREX::utils::internals::xml_arg_helper<>
-
+      
 #ifndef DOXYGEN
       template<class Base>
       struct xml_arg_helper<Base, void> {
-	typedef Base                                    &argument_type;
-	typedef boost::property_tree::ptree::value_type &node_proxy;
-
-	static Base &xml(argument_type arg) {
-	  return arg;
-	}
-
-	static argument_type build(Base &n) {
-	  return n;
-	}
-
-	static node_proxy build_node(boost::property_tree::ptree::value_type &n,
-				     argument_type b) {
-	  return n;
-	}
+        typedef Base                                    &argument_type;
+        typedef boost::property_tree::ptree::value_type &node_proxy;
+        
+        static Base &xml(argument_type arg) {
+          return arg;
+        }
+        
+        static argument_type build(Base &n) {
+          return n;
+        }
+        
+        static node_proxy build_node(boost::property_tree::ptree::value_type &n,
+                                     argument_type b) {
+          return n;
+        }
       }; // TREX::utils::internals::xml_arg_helper<,void>
-#endif // DOXYGEN    
-
+#endif // DOXYGEN
+      
     } // TREX::utils::details
-
-
+    
+    
     template<class Product, class Output=Product *, class Arg=void>
     class xml_factory :boost::noncopyable {
       typedef boost::property_tree::ptree tree_t;
-
+      
     public:
       typedef internals::xml_arg_helper<tree_t::value_type, Arg> arg_traits;
       
@@ -118,27 +118,27 @@ namespace TREX {
 #ifdef DOXYGEN
         using argument_type = typename internals::xml_arg_helper<Iter, Arg>::argument_type;
         typedef argument_type type;
-#else 
-	typedef typename internals::xml_arg_helper<Iter, Arg>::argument_type type;
+#else
+        typedef typename internals::xml_arg_helper<Iter, Arg>::argument_type type;
 #endif
       }; // TREX::utils::XmlFactory<>::iter_traits<>
-
+      
       typedef typename arg_traits::argument_type argument_type;
       
       typedef generic_factory<Product, symbol,
-                             argument_type, Output> factory_type;
+      argument_type, Output> factory_type;
       typedef typename factory_type::returned_type returned_type;
       
-
+      
       static tree_t::value_type &node(argument_type arg) {
-	return arg_traits::xml(arg);
+        return arg_traits::xml(arg);
       }
-
+      
       /** @brief Simple producer declaration
        *
        * @tparam Ty the real product type
        *
-       * This class allows to declare new producers for a XmlFactory and is based on 
+       * This class allows to declare new producers for a XmlFactory and is based on
        * Factory::declare implemetation.
        * The production is simply calling the constructor of @p Ty
        * accepting XmlFactory::argument_type as an argument.
@@ -158,26 +158,26 @@ namespace TREX {
       template<class Ty>
 #ifndef DOXYGEN
       class declare :public xml_factory::factory_type::template declare<Ty>
-#else 
-      class declare :public factory_type::declare<Ty> 
-#endif 
+#else
+      class declare :public factory_type::declare<Ty>
+#endif
       {
       public:
         /** @brief Constructor
          * @param[in] id A tag name
          *
-         * Declare the new producer that will create a class Ty whenever the 
+         * Declare the new producer that will create a class Ty whenever the
          * XmlFactory encounters an XML tag @p id
          */
-	declare(symbol const &id)
-	  :factory_type::template declare<Ty>(id) {}
-        /** @brief Destructor 
+        declare(symbol const &id)
+        :factory_type::template declare<Ty>(id) {}
+        /** @brief Destructor
          *
          * Undeclare this producer
          */
-	virtual ~declare() {}
+        virtual ~declare() {}
       }; // TREX::utils::XmlFactory<>::declare<>
-
+      
       /** @brief Production operator
        *
        * @param[in] arg An XML argument
@@ -186,11 +186,11 @@ namespace TREX {
        * @{
        */
       Output operator()(argument_type arg) {
-	return produce(arg);
+        return produce(arg);
       }
       Output produce(argument_type arg);
       /** @} */
-       
+      
       /** @brief Recognized XML tags
        *
        * @param[out] ids A list
@@ -198,20 +198,20 @@ namespace TREX {
        * Store all the currently recognized XML tags for this factory in @p ids
        */
       void get_ids(std::list<symbol> &ids) const {
-	m_factory->get_ids(ids);
+        m_factory->get_ids(ids);
       }
-
+      
       /** @brief iterator based production
        *
        * @param[in,out] it   A production iterator
        * @param[in] last An end iterator
-       * @param[out] ret product palcaholder 
+       * @param[out] ret product palcaholder
        *
-       * This method allow to create producats by iteratating through a single 
+       * This method allow to create producats by iteratating through a single
        * level of the XML structure.
        *
        * It advances @p it until a recognized tag is found or it reaches @p end.
-       * If a recognized tag is found it the produces a new product and strores 
+       * If a recognized tag is found it the produces a new product and strores
        * it in @p ret
        *
        * @throw XmlError captured an exception while trying to create a new product.
@@ -220,23 +220,23 @@ namespace TREX {
        * @retval false if @p it reached @p last without recognizing any tags
        */
       template<class Iter>
-      bool iter_produce(typename iter_traits<Iter>::type it, 
-			Iter const &last, Output &ret);
-
+      bool iter_produce(typename iter_traits<Iter>::type it,
+                        Iter const &last, Output &ret);
+      
     private:
       xml_factory() {}
       ~xml_factory() {}
       
       singleton::use<factory_type> m_factory;
-
+      
       friend class singleton::wrapper<xml_factory>;
     }; // TREX::utils::XmlFactory<>
-
-
+    
+    
 # define In_H_trex_utils_xml_factory
 #  include "bits/xml_factory.tcc"
 # undef In_H_trex_utils_xml_factory
-
+    
   } // TREX::utils
 } // TREX
 

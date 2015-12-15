@@ -45,7 +45,7 @@
 
 # include <trex/domain/int_domain.hh>
 
-namespace TREX {
+namespace trex {
   namespace transaction {
 
     /** @brief TREX unit of time

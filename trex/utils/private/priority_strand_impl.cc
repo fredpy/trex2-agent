@@ -33,7 +33,7 @@
  */
 #include "priority_strand_impl.hh"
 
-using namespace TREX::utils;
+using namespace trex::utils;
 namespace asio=boost::asio;
 
 /*

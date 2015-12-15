@@ -38,7 +38,7 @@
 
 # include "wrapper.hh"
 
-namespace TREX {
+namespace trex {
   namespace utils {
     namespace singleton {
     

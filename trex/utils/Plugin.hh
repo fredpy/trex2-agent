@@ -44,7 +44,7 @@
 #ifndef H_trex_utils_Plugin
 # define H_trex_utils_Plugin
 
-namespace TREX {
+namespace trex {
 	
   /** @brief Method to be implemented for each plugin
    * @ingroup utils

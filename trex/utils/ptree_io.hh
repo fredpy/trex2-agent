@@ -36,7 +36,7 @@
 
 # include <boost/property_tree/ptree.hpp>
 
-namespace TREX {
+namespace trex {
   namespace utils {
     
     void flatten_xml_attrs(boost::property_tree::ptree &p);

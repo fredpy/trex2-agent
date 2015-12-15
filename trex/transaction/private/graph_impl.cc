@@ -39,15 +39,15 @@
 
 #include "trex/utils/asio_runner.hh"
 
-using namespace TREX::transaction;
-namespace utils = TREX::utils;
+using namespace trex::transaction;
+namespace utils = trex::utils;
 namespace asio = boost::asio;
 namespace tlog = utils::log;
 
 using details::graph_impl;
 using utils::symbol;
 
-asio::io_service &TREX::transaction::details::service_of(SHARED_PTR<graph_impl> const &g) {
+asio::io_service &trex::transaction::details::service_of(SHARED_PTR<graph_impl> const &g) {
   return g->manager().service();
 }
 

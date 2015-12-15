@@ -50,7 +50,7 @@ namespace bpt=boost::posix_time;
 using bpt::ptime;
 
 
-using namespace TREX::utils; 
+using namespace trex::utils;
 
 
 /*

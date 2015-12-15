@@ -55,7 +55,7 @@
 
 # include "basic_enumerated.hh"
 
-namespace TREX {
+namespace trex {
   namespace transaction {
     
     /** @brief Enumeration based domain
@@ -105,7 +105,7 @@ namespace TREX {
        *
        * Create a new instance as a full domain of type @e type.
        */
-      explicit enumerated_domain(TREX::utils::symbol const &type)
+      explicit enumerated_domain(utils::symbol const &type)
       :basic_enumerated(type) {}
       /** @brief Constructor
        * @tparam Iter an iterator type
@@ -122,7 +122,7 @@ namespace TREX {
        * @throw EmptyDomain the created domain is empty
        */
       template<class Iter>
-      enumerated_domain(TREX::utils::symbol const &type,
+      enumerated_domain(utils::symbol const &type,
                        Iter from, Iter to)
       :basic_enumerated(type), m_elements(from, to) {
         if( m_elements.empty() )
@@ -136,7 +136,7 @@ namespace TREX {
        * Create a new instance of type @e type containing only the element
        * @e val
        */
-      explicit enumerated_domain(TREX::utils::symbol const &type,
+      explicit enumerated_domain(utils::symbol const &type,
                                 Ty const &val)
       :basic_enumerated(type) {
         add(val);

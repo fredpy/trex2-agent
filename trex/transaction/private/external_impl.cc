@@ -37,8 +37,8 @@
 
 #include <trex/utils/asio_runner.hh>
 
-using namespace TREX::transaction;
-namespace utils=TREX::utils;
+using namespace trex::transaction;
+namespace utils=trex::utils;
 namespace tlog=utils::log;
 
 using utils::symbol;

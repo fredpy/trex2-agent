@@ -38,15 +38,15 @@
 
 #include <trex/utils/asio_runner.hh>
 
-using namespace TREX::transaction;
-namespace utils=TREX::utils;
+using namespace trex::transaction;
+namespace utils=trex::utils;
 namespace tlog=utils::log;
 namespace bs2=boost::signals2;
 
 using utils::symbol;
 using details::internal_impl;
 
-std::string TREX::transaction::details::access_str
+std::string trex::transaction::details::access_str
 (details::transaction_flags const &gp) {
   std::string ret("--");
   if( gp[0] )

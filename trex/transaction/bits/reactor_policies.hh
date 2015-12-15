@@ -42,7 +42,7 @@
 
 # include <boost/thread/once.hpp>
 
-namespace TREX {
+namespace trex {
   namespace transaction {
 
     class reactor;

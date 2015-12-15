@@ -42,10 +42,10 @@
 
 # include "var.hh"
 
-using namespace TREX::utils;
+using namespace trex::utils;
 namespace bp=boost::property_tree;
 
-namespace TREX {
+namespace trex {
   namespace transaction {
     
     class var::impl :public ptree_convertible {
@@ -151,7 +151,7 @@ namespace TREX {
   } // TREX::transaction
 } // TREX
 
-using namespace TREX::transaction;
+using namespace trex::transaction;
 
 
 /*

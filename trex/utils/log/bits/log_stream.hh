@@ -40,7 +40,7 @@
 # include <boost/iostreams/stream.hpp>
 # include <trex/config/memory.hh>
 
-namespace TREX {
+namespace trex {
   namespace utils {
     namespace log {
       /** @brief Log implementation details
@@ -132,7 +132,7 @@ namespace TREX {
           WEAK_PTR<sig_impl> m_log;
           mutable entry::pointer    m_entry;
         
-          friend class ::TREX::utils::log::text_log;
+          friend class ::trex::utils::log::text_log;
         }; // class TREX::utils::log::details::entry_sink
         
         /** @brief Entry construction stream

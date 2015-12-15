@@ -40,7 +40,7 @@
 
 # include <trex/utils/log_manager.hh>
 
-namespace TREX {
+namespace trex {
   namespace transaction {
     
     class graph :boost::noncopyable {

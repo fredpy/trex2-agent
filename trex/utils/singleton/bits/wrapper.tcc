@@ -38,7 +38,7 @@
 
 # include <typeinfo>
 
-namespace TREX {
+namespace trex {
   namespace utils {
     namespace singleton {
 

@@ -34,7 +34,7 @@
 #include "bits/log_stream.hh"
 #include "text_log.hh"
 
-using namespace TREX::utils::log;
+using namespace trex::utils::log;
 
 // manipulators
 

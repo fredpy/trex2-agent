@@ -40,14 +40,14 @@
 
 #include <trex/utils/asio_runner.hh>
 
-using namespace TREX::transaction::details;
-using namespace TREX::transaction;
-using namespace TREX;
+using namespace trex::transaction::details;
+using namespace trex::transaction;
+using namespace trex;
 
-namespace tlog=TREX::utils::log;
+namespace tlog=trex::utils::log;
 namespace bs2=boost::signals2;
 
-using TREX::utils::symbol;
+using trex::utils::symbol;
 
 /*
  * class TREX::transaction::details::node_impl

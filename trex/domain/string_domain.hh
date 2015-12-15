@@ -2,24 +2,24 @@
 /** @file "StringDomain.hh"
  * @brief string values enumeration domain
  *
- * This file defines the StringDamain class. 
+ * This file defines the StringDamain class.
  *
  * The StringDomain is a specialization in order to declare domains
- * based on string values. 
+ * based on string values.
  *
  * @author Frederic Py <fpy@mbari.org>
  * @ingroup domains
  */
 /*********************************************************************
  * Software License Agreement (BSD License)
- * 
+ *
  *  Copyright (c) 2011, MBARI.
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions
  *  are met:
- * 
+ *
  *   * Redistributions of source code must retain the above copyright
  *     notice, this list of conditions and the following disclaimer.
  *   * Redistributions in binary form must reproduce the above
@@ -29,7 +29,7 @@
  *   * Neither the name of the TREX Project nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -48,30 +48,28 @@
 
 # include "enumerated_domain.hh"
 
-namespace TREX {
+namespace trex {
   namespace transaction {
-
+    
     /** @brief String domain
      *
      * This class implements a simple representation of strings domain.
      * The representation is based on an EnumeratedDomain that enumerates all
      * the possible values for this string.
      *
-     * @author Frederic Py <fpy@mbari.org> 
+     * @author Frederic Py <fpy@mbari.org>
      * @ingroup domains
      */
-    class string_domain
-      :public TREX::transaction::enumerated_domain<std::string> {
+    class string_domain:public enumerated_domain<std::string> {
     public:
-      static TREX::utils::symbol const type_str;
-      /** @brief Default Constructor 
-       * 
+      static utils::symbol const type_str;
+      /** @brief Default Constructor
+       *
        * Creates a new full string domain.
        */
-      string_domain()
-	:TREX::transaction::enumerated_domain<std::string>(type_str) {}
+      string_domain():enumerated_domain<std::string>(type_str) {}
       /** @brief Constructor
-       * 
+       *
        * @tparam a C++ iterator type
        * @param from an iterator
        * @param to an iterator
@@ -84,15 +82,13 @@ namespace TREX {
        * @throw EmptyDomainthe created domain is empty
        */
       template<class Iter>
-      string_domain(Iter from, Iter to)
-	:TREX::transaction::enumerated_domain<std::string>(type_str, from, to) {}
+      string_domain(Iter from, Iter to):enumerated_domain<std::string>(type_str, from, to) {}
       /** @brief Constructor
        * @param val a value
        *
        * Create a new domain with the single value @e val
        */
-      string_domain(std::string const &val)
-	:TREX::transaction::enumerated_domain<std::string>(type_str, val) {}
+      string_domain(std::string const &val):enumerated_domain<std::string>(type_str, val) {}
       /** @brief XML parsing constructor
        *
        * @param node an XML node
@@ -114,23 +110,23 @@ namespace TREX {
        *@endcode
        */
       explicit string_domain(boost::property_tree::ptree::value_type &node)
-	:TREX::transaction::enumerated_domain<std::string>(node) {}
-
+      :enumerated_domain<std::string>(node) {}
+      
       /** @brief Destructor */
       ~string_domain() {}
-
+      
       /** @brief Copy operator
        *
        * Allocates a new copy of current instance
        */
       abstract_domain *copy() const {
-	return new string_domain(begin(), end());
+        return new string_domain(begin(), end());
       }
     }; // TREX::transaction::StringDomain
-
-
+    
+    
   } // TREX::transaction
 } // TREX
-      
-      
+
+
 #endif  // H_StringDomain

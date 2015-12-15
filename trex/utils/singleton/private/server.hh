@@ -50,7 +50,7 @@
 
 # include <map>
 
-namespace TREX {
+namespace trex {
   namespace utils {
     namespace singleton {
       namespace internal {

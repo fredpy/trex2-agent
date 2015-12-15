@@ -37,7 +37,7 @@
 # include "external_impl.hh"
 # include <boost/thread/shared_mutex.hpp>
 
-namespace TREX {
+namespace trex {
   namespace transaction {
     namespace details {
 

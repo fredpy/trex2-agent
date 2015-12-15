@@ -15,7 +15,7 @@
 
 # include <private/dl_info.hh>
 
-namespace TREX {
+namespace trex {
   namespace utils {
     namespace internals {
 			

@@ -37,7 +37,7 @@
 
 # include "basic_symbol.hh"
 
-namespace TREX {
+namespace trex {
   namespace utils {
     
     /** @brief char based basic_symbol

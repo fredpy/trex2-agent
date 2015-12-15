@@ -46,7 +46,7 @@
 # include <boost/smart_ptr.hpp>
 # include <boost/thread.hpp>
 
-namespace TREX {
+namespace trex {
   namespace utils {
     
     /** @brief Boost Asio service manager

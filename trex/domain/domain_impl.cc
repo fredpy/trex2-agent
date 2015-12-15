@@ -51,8 +51,8 @@
 #include "string_domain.hh"
 #include "enum_domain.hh"
 
-using namespace TREX::transaction;
-using namespace TREX::utils;
+using namespace trex::transaction;
+using namespace trex::utils;
 
 
 namespace {
@@ -87,17 +87,17 @@ symbol const float_domain::type_str("float");
 symbol const string_domain::type_str("string");
 symbol const enum_domain::type_str("enum");
 
-double TREX::transaction::round(double d, size_t places) {
+double trex::transaction::round(double d, size_t places) {
   double factor = pow(10, places);
   return ::round(d*factor)/factor;
 }
 
-double TREX::transaction::floor(double d, size_t places) {
+double trex::transaction::floor(double d, size_t places) {
   double factor = pow(10, places);
   return std::floor(d*factor)/factor;  
 }
 
-double TREX::transaction::ceil(double d, size_t places) {
+double trex::transaction::ceil(double d, size_t places) {
   double factor = pow(10, places);
   return std::ceil(d*factor)/factor;  
 }

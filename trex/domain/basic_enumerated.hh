@@ -11,14 +11,14 @@
  */
 /*********************************************************************
  * Software License Agreement (BSD License)
- * 
+ *
  *  Copyright (c) 2011, MBARI.
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions
  *  are met:
- * 
+ *
  *   * Redistributions of source code must retain the above copyright
  *     notice, this list of conditions and the following disclaimer.
  *   * Redistributions in binary form must reproduce the above
@@ -28,7 +28,7 @@
  *   * Neither the name of the TREX Project nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -47,9 +47,9 @@
 
 # include "abstract_domain.hh"
 
-namespace TREX {
+namespace trex {
   namespace transaction {
-
+    
     /** @brief Enumerated Domain base class
      *
      * This class provide a unified abstract interface for implementing
@@ -63,19 +63,19 @@ namespace TREX {
     public:
       /** @brief Destructor */
       virtual ~basic_enumerated() {}
-
+      
       bool is_interval() const {
-	return false;
+        return false;
       }
       bool is_enumerated() const {
-	return true;
+        return true;
       }
-
+      
       bool is_full() const {
-	return 0==size();
+        return 0==size();
       }
       bool is_singleton() const {
-	return 1==size();
+        return 1==size();
       }
       
       /** @brief element count
@@ -90,7 +90,7 @@ namespace TREX {
       /** @brief generic element access
        * @param i index of the element
        *
-       * This method give access to the element @a i of the domain. 
+       * This method give access to the element @a i of the domain.
        *
        * @pre @a i is less than the size of the set
        *
@@ -103,7 +103,7 @@ namespace TREX {
       /** @overload boost::any getElement(size_t i) const
        */
       boost::any operator[](size_t i) const {
-	return element(i);
+        return element(i);
       }
       /** @brief Typed element access
        * @tparam Ty   expected return type
@@ -135,16 +135,16 @@ namespace TREX {
       template< class Ty, bool Safe >
       Ty typed_element(size_t n) const {
         boost::any val = element(n);
-	if( Safe ) {
+        if( Safe ) {
           Ty *ret = boost::any_cast<Ty>(&val);
           if( NULL!=ret )
             return *ret;
           else
             return boost::lexical_cast<Ty>(element_as_string(n));
-	} else 
-	  return boost::any_cast<Ty>(val);
+        } else
+          return boost::any_cast<Ty>(val);
       }
-           
+      
       /** @brief Get element textual value
        * @param[in] i Index of the element
        *
@@ -159,33 +159,33 @@ namespace TREX {
        * @sa getTypedElement(size_t) const
        */
       virtual std::string element_as_string(size_t i) const;
-
+      
       virtual void add_string_value(std::string const &val) =0;
     protected:
-      explicit basic_enumerated(TREX::utils::symbol const &type)
-	:abstract_domain(type) {}
+      explicit basic_enumerated(utils::symbol const &type)
+      :abstract_domain(type) {}
       explicit basic_enumerated(boost::property_tree::ptree::value_type &node)
-	:abstract_domain(node) {}
-
+      :abstract_domain(node) {}
+      
       void complete_parsing(boost::property_tree::ptree::value_type &node);
-
+      
       virtual std::ostream &print_value(std::ostream &out, size_t i) const =0;
       
     private:
       boost::property_tree::ptree build_tree() const;
-
+      
       void accept(domain_visitor &visitor) const;
       std::ostream &print_domain(std::ostream &out) const;
       
       boost::any singleton() const {
-	return element(0);
+        return element(0);
       }
       std::string string_singleton() const {
-	return element_as_string(0);
+        return element_as_string(0);
       }
     }; // TREX::transaction::BasicEnumerated
-
-
+    
+    
   } // TREX::transaction
 } // TREX 
 

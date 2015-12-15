@@ -35,8 +35,8 @@
 #include "private/node_impl.hh"
 #include "private/graph_impl.hh"
 
-using namespace TREX;
-using namespace TREX::transaction;
+using namespace trex;
+using namespace trex::transaction;
 
 namespace bpt=boost::property_tree;
 using utils::symbol;

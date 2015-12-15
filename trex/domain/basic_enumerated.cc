@@ -41,7 +41,7 @@
 #include <sstream>
 #include "domain_visitor.hh"
 
-using namespace TREX::transaction;
+using namespace trex::transaction;
 namespace bpt=boost::property_tree;
 /*
  * class TREX::transaction::basic_enumerated
@@ -57,13 +57,13 @@ void basic_enumerated::complete_parsing(bpt::ptree::value_type &node) {
     // In case there's no elem childs check if someone specified
     // its value directly
     boost::optional<std::string>
-    txt = TREX::utils::parse_attr< boost::optional<std::string> >(node, "value");
+    txt = utils::parse_attr< boost::optional<std::string> >(node, "value");
     if( txt )
       add_string_value(*txt);
   } else {
     for(; last!=i; ++i) {
       boost::optional<std::string>
-        txt = TREX::utils::parse_attr< boost::optional<std::string> >( i->second,   "value");
+        txt = utils::parse_attr< boost::optional<std::string> >( i->second,   "value");
       if( txt )
         add_string_value(*txt);
     }

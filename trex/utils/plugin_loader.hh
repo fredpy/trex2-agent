@@ -48,7 +48,7 @@
 # include "symbol.hh"
 # include "log_manager.hh"
 
-namespace TREX {
+namespace trex {
   namespace utils {
 		
     /** @brief plug-in management class

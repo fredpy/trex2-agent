@@ -39,7 +39,7 @@
 
 # include <boost/asio/io_service.hpp>
 
-namespace TREX {
+namespace trex {
   namespace utils {
     
     template<class Worker>

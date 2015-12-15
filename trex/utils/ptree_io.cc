@@ -73,11 +73,11 @@ namespace {
     
 }
   
-void TREX::utils::flatten_json_arrays(bp::ptree &p) {
+void trex::utils::flatten_json_arrays(bp::ptree &p) {
   remove_arrays("", p);
 }
 
-void TREX::utils::flatten_xml_attrs(bp::ptree &p) {
+void trex::utils::flatten_xml_attrs(bp::ptree &p) {
   if( !p.empty() ) {
     bp::ptree tmp;
     p.swap(tmp);
@@ -92,11 +92,11 @@ void TREX::utils::flatten_xml_attrs(bp::ptree &p) {
   }
 }
 
-void TREX::utils::read_xml(std::istream &in, bp::ptree &p) {
+void trex::utils::read_xml(std::istream &in, bp::ptree &p) {
   xml::read_xml(in, p, xml::no_comments|xml::trim_whitespace);
 }
 
-void TREX::utils::write_xml(std::ostream &out, bp::ptree p, bool header) {
+void trex::utils::write_xml(std::ostream &out, bp::ptree p, bool header) {
   // Clean up the mess for json
   flatten_json_arrays(p);
   if( header )
@@ -113,13 +113,13 @@ void TREX::utils::write_xml(std::ostream &out, bp::ptree p, bool header) {
   }
 }
 
-void TREX::utils::read_json(std::istream &in, bp::ptree &p) {
+void trex::utils::read_json(std::istream &in, bp::ptree &p) {
   json::read_json(in, p);
   // clean that up as it impedes my parsing
   flatten_json_arrays(p);
 }
 
-void TREX::utils::write_json(std::ostream &out, boost::property_tree::ptree p, bool fancy) {
+void trex::utils::write_json(std::ostream &out, boost::property_tree::ptree p, bool fancy) {
   // Clean up the mess for xml
   flatten_xml_attrs(p);
   // fancy print
@@ -127,7 +127,7 @@ void TREX::utils::write_json(std::ostream &out, boost::property_tree::ptree p, b
 }
 
 
-using namespace TREX::utils;
+using namespace trex::utils;
 
 std::ostream &ptree_convertible::to_xml(std::ostream &out) const {
   write_xml(out, as_tree(), false);

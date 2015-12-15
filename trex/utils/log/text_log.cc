@@ -44,7 +44,7 @@
 
 namespace bs2=boost::signals2;
 
-namespace TREX {
+namespace trex {
   namespace utils {
     namespace log {
       
@@ -87,7 +87,7 @@ namespace TREX {
   }
 }
 
-using namespace TREX::utils::log;
+using namespace trex::utils::log;
 
 /*
  * class TREX::utils::log::details::entry_sink
@@ -176,8 +176,8 @@ void out_file::operator()(entry::pointer msg) {
 // structors 
 
 log_pipe::log_pipe(text_log &log, std::ostream &os, 
-		   TREX::utils::symbol const &who,
-                   TREX::utils::symbol const &what)
+                   trex::utils::symbol const &who,
+                   trex::utils::symbol const &what)
   :m_who(who), m_what(what), m_log(log.m_new_log), m_dest(os), m_flush(log.service()) {
   m_initial = m_dest.rdbuf();
   m_me = new boost::iostreams::stream_buffer<pipe_sink>(*this);

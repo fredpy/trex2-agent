@@ -34,7 +34,7 @@
 #include "reactor_error.hh"
 #include <string>
 
-using namespace TREX::transaction;
+using namespace trex::transaction;
 
 namespace {
   
@@ -67,7 +67,7 @@ namespace {
   reactor_category_impl re_error;
 } // ::
 
-ERROR_CODE TREX::transaction::reactor_error_code
+ERROR_CODE trex::transaction::reactor_error_code
 (reactor_error::reactor_error_t e) {
   return ERROR_CODE(static_cast<int>(e), re_error);
 }

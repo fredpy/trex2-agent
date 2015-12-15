@@ -9,14 +9,14 @@
  */
 /*********************************************************************
  * Software License Agreement (BSD License)
- * 
+ *
  *  Copyright (c) 2011, MBARI.
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions
  *  are met:
- * 
+ *
  *   * Redistributions of source code must retain the above copyright
  *     notice, this list of conditions and the following disclaimer.
  *   * Redistributions in binary form must reproduce the above
@@ -26,7 +26,7 @@
  *   * Neither the name of the TREX Project nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -50,9 +50,9 @@
 # include <trex/utils/symbol.hh>
 # include "abstract_domain.hh"
 
-namespace TREX {
+namespace trex {
   namespace transaction {
-
+    
     /** @brief TREX variable representation
      *
      * This class implements a TREX variable. variables are
@@ -63,10 +63,10 @@ namespace TREX {
      * @author Frederic Py <fpy@mbari.org>
      * @ingroup domains
      */
-    class var :public TREX::utils::ptree_convertible {
+    class var :public utils::ptree_convertible {
     private:
       class impl;
-
+      
       UNIQ_PTR<impl> m_impl;
     public:
       /** @brief Constructor
@@ -88,7 +88,7 @@ namespace TREX {
        * @throw VariableException Tried to create a variable with an
        * empty name
        */
-      var(TREX::utils::symbol const &name,
+      var(utils::symbol const &name,
           abstract_domain const &domain);
       /** @brief Constructor
        * @brief var Another instance
@@ -117,7 +117,7 @@ namespace TREX {
       var(boost::property_tree::ptree::value_type &node);
       /** @brief Destructor */
       ~var();
-
+      
       /** @brief Check for complete varaible definition
        *
        * This method checks if current instance is fully defined with a
@@ -143,8 +143,8 @@ namespace TREX {
        * @return the name of this variable
        * @sa bool isComplete() const
        */
-      TREX::utils::symbol name() const;
-
+      utils::symbol name() const;
+      
       /** @brief Variable domain
        *
        * @pre The variable is complete
@@ -173,15 +173,15 @@ namespace TREX {
        */
       template<class Ty>
       Ty const &typed_domain() const {
-	BOOST_STATIC_ASSERT((boost::is_convertible<Ty const &, 
-			     abstract_domain const &>::value));
-	return dynamic_cast<Ty const &>(domain());
+        BOOST_STATIC_ASSERT((boost::is_convertible<Ty const &,
+                             abstract_domain const &>::value));
+        return dynamic_cast<Ty const &>(domain());
       }
       
       void accept(domain_visitor &visitor) const {
-	domain().accept(visitor);
+        domain().accept(visitor);
       }
-
+      
       /** @brief Restrict Variable domain
        * @param dom a domain
        *
@@ -212,7 +212,7 @@ namespace TREX {
        * @sa DomainBase &DomainBase::restrictWith(DomainBase const &)
        */
       var &operator*=(abstract_domain const &dom) {
-	restrict_with(dom);
+        restrict_with(dom);
         return *this;
       }
       /** @brief Merge variable
@@ -244,15 +244,15 @@ namespace TREX {
        * @sa DomainBase &DomainBase::restrictWith(DomainBase const &)
        */
       var &operator*=(var const &v) {
-	restrict_with(v);
+        restrict_with(v);
         return *this;
       }
-
-      boost::property_tree::ptree as_tree() const;
-   }; // class TREX::transaction::var
       
-  std::ostream &operator<<(std::ostream &out, var const &v);
-        
+      boost::property_tree::ptree as_tree() const;
+    }; // class TREX::transaction::var
+    
+    std::ostream &operator<<(std::ostream &out, var const &v);
+    
   } // TREX::transaction
 } // TREX 
 

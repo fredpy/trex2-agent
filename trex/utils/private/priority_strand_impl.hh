@@ -41,7 +41,7 @@
 
 # include <queue>
 
-namespace TREX {
+namespace trex {
   namespace utils {
     
     class priority_strand::pimpl: boost::noncopyable,

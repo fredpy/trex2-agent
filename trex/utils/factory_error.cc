@@ -35,7 +35,7 @@
 
 #include <string>
 
-using namespace TREX::utils;
+using namespace trex::utils;
 
 namespace  {
   
@@ -69,6 +69,6 @@ namespace  {
 }
 
 
-ERROR_CODE TREX::utils::factory_error_code(factory_error::factory_error_t e) {
+ERROR_CODE trex::utils::factory_error_code(factory_error::factory_error_t e) {
   return ERROR_CODE(static_cast<int>(e), factory_category());
 }

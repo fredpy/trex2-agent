@@ -45,7 +45,7 @@
 # include <string>
 # include <fstream>
 
-namespace TREX {
+namespace trex {
   namespace utils {
     
     

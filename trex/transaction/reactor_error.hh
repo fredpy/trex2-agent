@@ -36,7 +36,7 @@
 
 # include <trex/config/system_error.hh>
 
-namespace TREX {
+namespace trex {
   namespace transaction {
 
     namespace reactor_error {

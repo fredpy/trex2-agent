@@ -36,9 +36,9 @@
 #include "private/graph_impl.hh"
 
 
-using namespace TREX::transaction;
+using namespace trex::transaction;
 
-namespace utils=TREX::utils;
+namespace utils=trex::utils;
 namespace tlog=utils::log;
 namespace asio=boost::asio;
 namespace bpt=boost::property_tree;

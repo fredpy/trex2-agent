@@ -36,7 +36,7 @@
 
 # include <trex/config/chrono.hh>
 
-namespace TREX {
+namespace trex {
   namespace utils {
     
     /** @brief process cpu clock
@@ -90,7 +90,7 @@ namespace boost {
   namespace chrono {
     
     template<class CharT>
-    struct clock_string<TREX::utils::cpu_clock, CharT> {
+    struct clock_string<trex::utils::cpu_clock, CharT> {
       /** @brief Clock name */
       static std::basic_string<CharT> name() {
         static const CharT u[] =

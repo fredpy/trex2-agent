@@ -33,7 +33,7 @@
  */
 #include "private/server.hh"
 
-using namespace TREX::utils::singleton::internal;
+using namespace trex::utils::singleton::internal;
 
 // statics 
 

@@ -33,19 +33,19 @@
  */
 #include "private/dl_func.hh"
 
-void *TREX::utils::internals::p_dlopen(char const *path, int mode) {
+void *trex::utils::internals::p_dlopen(char const *path, int mode) {
   return dlopen(path, mode);
 }
 
-void *TREX::utils::internals::p_dlsym(void * handle, const char *symbol) {
+void *trex::utils::internals::p_dlsym(void * handle, const char *symbol) {
   return dlsym(handle,symbol);
 }
 
-const char *TREX::utils::internals::p_dlerror(void) {
+const char *trex::utils::internals::p_dlerror(void) {
   return dlerror();
 }
 
-int TREX::utils::internals::p_dlclose(void * handle) {
+int trex::utils::internals::p_dlclose(void * handle) {
   return dlclose(handle);
 }
 

@@ -40,7 +40,7 @@
 # include <boost/signals2/slot.hpp>
 # include <boost/signals2/connection.hpp>
 
-namespace TREX {
+namespace trex {
   namespace utils {
     namespace log {
       namespace details {

@@ -41,7 +41,7 @@
 
 # include <functional>
 
-namespace TREX {
+namespace trex {
   namespace transaction {
     
     
@@ -50,7 +50,7 @@ namespace TREX {
     typedef SHARED_PTR<token> token_ref;
     
     
-    class token: public TREX::utils::ptree_convertible,
+    class token: public utils::ptree_convertible,
     public ENABLE_SHARED_FROM_THIS<token> {
     public:
       struct attr_comp

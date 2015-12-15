@@ -55,7 +55,7 @@
 # include "singleton.hh"
 
 
-namespace TREX {
+namespace trex {
   namespace utils {
 
     /** @brief Logging and file access management for trex
