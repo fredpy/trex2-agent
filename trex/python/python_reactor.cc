@@ -54,12 +54,9 @@ namespace  {
 reactor_proxy::reactor_proxy(py_wrapper const &r)
 :m_impl(r.me) {
   m_impl->syslog()<<"Proxy created with address: "<<this;
-  m_impl->set_proxy(this);
 }
 
-reactor_proxy::~reactor_proxy() {
-  m_impl->detach(this);
-}
+reactor_proxy::~reactor_proxy() {}
 
 // observers
 
@@ -354,7 +351,7 @@ py_reactor::py_reactor(xml_arg_type arg)
       throw XmlError(node, "Python class \""+class_name+"\" not found.");
     }
     syslog()<<"Creating new instance of "<<class_name;
-    py_wrapper wrap(this);
+    py_wrapper wrap(this, node);
     m_obj = my_class(wrap);
     
     bp::extract<reactor_wrap &> extractor(m_obj);
@@ -370,23 +367,6 @@ py_reactor::py_reactor(xml_arg_type arg)
 
 py_reactor::~py_reactor() {}
 
-
-// modifiers
-
-void py_reactor::set_proxy(reactor_proxy *self) {
-//  mutex_type::scoped_lock lock(m_mtx);
-//  if( NULL==m_self )
-//    m_self = self;
-//  else
-//    // for now just display an error without exception
-//    syslog(log::error)<<"Multiple proxies attempted to attach to me.";
-}
-
-void py_reactor::detach(reactor_proxy *self) {
-//  mutex_type::scoped_lock lock(m_mtx);
-//  if( self==m_self )
-//    m_self = NULL;
-}
 
 // observers
 

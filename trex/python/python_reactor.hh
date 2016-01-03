@@ -45,10 +45,16 @@ namespace TREX {
     class py_reactor;
     
     struct py_wrapper {
-      py_wrapper(py_reactor *r):me(r) {}
+      py_wrapper(py_reactor *r, boost::property_tree::ptree::value_type &node):me(r), xml_ref(node) {
+      }
       ~py_wrapper() {}
       
+      boost::property_tree::ptree::value_type const &xml() const {
+        return xml_ref;
+      }
+      
       py_reactor *me;
+      boost::property_tree::ptree::value_type &xml_ref;
     };
     
     
@@ -146,8 +152,6 @@ namespace TREX {
       ~py_reactor();
       
     private:
-      void set_proxy(reactor_proxy *self);
-      void detach(reactor_proxy *self);
       reactor_proxy &self();
       
       void handleInit();
