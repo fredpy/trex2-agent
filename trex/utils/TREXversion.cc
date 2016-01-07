@@ -36,14 +36,7 @@
 
 #include <sstream>
 
-#ifdef WITH_GIT_TRACK
-# include "git/version.hh"
-#else
-// Make the default dimilar to when we do not find svn
-# define GIT_INFO   false
-# define GIT_BRANCH "unknown"
-# define GIT_REV    "exported"
-#endif 
+# include "bits/git_version.hh"
 
 using namespace TREX;
 
@@ -96,7 +89,11 @@ std::string version::svn_revision() {
 }
 
 bool version::git_info() {
-  return GIT_INFO;
+#ifdef GIT_PROJECT
+  return true;
+#else
+  return false;
+#endif
 }
 
 std::string version::git_branch() {
