@@ -28,7 +28,7 @@ if(GIT_PROJECT)
 
   macro(git_header file)
     add_custom_command(OUTPUT ${file} 
-      DEPENDS get_git
+      DEPENDS get_git ${CMAKE_BINARY_DIR}/git/git_version.hh
       COMMAND ${CMAKE_COMMAND}
       ARGS -E copy_if_different ${CMAKE_BINARY_DIR}/git/git_version.hh ${file})
     set_source_files_properties(${file}
