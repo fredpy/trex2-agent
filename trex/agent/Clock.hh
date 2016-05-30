@@ -58,6 +58,8 @@ namespace TREX {
     using utils::log::warn;
     using utils::log::error;
     
+    class FastClock;
+    
     /** @brief TREX clock
      *
      * This class defines the abstract interface to the Clock that
@@ -274,6 +276,8 @@ namespace TREX {
       mutable bool               m_free;
       mutable size_t             m_free_count, m_count;
       mutable utils::async_ofstream m_data;
+      
+      friend class FastClock;
     }; // TREX::agent::Clock
     
   } // TREX::agent   

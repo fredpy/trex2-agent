@@ -36,6 +36,7 @@
 add_library(TREXagent SHARED
     Agent.cc
     Clock.cc
+    FastClock.cc
     LogClock.cc
     RealTimeClock.cc
     StepClock.cc
@@ -43,6 +44,7 @@ add_library(TREXagent SHARED
     bits/agent_graph.hh
     Agent_fwd.hh
     Agent.hh
+    FastClock.hh
     LogClock.hh
     Clock.hh
     RealTimeClock.hh

@@ -389,7 +389,7 @@ namespace TREX {
       }
       
       duration_type doSleep() {
-	return Clock::doSleep();
+        return Clock::doSleep();
       }
 
       duration_type getSleepDelay() const {
