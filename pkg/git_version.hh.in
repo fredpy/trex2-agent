@@ -1,0 +1,4 @@
+/* @CMAKE_GENERATED_MESSAGE@ */
+#cmakedefine GIT_PROJECT
+#define GIT_BRANCH "@GIT_WC_BRANCH@"
+#define GIT_REV "@GIT_WC_REV@"

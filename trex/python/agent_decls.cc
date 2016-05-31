@@ -32,11 +32,15 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 #include <trex/agent/RealTimeClock.hh>
+#include <trex/agent/FastClock.hh>
 #include <trex/agent/StepClock.hh>
 #include <trex/agent/Agent.hh>
 #include <trex/utils/platform/memory.hh>
+#include <trex/utils/StringExtract.hh>
 
 #include <boost/python.hpp>
+#include <boost/date_time/posix_time/posix_time_io.hpp>
+
 
 #include "exception_helper.hh"
 
@@ -65,6 +69,15 @@ namespace {
   
   double to_seconds(ta::Clock const &c, tt::TICK t) {
     return CHRONO::duration_cast<fl_secs>(c.tickDuration()*t).count();
+  }
+  
+  SHARED_PTR<ta::FastClock> fast_clock_init(ta::clock_ref const &base,
+                                            std::string const &date,
+                                            double secs) {
+    ta::Clock::date_type epoch = TREX::utils::string_cast<ta::Clock::date_type>(date);
+    fl_secs my_secs(secs);
+    return MAKE_SHARED<ta::FastClock>(base, epoch,
+                                      CHRONO::duration_cast<ta::Clock::duration_type>(my_secs));
   }
 }
 
@@ -118,7 +131,7 @@ void export_agent() {
   ("rt_clock", "real time clock at 1000Hz resolution",
    init<ta::RealTimeClock::rep const &,
         optional<unsigned> >(args("self", "period", "percent_use"),
-                             "Create a vlock with the given period in ms.\n"
+                             "Create a clock with the given period in ms.\n"
                              "percent_use is internal and indicate how much of a tick\n"
                              "         is allowed for the agent to execute reactors.\n"
                              "          passed this amount the agent will then try to put\n"
@@ -129,6 +142,23 @@ void export_agent() {
   ;
   
   implicitly_convertible<SHARED_PTR<ta::RealTimeClock>, ta::clock_ref>();
+  
+  
+  class_<ta::FastClock, bases<ta::Clock>, SHARED_PTR<ta::FastClock>,
+    boost::noncopyable>
+  ("fast_clock", "clock that can go faster (or slower) than its associated clock",
+   no_init)
+  .def("__init__",
+       make_constructor(&fast_clock_init,
+                        default_call_policies(),
+                        args(/*"self",*/ "clk", "epoch", "seconds")),
+       "Create a fast clock using the clock clk with epoch as a simulated\n"
+       "start date (ie the inital tick) and seconds as a simulated period.\n"
+       "Note: epoch is a string representing a date in ISO 8601 format.\n"
+       "      for example \'2016-05-31T20:10:05+00:00\'")
+  ;
+  
+  implicitly_convertible<SHARED_PTR<ta::FastClock>,ta::clock_ref>();
   
   class_<ta::StepClock, bases<ta::Clock>, SHARED_PTR<ta::StepClock>,
          boost::noncopyable>("sim_clock",

@@ -489,7 +489,7 @@ void export_utils() {
        "Add the directory path to TREX_PATH")
   ;
   
-  scope().attr("logger") = boost::make_shared<log_wrapper>(TREX::utils::Symbol("python"));
+//scope().attr("logger") = boost::make_shared<log_wrapper>(TREX::utils::Symbol("python"));
   
   // trex.utils.log_handler
   // new log entry handler abstract class

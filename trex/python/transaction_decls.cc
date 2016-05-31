@@ -285,7 +285,11 @@ void export_transactions() {
   s_py_err->attach<MultipleReactors>(mul_r_e.ptr());
   
   bp::class_<py_wrapper>
-  ("reactor_anchor", "Internal anchor for a python reactor", bp::no_init);
+  ("reactor_anchor", "Internal anchor for a python reactor", bp::no_init)
+  .add_property("xml",
+                bp::make_function(&py_wrapper::xml,
+                                  bp::return_internal_reference<>()),
+                "Get xml tag used to create to this reactor");
   
   bp::class_<reactor_wrap, boost::noncopyable>
   ("reactor", "Python api for reactor.\n"

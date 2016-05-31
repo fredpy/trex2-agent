@@ -51,11 +51,11 @@ install(
   DESTINATION include/trex/utils/bits
 )
 
+git_header(bits/git_version.hh)
+set_source_files_properties(TREXversion.cc
+  PROPERTIES OBJECT_DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/bits/git_version.hh)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
-
-
-
 
 add_library(TREXutils SHARED
   # real source
@@ -77,6 +77,7 @@ add_library(TREXutils SHARED
   log/text_log.cc
   cpu_clock.cc
   # headers
+  ${CMAKE_CURRENT_BINARY_DIR}/bits/git_version.hh
   asio_fstream.hh
   asio_signal.hh
   asio_signal_n.hh
@@ -135,47 +136,48 @@ add_library(TREXutils SHARED
   bits/XmlFactory.tcc
 )
 
-if(TREX_FROM_PKG)
-  # svn data is given by the package
-  set(GIT_HH ${CMAKE_SOURCE_DIR}/${TREX_EXTRA_SRC}/git/version.hh)
+# if(TREX_FROM_PKG)
+#   # svn data is given by the package
+#   set(GIT_HH ${CMAKE_SOURCE_DIR}/${TREX_EXTRA_SRC}/git/version.hh)
 
-  if(EXISTS ${GIT_HH})
-    include_directories(${CMAKE_SOURCE_DIR}/${TREX_EXTRA_SRC})
-    add_definitions(-DWITH_GIT_TRACK)
-  endif()
-else(TREX_FROM_PKG)
- # I need to generate the file
+#   if(EXISTS ${GIT_HH})
+#     include_directories(${CMAKE_SOURCE_DIR}/${TREX_EXTRA_SRC})
+#     add_definitions(-DWITH_GIT_TRACK)
+#   endif()
+# else(TREX_FROM_PKG)
+#  # I need to generate the file
 
- option(WITH_GIT_TRACK "Enable tracking of git compiled version in TREXversion" ON)
- mark_as_advanced(WITH_GIT_TRACK)
+#  option(WITH_GIT_TRACK "Enable tracking of git compiled version in TREXversion" ON)
+#  mark_as_advanced(WITH_GIT_TRACK)
 
- if(WITH_GIT_TRACK)
-    set(GIT_HH git/version.hh)
-    add_custom_target(githeader ALL 
-      DEPENDS ${GIT_HH})
-    add_dependencies(trex_prep githeader)
+#  if(WITH_GIT_TRACK)
+#     set(GIT_HH git/version.hh)
+#     add_custom_target(githeader ALL 
+#       DEPENDS ${GIT_HH})
+#     add_dependencies(trex_prep githeader)
 
-    # this run my svn script
-    add_custom_command(OUTPUT ${GIT_HH}
-      PRE_BUILD
-      COMMAND ${CMAKE_COMMAND} -DSOURCE_DIR=${CMAKE_SOURCE_DIR}
-      -DOUTPUT_DIR=${TREX_EXTRA_DIR}
-      -P ${CMAKE_SOURCE_DIR}/cmake/getgit.cmake)
+#     # this run my svn script
+#     add_custom_command(OUTPUT ${GIT_HH}
+#       PRE_BUILD
+#       COMMAND ${CMAKE_COMMAND} -DSOURCE_DIR=${CMAKE_SOURCE_DIR}
+#       -DOUTPUT_DIR=${TREX_EXTRA_DIR}
+#       -P ${CMAKE_SOURCE_DIR}/cmake/getgit.cmake)
     
-    include_directories(${TREX_EXTRA_DIR})
-    set_source_files_properties(${GIT_HH}
-      PROPERTIES GENERATED TRUE
-     # HEADER_FILE_ONLY TRUE
-     LOCATION ${TREX_EXTRA_DIR}
-     )
+#     include_directories(${TREX_EXTRA_DIR})
+#     set_source_files_properties(${GIT_HH}
+#       PROPERTIES GENERATED TRUE
+#      # HEADER_FILE_ONLY TRUE
+#      LOCATION ${TREX_EXTRA_DIR}
+#      )
 
-    add_dependencies(TREXutils githeader)
+#     add_dependencies(TREXutils githeader)
 
-    set_source_files_properties(TREXversion.cc
-      PROPERTIES OBJECT_DEPENDS ${TREX_EXTRA_DIR}/${GIT_HH})
-    add_definitions(-DWITH_GIT_TRACK)
- endif(WITH_GIT_TRACK)
-endif(TREX_FROM_PKG)
+#     set_source_files_properties(TREXversion.cc
+#       PROPERTIES OBJECT_DEPENDS ${TREX_EXTRA_DIR}/${GIT_HH})
+#     add_definitions(-DWITH_GIT_TRACK)
+#  endif(WITH_GIT_TRACK)
+# endif(TREX_FROM_PKG)
+
 
 add_dependencies(core TREXutils)
 target_link_libraries(TREXutils ${SYSTEM_LIBRARIES}  
