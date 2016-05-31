@@ -149,7 +149,13 @@ void export_agent() {
   ("fast_clock", "clock that can go faster (or slower) than its associated clock",
    no_init)
   .def("__init__",
-       make_constructor(fast_clock_init))
+       make_constructor(&fast_clock_init,
+                        default_call_policies(),
+                        args(/*"self",*/ "clk", "epoch", "seconds")),
+       "Create a fast clock using the clock clk with epochs as a simulated\n"
+       "start date and seconds as a simulated period.\n"
+       "Note: epoch is a string representing a date in ISO 8601 format.\n"
+       "      for example \'2016-05-31T20:10:05+00:00\'")
   ;
   
   implicitly_convertible<SHARED_PTR<ta::FastClock>,ta::clock_ref>();
