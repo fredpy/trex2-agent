@@ -152,8 +152,8 @@ void export_agent() {
        make_constructor(&fast_clock_init,
                         default_call_policies(),
                         args(/*"self",*/ "clk", "epoch", "seconds")),
-       "Create a fast clock using the clock clk with epochs as a simulated\n"
-       "start date and seconds as a simulated period.\n"
+       "Create a fast clock using the clock clk with epoch as a simulated\n"
+       "start date (ie the inital tick) and seconds as a simulated period.\n"
        "Note: epoch is a string representing a date in ISO 8601 format.\n"
        "      for example \'2016-05-31T20:10:05+00:00\'")
   ;
