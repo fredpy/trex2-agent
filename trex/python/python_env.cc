@@ -46,8 +46,15 @@ namespace tlog=TREX::utils::log;
 
 python_env::python_env()
 :m_strand(m_log->service(), false) {
-  static char name[] = {'\0'};
-  static char *argv[] = { name };
+#if PY_MAJOR_VERSION >= 3
+  typedef wchar_t py_char;
+#else
+  typedef char py_char;
+#endif
+  
+  static py_char name[] = {'\0'};
+  static py_char *argv[] = { name };
+
   m_log->syslog("python", tlog::info)<<"Initializing python";
   Py_Initialize();
   // Needed for some python libs inclufing rospy
