@@ -36,8 +36,11 @@
 #include <boost/scope_exit.hpp>
 #include <pyerrors.h>
 
+
 using namespace TREX::python::details;
 using namespace TREX::python;
+namespace bp=boost::python;
+
 
 /*
  * class TREX::python::details::exception_table
@@ -69,42 +72,30 @@ void exception_table::unwrap_py_error() {
    
     // fetch error from python
     PyErr_Fetch(&py_type, &py_val, &py_trace);
+    bp::handle<> h_type(py_type), h_val(bp::allow_null(py_val)),
+      h_trace(bp::allow_null(py_trace));
     // clear error on pyhton
     PyErr_Clear();
-    
-    // ensure that we will dereferences thisese variables
-    BOOST_SCOPE_EXIT((&py_type)(&py_val)(&py_trace)) {
-      Py_XDECREF(py_type);
-      Py_XDECREF(py_val);
-      Py_XDECREF(py_trace);
-    } BOOST_SCOPE_EXIT_END;
     
     if( NULL!=py_type ) {
       // First look if I know how to convert it
       exc_set::const_iterator pos = m_exceptions.find(py_type);
-      
+
       if( m_exceptions.end()!=pos && NULL!=py_val ) {
         // This type is known and has an object => convert it
         (*pos)->convert(py_val);
       } else {
         // type or val is not known: build a python_error instead
-        std::string type;
-        
-        if( NULL!=(py_str=PyObject_Str(py_type)) && (PyString_Check(py_str)) )
-          type = PyString_AsString(py_str);
-        else
-          type = "<unknown>";
-        Py_XDECREF(py_str);
-        
-        if( NULL!=py_val && NULL!=(py_str=PyObject_Str(py_val)) &&
-           (PyString_Check(py_str)) ) {
-          std::string msg = PyString_AsString(py_str);
-          Py_XDECREF(py_str);
-          throw python_error(type, msg);
-        } else {
-          Py_XDECREF(py_str);
-          throw python_error(type);
-        }
+	std::string type, msg;
+
+	type = bp::extract<std::string>(bp::str(h_type));
+	if( type.empty() )
+	  type = "<unknown>";
+
+	msg = bp::extract<std::string>(bp::str(h_val));
+	if( !msg.empty() )
+	  type += ": "+msg;
+	throw python_error(type);
       }
     } else
       // send a python_error with <null> type (should never occur ???)
