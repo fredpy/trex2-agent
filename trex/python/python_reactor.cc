@@ -229,9 +229,9 @@ void reactor_wrap::handle_init_default() {
 
 void reactor_wrap::handle_request(goal_id const &g) {
   bp::override f = this->get_override("handle_request");
-  if( f )
-    f(g);
-  else
+  if( f ) {
+    f(boost::ref(g));
+  } else
     handle_request_default(g);
 }
 
@@ -242,7 +242,7 @@ void reactor_wrap::handle_request_default(goal_id const &g) {
 void reactor_wrap::handle_recall(goal_id const &g) {
   bp::override f = this->get_override("handle_recall");
   if( f )
-    f(g);
+    f(boost::ref(g));
   else
     handle_recall_default(g);
 }
@@ -267,7 +267,7 @@ void reactor_wrap::handle_new_tick_default() {
 void reactor_wrap::notify(Observation const &o) {
   bp::override f = this->get_override("notify");
   if( f )
-    f(o);
+    f(boost::ref(o));
   else
     notify_default(o);
 }
@@ -307,7 +307,7 @@ void reactor_wrap::resume_default() {
 void reactor_wrap::new_plan(goal_id const &g) {
   bp::override f = this->get_override("new_plan");
   if( f )
-    f(g);
+    f(boost::ref(g));
   else
     new_plan_default(g);
 }
@@ -319,7 +319,7 @@ void reactor_wrap::new_plan_default(goal_id const &g) {
 void reactor_wrap::cancelled_plan(goal_id const &g) {
   bp::override f = this->get_override("cancelled_plan");
   if( f )
-    f(g);
+    f(boost::ref(g));
   else
     cancelled_plan_default(g);
 }
