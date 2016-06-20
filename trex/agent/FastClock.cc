@@ -25,8 +25,16 @@ FastClock::~FastClock() {}
 
 
 TICK FastClock::max_tick() const {
-  TICK base = m_clock->max_tick(),
-    mine = timeToTick(date_type(boost::posix_time::max_date_time));
+  TICK base = m_clock->max_tick(), mine;
+  typedef typename CHRONO::duration< double, CHRONO_NS::ratio<1> > tick_rate;
+  typedef utils::chrono_posix_convert<tick_rate> convert;
+
+  double seconds = convert::to_chrono(date_type(boost::posix_time::max_date_time)-epoch()).count();
+
+  seconds /= CHRONO::duration_cast<tick_rate>(m_freq).count(); 
+  mine = std::floor(seconds);
+  
+  std::cerr<<"max tick = min("<<base<<", "<<mine<<")"<<std::endl;
   
   // Take the smallest value between the maximum tick of the base clock and
   // the maximum tick that can be represented by our simulated time warp
