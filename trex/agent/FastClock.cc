@@ -34,8 +34,6 @@ TICK FastClock::max_tick() const {
   seconds /= CHRONO::duration_cast<tick_rate>(m_freq).count(); 
   mine = std::floor(seconds);
   
-  std::cerr<<"max tick = min("<<base<<", "<<mine<<")"<<std::endl;
-  
   // Take the smallest value between the maximum tick of the base clock and
   // the maximum tick that can be represented by our simulated time warp
   return std::min(base, mine);
