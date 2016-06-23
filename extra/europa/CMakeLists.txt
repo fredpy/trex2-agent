@@ -97,6 +97,7 @@ if(WITH_EUROPA)
     extensions/Trigonometry.cc
     # headers
     EuropaReactor.hh
+    extensions/interv_patch.hh
     extensions/Bind.hh
     extensions/DoNotMatchFilter.hh
     extensions/EarliestFirstFlawManager.hh
