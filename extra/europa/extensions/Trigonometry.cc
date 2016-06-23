@@ -41,60 +41,6 @@
 
 namespace {
   
-  bool
-  intersect(EUROPA::Domain& dom, EUROPA::edouble::basis_type lb, EUROPA::edouble::basis_type ub,
-	    EUROPA::edouble::basis_type decimal_places)
-  {
-    EUROPA::edouble const p_inf = std::numeric_limits<EUROPA::edouble>::infinity();
-    EUROPA::edouble const n_inf = std::numeric_limits<EUROPA::edouble>::minus_infinity();
-    EUROPA::edouble const prec = decimal_places;
-      
-
-    if( lb>ub || lb>=p_inf || ub<=n_inf ) {
-      dom.empty();
-      return true;
-    } else {
-      EUROPA::edouble lo = n_inf, hi = p_inf;
-
-      // std::cerr<<dom.toString()<<" * ["<<lb<<", "<<ub<<"]"<<std::flush;
-
-      if( lb>lo ) {
-	lo = lb;
-	if( lo > dom.getUpperBound() )
-	  lo -= prec;
-      }
-      if( ub<hi ) {
-	hi = ub;
-	if( hi < dom.getLowerBound() )
-	  hi += prec;
-      }
-      bool ret = dom.intersect(lo, hi);
-
-      // if( dom.isEmpty() )
-      // 	std::cerr<<" EMPTY"<<std::endl;
-      // else
-      // 	std::cerr<<" = "<<dom.toString()<<std::endl;
-
-      return ret;
-    }
-  }
-
-  bool intersect(EUROPA::Domain &dom, EUROPA::edouble lb, EUROPA::edouble ub, 
-		 EUROPA::edouble::basis_type decimal_places) {
-    
-    EUROPA::edouble const prec = decimal_places;
-    
-    if( lb>dom.getUpperBound() &&
-	lb < std::numeric_limits<EUROPA::edouble>::infinity() )
-      lb -= prec;
-    if( ub<dom.getLowerBound() &&
-	ub > std::numeric_limits<EUROPA::edouble>::minus_infinity() )
-      ub += prec;
-	
-    // std::cerr<<dom.toString()<<" * ["<<lb<<", "<<ub<<"]"<<std::endl;
-    return dom.intersect(lb, ub);
-  }
-  
   using namespace boost::numeric;
   using namespace interval_lib;
 

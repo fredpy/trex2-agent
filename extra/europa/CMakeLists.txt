@@ -95,6 +95,7 @@ if(WITH_EUROPA)
     extensions/GoalFilter.cc
     extensions/Numeric.cc
     extensions/Trigonometry.cc
+    extensions/Exponent.cc
     # headers
     EuropaReactor.hh
     extensions/interv_patch.hh
@@ -104,6 +105,7 @@ if(WITH_EUROPA)
     extensions/GoalFilter.hh
     extensions/Numeric.hh
     extensions/Trigonometry.hh
+    extensions/Exponent.hh
     )
   target_link_libraries(europa_pg TREXeuropa_core TREXtransaction)
 

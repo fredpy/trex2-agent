@@ -46,6 +46,7 @@
 #include "EarliestFirstFlawManager.hh"
 #include "Trigonometry.hh"
 #include "Numeric.hh"
+#include "Exponent.hh"
 #include "DoNotMatchFilter.hh"
 #include "GoalFilter.hh"
 #include "Bind.hh"
@@ -106,7 +107,7 @@ namespace TREX {
     DECLARE_FUNCTION_TYPE(MaxConstraint, max, "maxf", EUROPA::FloatDT, 2);
     DECLARE_FUNCTION_TYPE(MinConstraint, min, "minf", EUROPA::FloatDT, 2);
     
-    
+    DECLARE_FUNCTION_TYPE(Exponent, exp, "expf",  EUROPA::FloatDT, 2); 
     
     class TowardZero: public EUROPA::SOLVERS::UnboundVariableDecisionPoint {
     public:
@@ -219,6 +220,8 @@ namespace {
                                maxf, Default);
       TREX_REGISTER_CONSTRAINT(assembly, TREX::europa::MinConstraint,
                                minf, Default);
+      TREX_REGISTER_CONSTRAINT(assembly, TREX::europa::Exponent,
+                               expf, Default);
       TREX_REGISTER_CONSTRAINT(assembly, TREX::europa::Bind, bind, trex);
       
       declareFunction(assembly, new TREX::europa::InCircleFunction());
@@ -231,6 +234,7 @@ namespace {
       declareFunction(assembly, new TREX::europa::FloorConstraintFunction());
       declareFunction(assembly, new TREX::europa::MaxConstraintFunction());
       declareFunction(assembly, new TREX::europa::MinConstraintFunction());
+      declareFunction(assembly, new TREX::europa::ExponentFunction());
     }
     
   }; // ::Extensions
