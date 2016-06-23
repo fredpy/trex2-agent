@@ -243,7 +243,7 @@ void details::europa_domain::visit(tr::BasicInterval const *dom) {
       // 8 decimal places
       if( elo>std::numeric_limits<EUROPA::edouble>::minus_infinity() )
         elo = decimal_places(EUROPA::cast_basis(elo), 8);
-      if( ehi<std::numeric_limits<EUROPA::edouble>::minus_infinity() )
+      if( ehi<std::numeric_limits<EUROPA::edouble>::infinity() )
         ehi = decimal_places(EUROPA::cast_basis(ehi), 8);
       
       tmp->intersect(elo, ehi);

@@ -207,13 +207,13 @@ EuropaReactor::EuropaReactor(TeleoReactor::xml_arg_type arg)
 		      <<" found in the model.";
   m_stats.open(file_name("europa_stat.csv").c_str());
   m_stats<<"tick , what, dur_ns, tokens, steps, depth\n";
-  syslog(midca)<<"LOG "<<manager().logPath();
+  //syslog(midca)<<"LOG "<<manager().logPath();
 }
 
 EuropaReactor::~EuropaReactor() {
   // Checking current goals
   
-  syslog(null, midca)<<"END "<<m_active_requests.size()<<" request(s) pending";
+  //syslog(null, midca)<<"END "<<m_active_requests.size()<<" request(s) pending";
   goal_map::right_const_iterator i = m_active_requests.right.begin();
   
   for( ; m_active_requests.right.end()!=i; ++i) {
@@ -226,11 +226,12 @@ EuropaReactor::~EuropaReactor() {
       if( tok->isMerged() )
         active = tok->getActiveToken();
       
-      syslog(null, midca)<<"UNCONFIRMED ["<<i->first<<"] "<<state->toString()
-        <<", start="<<active->start()->toString()
-        <<", end="<<active->end()->toString();
-    } else
-      syslog(null, midca)<<"ERROR ["<<i->first<<"] not in europa";
+      //syslog(null, midca)<<"UNCONFIRMED ["<<i->first<<"] "<<state->toString()
+      //  <<", start="<<active->start()->toString()
+      //  <<", end="<<active->end()->toString();
+    } else {
+      // syslog(null, midca)<<"ERROR ["<<i->first<<"] not in europa";
+    }
   }
   
   m_stats.close();
@@ -283,7 +284,7 @@ void EuropaReactor::handleRequest(goal_id const &request) {
       syslog(info)<<"Integrated request "<<request
 		  <<" as the token with Europa ID "
 		  <<goal->getKey();
-      syslog(midca)<<"REQUESTED ["<<request<<"] "<<(*request);
+      //syslog(midca)<<"REQUESTED ["<<request<<"] "<<(*request);
       debugMsg("trex:request", "New goal:\n"<<goal->toLongString());
 
       m_active_requests.insert(goal_map::value_type(goal->getKey(), request));
@@ -315,7 +316,7 @@ void EuropaReactor::handleRecall(goal_id const &request) {
       planner()->reset();
     }
     syslog(info)<<"Cancel europa goal "<<key<<" due to recall ["<<request<<"]";    
-    syslog(midca)<<"RECALLED ["<<request<<"]";
+    //syslog(midca)<<"RECALLED ["<<request<<"]";
     recalled(EUROPA::Entity::getTypedEntity<EUROPA::Token>(key));
   }
   // logPlan("recall");
@@ -550,12 +551,14 @@ bool EuropaReactor::discard(EUROPA::TokenId const &tok) {
   
   if( m_active_requests.left.end()!=i ) {
     if( constraint_engine()->provenInconsistent() ) {
-      syslog(null, midca)<<"INCONSITENT ["<<i->second<<"]";
+      //syslog(null, midca)<<"INCONSITENT ["<<i->second<<"]";
     } else {
+      /*
       EUROPA::StateVarId state = tok->getState();
       syslog(null, midca)<<"CONFIRMED ["<<i->second<<"] "<<state->toString()
       <<", start="<<active->start()->toString()
       <<", end="<<active->end()->toString();
+      */
     }
     
 //    EUROPA::StateVarId state = tok->getState();
@@ -766,7 +769,7 @@ void EuropaReactor::notify(EUROPA::LabelStr const &object,
       obs.restrictAttribute(var);
     }
   }
-  syslog(midca)<<"ASSERT "<<obs;
+  //syslog(midca)<<"ASSERT "<<obs;
   postObservation(obs);
 }
 
