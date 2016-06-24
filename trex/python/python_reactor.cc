@@ -277,7 +277,12 @@ void reactor_wrap::notify_default(Observation const &o) {
 }
 
 bool reactor_wrap::synchronize() {
-  return this->get_override("synchronize")();
+  bp::override sync = this->get_override("synchronize");
+
+  if( sync )
+    return sync();
+  else
+    throw std::runtime_error("Failed to find override function for synchronize");
 }
 
 bool reactor_wrap::has_work() {
