@@ -887,34 +887,20 @@ void Agent::synchronize() {
 
 bool Agent::executeReactor() {
   Symbol id = null;
+  bool was_empty = m_edf.empty();
   
-  if( m_edf.empty() )
-    return false;
-  else {
+  if( !was_empty ) {
+    // One reactor requested to run
     double wr;
     reactor_id r;
-    
+
     boost::tie(wr, r) = *(m_edf.begin());
     m_edf.erase(m_edf.begin());
     m_idle.push_back(r);
+
     try {
       id = r->getName();
       r->step();
-      
-      std::list<reactor_id>::iterator i = m_idle.begin();
-      
-      while( m_idle.end()!=i ) {
-        // Check if the reactor is still valid
-        if( is_member(*i) ) {
-          wr = (*i)->workRatio();
-          if( !std::isnan(wr) ) {
-            m_edf.insert(std::make_pair(wr, *i));
-            i = m_idle.erase(i);
-          } else
-            ++i;
-        } else
-          i = m_idle.erase(i);
-      }
     } catch(Exception const &e) {
       syslog(id, warn)<<"Exception caught while executing reactor step:\n"<<e;
     } catch(std::exception const &se) {
@@ -923,8 +909,23 @@ bool Agent::executeReactor() {
     } catch(...) {
       syslog(id, warn)<<"Unknown exception caught while executing reactor step.";
     }
-    return !m_edf.empty();
   }
+  
+  std::list<reactor_id>::iterator i = m_idle.begin();
+  double wr;
+  while( m_idle.end()!=i ) {
+    // Check if the reactor is still valid
+    if( is_member(*i) ) {
+      wr = (*i)->workRatio();
+      if( !std::isnan(wr) ) {
+	m_edf.insert(std::make_pair(wr, *i));
+	i = m_idle.erase(i);
+      } else
+	++i;
+    } else
+      i = m_idle.erase(i);
+  }
+  return !(was_empty && m_edf.empty());
 }
 
 bool Agent::doNext() {
