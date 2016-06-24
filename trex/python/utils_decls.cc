@@ -499,37 +499,37 @@ void export_utils() {
   //   - new_entry(e) : method that will be called by trex on a new log entry
   //                    this is the method that one can implement to handle log messages
   //                    in python
-  class_< py_log_handler_wrap, boost::noncopyable>
-  ("log_handler",
-   "Logging entry handler.\n"
-   "This class allow user to implement in python their own listener to trex \n"
-   "log messages. Any declasses derived from this one will subscribe to new \n"
-   "log messages events as soon as instantiated.\n\n"
-   "Note:\n"
-   "It is important to know that the new_entry method is called by trex in a\n"
-   "different thread than the one where python is running. While trex do \n"
-   "protect this call within C++, implementer of a new log_handler should \n"
-   "make sure that the operations they do within this method are thread safe\n"
-   "within python.",
-   init<>(args("self"), "Default intializer.\n"))
-  .add_property("connected", &py_log_handler::connected,
-                "Checks if the handler is still active")
-  .def("disconnect", &py_log_handler::disconnect, (arg("self")),
-       "Disconnect this handler making it inactive.\n"
-       "As of today there's no way to reenable a disconnected handler.")
-  .def("new_entry", pure_virtual(&py_log_handler::new_entry), args("self","entry"),
-       "New entry callback.\n\n"
-       "This method is called by trex whenever a new log entry has been \n"
-       "produced. This method is pure virtual and therefore need to be \n"
-       "redefined in a python derived class.\n\n"
-       "Note also that this method is called in a different thread than \n"
-       "the one where python is running:\n"
-       " - trex ensure basic thread safety with python interpreter and\n"
-       "   guarantee that this method is not called twice concurrently.\n"
-       " - Still implementer should consider that any operation done in\n"
-       "   this method can be concurrent to any python code and protect\n"
-       "   accordingly data shared with this method.")
-  ;
+  // class_< py_log_handler_wrap, boost::noncopyable>
+  // ("log_handler",
+  //  "Logging entry handler.\n"
+  //  "This class allow user to implement in python their own listener to trex \n"
+  //  "log messages. Any declasses derived from this one will subscribe to new \n"
+  //  "log messages events as soon as instantiated.\n\n"
+  //  "Note:\n"
+  //  "It is important to know that the new_entry method is called by trex in a\n"
+  //  "different thread than the one where python is running. While trex do \n"
+  //  "protect this call within C++, implementer of a new log_handler should \n"
+  //  "make sure that the operations they do within this method are thread safe\n"
+  //  "within python.",
+  //  init<>(args("self"), "Default intializer.\n"))
+  // .add_property("connected", &py_log_handler::connected,
+  //               "Checks if the handler is still active")
+  // .def("disconnect", &py_log_handler::disconnect, (arg("self")),
+  //      "Disconnect this handler making it inactive.\n"
+  //      "As of today there's no way to reenable a disconnected handler.")
+  // .def("new_entry", pure_virtual(&py_log_handler::new_entry), args("self","entry"),
+  //      "New entry callback.\n\n"
+  //      "This method is called by trex whenever a new log entry has been \n"
+  //      "produced. This method is pure virtual and therefore need to be \n"
+  //      "redefined in a python derived class.\n\n"
+  //      "Note also that this method is called in a different thread than \n"
+  //      "the one where python is running:\n"
+  //      " - trex ensure basic thread safety with python interpreter and\n"
+  //      "   guarantee that this method is not called twice concurrently.\n"
+  //      " - Still implementer should consider that any operation done in\n"
+  //      "   this method can be concurrent to any python code and protect\n"
+  //      "   accordingly data shared with this method.")
+  // ;
   
   class_<bp::ptree_error> pt_e
   ("ptree_error", "Exception related to xml tree", no_init);
