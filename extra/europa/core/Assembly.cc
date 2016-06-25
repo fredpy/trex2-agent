@@ -1424,29 +1424,29 @@ void Assembly::backtracking(EUROPA::SOLVERS::DecisionPointId &dp) {
 void Assembly::print_context(std::ostream &out, EUROPA::ConstrainedVariableId const &v) const {
   // EUROPA::TokenId tok = details::parent_token(v);
   details::var_print(out<<"Local context for ", v)<<":\n";
-  out<<"  - base domain: "<<v->baseDomain().toString()
-     <<"\n  - last domain: "<<v->lastDomain().toString()
-     <<"\n  - europa violation explanation: "<<v->getViolationExpl()<<'\n';
-  EUROPA::ConstraintSet constraints;
-  v->constraints(constraints);
-  if( !constraints.empty() ) {
-    out<<"  - related constraints:\n";
-    for(EUROPA::ConstraintSet::const_iterator c=constraints.begin(); constraints.end()!=c; ++c) {
-      EUROPA::ConstraintId cstr = *c;
-      std::vector<EUROPA::ConstrainedVariableId> const &scope = cstr->getScope();
-      size_t i, end_i = scope.size();
+  // out<<"  - base domain: "<<v->baseDomain().toString()
+  //    <<"\n  - last domain: "<<v->lastDomain().toString()
+  //    <<"\n  - europa violation explanation: "<<v->getViolationExpl()<<'\n';
+  // EUROPA::ConstraintSet constraints;
+  // v->constraints(constraints);
+  // if( !constraints.empty() ) {
+  //   out<<"  - related constraints:\n";
+  //   for(EUROPA::ConstraintSet::const_iterator c=constraints.begin(); constraints.end()!=c; ++c) {
+  //     EUROPA::ConstraintId cstr = *c;
+  //     std::vector<EUROPA::ConstrainedVariableId> const &scope = cstr->getScope();
+  //     size_t i, end_i = scope.size();
 
-      out<<"\t+ "<<cstr->getName().toString()<<'(';
-      for(i=0; i<end_i; ++i) {
-        if( i>0 )
-          out<<", ";
-        details::var_print(out, scope[i]);
-        if( scope[i]!=v )
-          out<<"="<<scope[i]->lastDomain().toString();
-      }
-      out<<")\n";
-    }
-  }
+  //     out<<"\t+ "<<cstr->getName().toString()<<'(';
+  //     for(i=0; i<end_i; ++i) {
+  //       if( i>0 )
+  //         out<<", ";
+  //       details::var_print(out, scope[i]);
+  //       if( scope[i]!=v )
+  //         out<<"="<<scope[i]->lastDomain().toString();
+  //     }
+  //     out<<")\n";
+  //   }
+  // }
 }
 
 /*
