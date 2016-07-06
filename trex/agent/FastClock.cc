@@ -16,9 +16,71 @@ FastClock::FastClock(clock_ref baseline,
 }
 
 FastClock::FastClock(bpt::ptree::value_type &node)
-:Clock(duration_type::zero()) {
-  // TODO: implement the parsing
-  throw Clock::Error("xml parsing for FastClock not implemented");
+  :Clock(duration_type::zero()), m_epoch(utils::parse_attr<date_type>(node, "epoch")) {
+  utils::SingletonUse<Clock::xml_factory> clk_f;
+  
+  CHRONO::nanoseconds ns_tick = CHRONO::nanoseconds::zero();
+  typedef boost::optional< typename CHRONO::nanoseconds::rep >
+    value_type;
+  value_type value;
+  bool has_attr = false;
+  
+  // Get nanoseconds
+  value = utils::parse_attr<value_type>(node, "nanos");
+  if( value ) {
+    has_attr = true;
+    ns_tick += CHRONO::nanoseconds(*value);
+  }
+  
+  // Get microseconds
+  value = utils::parse_attr<value_type>(node, "micros");
+  if( value ) {
+    has_attr = true;
+    ns_tick += CHRONO::microseconds(*value);
+  }
+  
+  // Get milliseconds
+  value = utils::parse_attr<value_type>(node, "millis");
+  if( value ) {
+    has_attr = true;
+    ns_tick += CHRONO::milliseconds(*value);
+  }
+  
+  // Get seconds
+  value = utils::parse_attr<value_type>(node, "seconds");
+  if( value ) {
+    has_attr = true;
+    ns_tick += CHRONO::seconds(*value);
+  }
+  
+  // Get minutes
+  value = utils::parse_attr<value_type>(node, "minutes");
+  if( value ) {
+    has_attr = true;
+    ns_tick += CHRONO::minutes(*value);
+  }
+  
+  // Get hours
+  value = utils::parse_attr<value_type>(node, "hours");
+  if( value ) {
+    has_attr = true;
+    ns_tick += CHRONO::hours(*value);
+  }
+
+  if( !has_attr ) {
+    std::ostringstream oss;
+    oss<<"No tick duration attribute found. Specify one or more of the following:\n"
+       <<" - hours,minutes,seconds,millis,nanos";
+    throw utils::XmlError(node, oss.str());
+  }
+  
+  m_freq = CHRONO::duration_cast<duration_type>(ns_tick);
+
+  // Extract the clock
+  boost::property_tree::ptree::iterator i = node.second.begin();
+  if( !clk_f->iter_produce(i, node.second.end(), m_clock) )
+    throw utils::XmlError(node, "Missing clock definition for clock usedd by FastClock");
+
 }
 
 FastClock::~FastClock() {}
