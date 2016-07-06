@@ -96,7 +96,7 @@ namespace TREX {
                           "isInternal", EUROPA::BoolDT, 1); 
                           
     DECLARE_FUNCTION_TYPE(TickFromDate, to_tick, 
-                          "tick_date", EUROPA::IntDT, 1);
+                          "tick_date", EUROPA::IntDT, 3);
     
     /** @brief TREX core extensions for europa
      * 
@@ -246,7 +246,7 @@ namespace TREX {
       TREX_REGISTER_CONSTRAINT(assembly,TREX::europa::CheckInternal,
 			       isInternal,trex); 
       TREX_REGISTER_CONSTRAINT(assembly,TREX::europa::TickFromDate, 
-                               tick_date, trex)
+                               tick_date, trex);
       
       declareFunction(assembly, new CheckExternalFunction());
       declareFunction(assembly, new CheckInternalFunction());

@@ -143,8 +143,8 @@ namespace TREX {
       EUROPA::eint look_ahead() const {
         return static_cast<EUROPA::eint::basis_type>(getLookAhead());
       }
-      EUROPA::edouble tick_to_date(EUROPA::eint tick) const;
-      EUROPA::eint date_to_tick(EUROPA::edouble date) const;
+      pdate tick_to_date(EUROPA::eint tick) const;
+      EUROPA::eint date_to_tick(pdate const &date) const;
 
 
 

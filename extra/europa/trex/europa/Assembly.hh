@@ -58,7 +58,7 @@
 # include <fstream>
 # include <memory>
 
-#include <trex/utils/platform/chrono.hh>
+#include <trex/utils/TimeUtils.hh>
 
 namespace TREX {
   namespace europa {
@@ -557,6 +557,8 @@ namespace TREX {
        */
       virtual EUROPA::edouble tick_duration() const =0;
 
+      typedef boost::posix_time::ptime pdate;
+      
       /** @brief Tick to date
        * @param[in] tick A Europa tick
        *
@@ -567,7 +569,7 @@ namespace TREX {
        * @note While the conversion is highly dependent on the Clock used by
        * the agent. This conversion is often into a unix time tag format.
        */
-      virtual EUROPA::edouble tick_to_date(EUROPA::eint tick) const =0;
+      virtual pdate tick_to_date(EUROPA::eint tick) const =0;
       /** @brief Date to tick
        * @param[in] date A real-time date
        *
@@ -578,7 +580,7 @@ namespace TREX {
        * @note While the conversion is highly dependent on the Clock used by
        * the agent. This conversion is often from a unix time tag format.
        */
-      virtual EUROPA::eint date_to_tick(EUROPA::edouble date) const =0;
+      virtual EUROPA::eint date_to_tick(pdate const &date) const =0;
 
       /** @brief Clock variable
        *

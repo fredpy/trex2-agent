@@ -56,7 +56,7 @@ namespace TREX {
      *
      * It is provided as a nddl constraint with following format
      * @code 
-     *  tick_date(tick, date)
+     *  tick_date(tick, seconds, days, year)
      * @endcode
      * where @c tick and @c date are two integer variables
      *
@@ -90,12 +90,16 @@ namespace TREX {
       void handleExecute();
     private:
       EUROPA::Domain *m_tick;
-      EUROPA::Domain *m_date;
+      EUROPA::Domain *m_seconds;
+      EUROPA::Domain *m_days;
+      EUROPA::Domain *m_years;
 
       enum indexes {
 	TICK =0,
-	DATE =1,
-	NARGS = 2
+	SECONDS =1,
+	DAYS = 2,
+	YEARS = 3, 
+	NARGS = 4
       };
     };
 
