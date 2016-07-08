@@ -935,6 +935,17 @@ bool Agent::doNext() {
     syslog(null, "END")<<"\t=========================================================";
     return false;
   }
+  // Flush the goal to be parsed queue
+  while( !m_goals.empty() ) {
+    try {
+      goal_id tmp = parse_goal(m_goals.front());
+      sendRequest(tmp);
+    } catch(...) {
+      syslog(null, error)<<"Failed to parse a goal ... skipping it";
+    }
+    m_goals.pop_front();
+  }
+  
   synchronize();
   TICK const now = getCurrentTick();
   
@@ -988,6 +999,7 @@ void Agent::sendRequest(goal_id const &g) {
     syslog(null, warn)<<"Posting goal on a unknnown timeline \""
     <<g->object()<<"\".";
   m_proxy->postRequest(g);
+  syslog(null, info)<<"Added "<<g<<" to goal queue:\n\t"<<(*g);
 }
 
 size_t Agent::sendRequests(boost::property_tree::ptree &g) {
@@ -998,7 +1010,6 @@ size_t Agent::sendRequests(boost::property_tree::ptree &g) {
     sendRequest(*i);
     ++ret;
   }
-  syslog(null, info)<<ret<<" goal"<<(ret>1?"s":"")<<" loaded.";
   return ret;
 }
 

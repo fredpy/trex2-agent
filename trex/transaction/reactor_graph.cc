@@ -70,16 +70,23 @@ namespace {
   private:  
     base_class::result_type produce(base_class::argument_type arg) const {
       boost::optional<date_type> 
-      min = utils::parse_attr< boost::optional<date_type> >(arg.second, "min"),
-      max = utils::parse_attr< boost::optional<date_type> >(arg.second, "max");
-      IntegerDomain::bound lo(IntegerDomain::minus_inf), 
+	val = utils::parse_attr< boost::optional<date_type> >(arg.second, "value");
+
+      if( val ) 
+	return result_type(new IntegerDomain(m_owner.timeToTick(*val)));
+      else {	
+	boost::optional<date_type> 
+	  min = utils::parse_attr< boost::optional<date_type> >(arg.second, "min"),
+	  max = utils::parse_attr< boost::optional<date_type> >(arg.second, "max");
+	IntegerDomain::bound lo(IntegerDomain::minus_inf), 
           hi(IntegerDomain::plus_inf);
-      boost::posix_time::ptime date;
-      if( min )
-        lo = m_owner.timeToTick(*min);
-      if( max )
-        hi = m_owner.timeToTick(*max);
-      return result_type(new IntegerDomain(lo, hi));
+	boost::posix_time::ptime date;
+	if( min )
+	  lo = m_owner.timeToTick(*min);
+	if( max )
+	  hi = m_owner.timeToTick(*max);
+	return result_type(new IntegerDomain(lo, hi));
+      }
     }
 
     graph const &m_owner;

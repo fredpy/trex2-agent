@@ -340,8 +340,8 @@ namespace TREX {
        *  @sa sendRequests(TREX::utils::ext_iterator &)
        */
       void sendRequest(boost::property_tree::ptree::value_type &g) {
-        TREX::transaction::goal_id tmp = parse_goal(g);
-        sendRequest(tmp);
+	// queue goal for parsing when the Agent is ready to start
+	m_goals.push_back(g);
       }
       /** @brief Post a goals from xml
        *
@@ -426,6 +426,8 @@ namespace TREX {
       
       std::list<reactor_id> init_dfs_sync();
       std::list<reactor_id> sort_reactors_sync();
+      
+      std::list<boost::property_tree::ptree::value_type> m_goals;
       
       AgentProxy *m_proxy;
       
