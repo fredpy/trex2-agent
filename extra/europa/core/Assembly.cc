@@ -515,14 +515,15 @@ bool Assembly::commit_externals() {
                <<"] failed to integrate state of external timeline "
                <<(*i)->timeline()->getName().toString());
       return false;
-    } else {
+    } /* else {
       EUROPA::TokenId cur = (*i)->current();
       if(cur->isMerged()) {
         EUROPA::TokenId act = cur->getActiveToken();
         cur->cancel();
         plan_db()->getClient()->merge(cur, act);
       }
-    }
+      
+      }*/
 
   }
   return true;
