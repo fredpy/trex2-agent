@@ -14,7 +14,8 @@ namespace TREX {
       
       FastClock(clock_ref baseline,
                 date_type const &epoch,
-                duration_type const &duration);
+                duration_type const &duration,
+		bool no_skip = true);
       explicit FastClock(boost::property_tree::ptree::value_type &node);
       virtual ~FastClock();
       
@@ -39,14 +40,15 @@ namespace TREX {
       clock_ref     m_clock;
       date_type     m_epoch;
       duration_type m_freq;
+      bool const    m_no_skip;
+      boost::optional<transaction::TICK> m_real_prev;
+      transaction::TICK m_prev;
       
       duration_type getSleepDelay() const {
         return m_clock->getSleepDelay();
       }
       
-      TREX::transaction::TICK getNextTick() {
-        return m_clock->getNextTick();
-      }
+      TREX::transaction::TICK getNextTick();
       
       void start() {
         m_clock->start();

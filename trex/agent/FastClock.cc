@@ -11,12 +11,16 @@ namespace {
 
 FastClock::FastClock(clock_ref baseline,
                      date_type const &epoch,
-                     duration_type const &duration)
-:Clock(duration_type::zero()), m_clock(baseline), m_epoch(epoch), m_freq(duration) {
+                     duration_type const &duration,
+		     bool no_skip)
+:Clock(duration_type::zero()), m_clock(baseline), m_epoch(epoch),
+ m_freq(duration), m_no_skip(no_skip) {
 }
 
 FastClock::FastClock(bpt::ptree::value_type &node)
-  :Clock(duration_type::zero()), m_epoch(utils::parse_attr<date_type>(node, "epoch")) {
+  :Clock(duration_type::zero()),
+   m_epoch(utils::parse_attr<date_type>(node, "epoch")),
+   m_no_skip(!utils::parse_attr<bool>(false, node, "skip")) {
   utils::SingletonUse<Clock::xml_factory> clk_f;
   
   CHRONO::nanoseconds ns_tick = CHRONO::nanoseconds::zero();
@@ -116,12 +120,31 @@ std::string FastClock::duration_str(TICK dur) const {
   return oss.str();
 }
 
+TICK FastClock::getNextTick() {
+  TICK cur = m_clock->getNextTick();
+
+  if( m_no_skip ) {
+    if( m_real_prev ) {
+      if( (*m_real_prev)<cur ) {
+	m_prev += 1;
+	std::cerr<<"tick "<<cur<<" -> "<<m_prev<<std::endl;
+      }
+    } else
+      m_prev = cur;
+    m_real_prev = cur;
+    return m_prev;
+  }
+  return cur;
+}
+
+
 std::string FastClock::info() const {
   std::ostringstream oss;
   
   oss<<"Warped clock:\n"
     << " - sim epoch: "<<epoch()
     << "\n - sim freq: "<<duration_str(1)
+    << "\n - hide_skips: "<<m_no_skip
     << "\n - base: "<<m_clock->info();
   return oss.str();
 }

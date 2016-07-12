@@ -73,11 +73,12 @@ namespace {
   
   SHARED_PTR<ta::FastClock> fast_clock_init(ta::clock_ref const &base,
                                             std::string const &date,
-                                            double secs) {
+                                            double secs,
+					    bool no_skip) {
     ta::Clock::date_type epoch = TREX::utils::string_cast<ta::Clock::date_type>(date);
     fl_secs my_secs(secs);
     return MAKE_SHARED<ta::FastClock>(base, epoch,
-                                      CHRONO::duration_cast<ta::Clock::duration_type>(my_secs));
+                                      CHRONO::duration_cast<ta::Clock::duration_type>(my_secs), no_skip);
   }
 }
 
@@ -151,7 +152,8 @@ void export_agent() {
   .def("__init__",
        make_constructor(&fast_clock_init,
                         default_call_policies(),
-                        args(/*"self",*/ "clk", "epoch", "seconds")),
+			(arg("clk"), arg("epoch"), arg("seconds"),
+			 arg("no_skip")=true)),
        "Create a fast clock using the clock clk with epoch as a simulated\n"
        "start date (ie the inital tick) and seconds as a simulated period.\n"
        "Note: epoch is a string representing a date in ISO 8601 format.\n"
