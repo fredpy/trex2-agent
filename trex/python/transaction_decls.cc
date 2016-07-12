@@ -217,6 +217,8 @@ void export_transactions() {
     "Create new goal pred on timeline\n\n"
     "Raises:\n"
     "  predicate_error: either timline or pred is empty"))
+    .def(bp::init<Goal>(bp::args("self", "other"),
+			"Make a copy of this goal"))
   .def("from_xml", &goal_from_xml, (bp::arg("xml")),
        "Create a goal from its xml description").staticmethod("from_xml")
   .add_property("id", &get_goal_id,
