@@ -3,6 +3,7 @@
 using namespace TREX::agent;
 using TREX::transaction::TICK;
 namespace utils=TREX::utils;
+namespace tlog=utils::log;
 namespace bpt=boost::property_tree;
 
 namespace {
@@ -125,9 +126,16 @@ TICK FastClock::getNextTick() {
 
   if( m_no_skip ) {
     if( m_real_prev ) {
+      
       if( (*m_real_prev)<cur ) {
+	TICK delta = cur - (*m_real_prev); 
 	m_prev += 1;
-	std::cerr<<"tick "<<cur<<" -> "<<m_prev<<std::endl;
+	if( delta>1 ) {
+	  syslog(tlog::info)<<"Hiding that the real clock skipped "
+			    <<(delta-1)<<" tick(s)\n\t"
+			    <<"- real_tick = "<<cur
+			    <<"\n\t- sim tick = "<<m_prev;
+	}
       }
     } else
       m_prev = cur;
