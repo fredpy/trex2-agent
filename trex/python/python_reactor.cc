@@ -343,18 +343,47 @@ void reactor_wrap::cancelled_plan_default(goal_id const &g) {
 
 py_reactor::py_reactor(xml_arg_type arg)
 :TeleoReactor(arg, false, true) {
-  boost::property_tree::ptree::value_type &node = xml_factory::node(arg);
-  std::string class_name = parse_attr<std::string>(node, "python_class");
-  
-  syslog()<<"Looking for python class \""<<class_name<<"\"";
   try {
+    boost::property_tree::ptree::value_type &node = xml_factory::node(arg);
+    std::string class_name = parse_attr<std::string>(node, "python_class");
+    boost::optional<std::string> source = parse_attr< boost::optional<std::string> >(node, "file");
+    
+    bp::object scope_d;
+
+    if( source ) {
+      bool found;
+      std::string py = manager().use(*source, found);
+      
+      if( !found ) {
+        py = manager().use((*source)+".py", found);
+        if( !found )
+          throw XmlError(node, "Unable to locate "+(*source)+"[.py]");
+      }
+      syslog()<<"exec python script: "<<py;
+      scoped_gil_release lock;
+      m_scope = m_python->add_module(bp::scope(), "_trex");
+      m_scope = m_python->add_module(m_scope, getAgentName().str());
+      m_scope = m_python->add_module(m_scope, getName().str());
+      
+      
+      bp::scope my_scope = m_scope;
+      scope_d = m_scope.attr("__dict__");
+      
+      scope_d["__builtins__"] = bp::import("__builtin__");
+      bp::exec_file(bp::str(py), scope_d);
+    }
+    
+    
+    syslog()<<"Looking for python class \""<<class_name<<"\"";
     scoped_gil_release lock;
-    bp::object my_class = bp::eval(bp::str(class_name));
-  
+    
+    bp::object my_class = bp::eval(bp::str(class_name), scope_d);
+
     if( my_class.is_none() ) {
       syslog(log::error)<<"Python class \""<<class_name<<"\" not found.";
       throw XmlError(node, "Python class \""+class_name+"\" not found.");
     }
+    
     syslog()<<"Creating new instance of "<<class_name;
     py_wrapper wrap(this, node);
     m_obj = my_class(wrap);

@@ -165,7 +165,7 @@ namespace TREX {
       void newPlanToken(transaction::goal_id const &g);
       void cancelledPlanToken(transaction::goal_id const &g);
       
-      boost::python::object m_obj;
+      boost::python::object m_scope, m_obj;
       utils::SingletonUse<exception_table> m_exc;
       utils::SingletonUse<python_env> m_python;
       
