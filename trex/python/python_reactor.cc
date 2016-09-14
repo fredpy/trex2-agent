@@ -361,16 +361,22 @@ py_reactor::py_reactor(xml_arg_type arg)
       }
       syslog()<<"exec python script: "<<py;
       scoped_gil_release lock;
-      m_scope = m_python->add_module(bp::scope(), "_trex");
+      m_scope = m_python->add_module(m_python->main(), "_trex");
       m_scope = m_python->add_module(m_scope, getAgentName().str());
       m_scope = m_python->add_module(m_scope, getName().str());
       
       
       bp::scope my_scope = m_scope;
       scope_d = m_scope.attr("__dict__");
+      scope_d["__builtins__"] = m_python->main_env()["__builtins__"];
+      bp::str py_name(py);
       
-      scope_d["__builtins__"] = bp::import("__builtin__");
-      bp::exec_file(bp::str(py), scope_d);
+      bp::exec_file(py_name, scope_d);
+      
+//      std::string dir = bp::extract<std::string>(bp::str(m_python->dir(m_scope)));
+//      syslog()<<"env: "<<dir;
+//      dir = bp::extract<std::string>(bp::str(m_python->dir(m_python->main())));
+//      syslog()<<"main: "<<dir;
     }
     
     

@@ -39,6 +39,7 @@
 
 # include <trex/utils/SingletonUse.hh>
 # include <trex/utils/id_mapper.hh>
+# include <trex/utils/Exception.hh>
 
 
 namespace TREX {
@@ -108,19 +109,19 @@ namespace TREX {
       
     } // TREX::python::details
     
-    class python_error: public std::runtime_error {
+    class python_error: public utils::Exception {
     public:
       python_error(python_error const &other) throw()
-      :std::runtime_error(other) {}
+      :utils::Exception(other) {}
       ~python_error() throw() {}
       
     private:
       explicit python_error(std::string const &type) throw()
-      :std::runtime_error("Python error "+type) {}
+      :utils::Exception("Python error "+type) {}
       
       python_error(std::string const &type,
                    std::string const &what) throw()
-      :std::runtime_error("Python error "+type+": "+what) {}
+      :utils::Exception("Python error "+type+": "+what) {}
       
       friend class exception_table;
     };
@@ -143,6 +144,7 @@ namespace TREX {
     private:
       typedef utils::list_set< utils::pointer_id_traits<details::e_cvt_base> > exc_set;
       exc_set m_exceptions;
+      boost::python::object m_traceback;
       
       exception_table();
       ~exception_table();

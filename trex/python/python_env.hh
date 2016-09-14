@@ -53,6 +53,10 @@ namespace TREX {
       bool is_instance(boost::python::object const &obj,
                        boost::python::object const &type) const;
 
+      boost::python::object main() const {
+        return m_main;
+      }
+      boost::python::dict main_env() const;
       
       utils::priority_strand &strand() {
         return m_strand;
@@ -61,6 +65,7 @@ namespace TREX {
     private:
       typedef std::map<std::string, boost::python::object> object_map;
       object_map m_loaded;
+      boost::python::object m_main;
       
       
       python_env();

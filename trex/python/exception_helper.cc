@@ -68,38 +68,50 @@ bool exception_table::add(e_cvt_base *ref) {
 
 void exception_table::unwrap_py_error() {
   if( PyErr_Occurred() ) {
-    PyObject *py_type=NULL, *py_val=NULL, *py_trace=NULL, *py_str=NULL;
-   
-    // fetch error from python
-    PyErr_Fetch(&py_type, &py_val, &py_trace);
-    bp::handle<> h_type(py_type), h_val(bp::allow_null(py_val)),
-      h_trace(bp::allow_null(py_trace));
-    // clear error on pyhton
+    PyObject *exc,*val,*tb;
+    
+    // fetch error info
+    PyErr_Fetch(&exc, &val, &tb);
+    bp::handle<> hexc(exc), hval(bp::allow_null(val)), htb(bp::allow_null(tb));
+    // clear error on python
     PyErr_Clear();
     
-    if( NULL!=py_type ) {
-      // First look if I know how to convert it
-      exc_set::const_iterator pos = m_exceptions.find(py_type);
-
-      if( m_exceptions.end()!=pos && NULL!=py_val ) {
-        // This type is known and has an object => convert it
-        (*pos)->convert(py_val);
+    
+    if( NULL!=exc ) {
+      // Look if I know the error
+      exc_set::const_iterator pos = m_exceptions.find(exc);
+      
+      if( m_exceptions.end()!=pos && NULL!=val ) {
+        // This type is known and has an instance -> convert it
+        (*pos)->convert(val);
       } else {
-        // type or val is not known: build a python_error instead
-	std::string type, msg;
-
-	type = bp::extract<std::string>(bp::str(h_type));
-	if( type.empty() )
-	  type = "<unknown>";
-
-	msg = bp::extract<std::string>(bp::str(h_val));
-	if( !msg.empty() )
-	  type += ": "+msg;
-	throw python_error(type);
+        bp::object formatted_list, formatted;
+        std::string type, msg;
+        
+        if( m_traceback.is_none() ) {
+          m_traceback = bp::import("traceback");
+        }
+        // extract call stack info when available
+        if( NULL==tb ) {
+          bp::object fmt_exc_only(m_traceback.attr("format_exception_only"));
+          formatted_list = fmt_exc_only(hexc, hval);
+        } else {
+          bp::object fmt_exc(m_traceback.attr("format_exception"));
+          formatted_list = fmt_exc(hexc, hval, htb);
+        }
+        formatted = bp::str("\n").join(formatted_list);
+        type = bp::extract<std::string>(bp::str(hexc));
+        if( type.empty() )
+          type = "<unknown>";
+        msg = bp::extract<std::string>(formatted);
+        if( !msg.empty() )
+          type += ":\n"+msg;
+        throw python_error(type);
       }
-    } else
-      // send a python_error with <null> type (should never occur ???)
+    } else {
+    // send a python error with <null> type; but this should never occur
       throw python_error("<null>");
+    }
   }
 }
 

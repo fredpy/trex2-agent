@@ -46,6 +46,7 @@ namespace tlog=TREX::utils::log;
 
 python_env::python_env()
 :m_strand(m_log->service(), false) {
+
 #if PY_MAJOR_VERSION >= 3
   typedef wchar_t py_char;
 #else
@@ -54,11 +55,19 @@ python_env::python_env()
   
   static py_char name[] = {'\0'};
   static py_char *argv[] = { name };
-
-  m_log->syslog("python", tlog::info)<<"Initializing python";
-  Py_Initialize();
-  // Needed for some python libs inclufing rospy
-  PySys_SetArgv(1, argv);
+  
+  
+  if( !Py_IsInitialized() ) {
+    m_log->syslog("python", tlog::info)<<"Initializing python";
+    Py_Initialize();
+    // Needed for some python libs inclufing rospy
+    PySys_SetArgv(1, argv);
+    
+  }
+  m_log->syslog("python", tlog::info)<<"Getting __main__ module";
+  m_main = bp::import("__main__");
+  
+  
   m_log->syslog("python", tlog::info)<<"Starting queue";
   m_strand.start();
 }
@@ -106,6 +115,11 @@ bp::object python_env::dir(bp::object const &obj) const {
   bp::handle<> ret(PyObject_Dir(obj.ptr()));
   return bp::object(ret);  
 }
+
+bp::dict python_env::main_env() const {
+  return bp::extract<bp::dict>(main().attr("__dict__"));
+}
+
 
 bool python_env::callable(bp::object const &obj) const {
   return 1==PyCallable_Check(obj.ptr());
