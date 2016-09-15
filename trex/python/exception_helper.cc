@@ -85,6 +85,7 @@ void exception_table::unwrap_py_error() {
         // This type is known and has an instance -> convert it
         (*pos)->convert(val);
       } else {
+        // Not a type I can convert -> decode it and thow the content as python_error
         bp::object formatted_list, formatted;
         std::string type, msg;
         
@@ -109,7 +110,8 @@ void exception_table::unwrap_py_error() {
         throw python_error(type);
       }
     } else {
-    // send a python error with <null> type; but this should never occur
+      // exc was null even though Python says that and error occurred !??
+      // send a python error with <null> type; but this should never occur
       throw python_error("<null>");
     }
   }
