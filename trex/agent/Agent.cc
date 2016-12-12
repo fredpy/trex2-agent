@@ -672,6 +672,16 @@ void Agent::subConf(boost::property_tree::ptree &conf,
   sendRequests(conf);
 }
 
+void Agent::add_to_agent(boost::property_tree::ptree::value_type &config) {
+  if( !config.second.empty() ) {
+    // TODO: may need to make it hread safe
+    syslog(null, info)<<"Modifying agent based on additional XML";
+    subConf(config.second, "");
+    syslog(null, info)<<"End of modification";
+  }
+}
+
+
 void Agent::loadConf(boost::property_tree::ptree::value_type &config) {
   if( !is_tag(config, "Agent") )
     throw XmlError(config, "Not an Agent node");

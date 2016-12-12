@@ -247,6 +247,8 @@ namespace TREX {
         return m_clock;
       }
       
+      void add_to_agent(boost::property_tree::ptree::value_type &config);
+      
       /** @brief run the agent
        *
        * This method runs the agent until its completes. It is just a

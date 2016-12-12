@@ -202,6 +202,10 @@ void export_agent() {
        "complete agent initialization.\n\n"
        "Raises:\n"
        "  agent_exception: something went wrong during initialization.")
+  .def("add_to_agent", &ta::Agent::add_to_agent, args("self", "xml"),
+       " add new components to the agent.\n"
+       "Raises:\n"
+       "  agent_exception: something went wrong during initialization.")
   .def("run", &ta::Agent::run, arg("self"),
        "run the agent until completion.\n\n"
        "Note: run calls initialize on its own so you do not need to\n\n"
