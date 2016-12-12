@@ -395,7 +395,7 @@ bool Assembly::locate_nddl(std::string &nddl) const {
   return found;
 }
 
-bool Assembly::playTransaction(std::string const &nddl) {
+bool Assembly::playTransaction(std::string const &nddl, bool isFile) {
   std::string const &path = m_trex_schema->nddl_path();
   std::string ret;
 
@@ -404,7 +404,7 @@ bool Assembly::playTransaction(std::string const &nddl) {
 
   // parse nddl
   try {
-    ret = executeScript("nddl", nddl, true);
+    ret = executeScript("nddl", nddl, isFile);
   } catch(EUROPA::PSLanguageExceptionList const &l_err) {
     std::ostringstream err;
     err<<"Error while parsing "<<nddl<<":\n"<<l_err;

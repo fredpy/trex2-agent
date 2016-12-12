@@ -82,7 +82,7 @@ EuropaReactor::EuropaReactor(TeleoReactor::xml_arg_type arg)
                                   "relation_gv")),
    m_full_log(parse_attr<bool>(false, xml_factory::node(arg),
 			       "all_plans")) {
-  bool found;
+  bool found, is_file;
   std::string nddl;
 
 
@@ -93,15 +93,29 @@ EuropaReactor::EuropaReactor(TeleoReactor::xml_arg_type arg)
   if( m_full_log )
     syslog(warn)<<"I will log all my plans as they are produced."
 		<<"\n\tThis can be very costful in term of disk space.";
+     
+//  std::string content = cfg.second.data();
+//  if( !content.empty() )
+//    std::cout<<"content:\n"<<content<<std::endl;
+     
 
   // Load the specified model
   if( model ) {
+    is_file = true;
     if( model->empty() )
       throw XmlError(cfg, "Attribute \"model\" is empty.");
     nddl = *model;
     if( !locate_nddl(nddl) )
       throw XmlError(cfg, "Unable to locate model file \""+(*model)+"\"");
   } else {
+    std::string content = cfg.second.data();
+    syslog(null, info)<<"No model file; parsing xml text data instead:\n"
+    <<content
+    <<"\n-----------------------------------------------------";
+    is_file = false;
+    nddl = content;
+    
+    /*
     std::string short_nddl = getName().str()+".nddl",
       long_nddl = getGraphName().str()+"."+short_nddl;
 
@@ -114,9 +128,10 @@ EuropaReactor::EuropaReactor(TeleoReactor::xml_arg_type arg)
       if( !locate_nddl(nddl) )
 	throw ReactorException(*this, "Unable to locate "+long_nddl+" or "+short_nddl);
     }
+     */
   }
   // Load the nddl model
-  if( !playTransaction(nddl) ) {
+  if( !playTransaction(nddl, is_file) ) {
     syslog(null,error)<<"Model is inconsistent.";
     throw ReactorException(*this, "model in "+nddl+" is inconsistent.");
   }

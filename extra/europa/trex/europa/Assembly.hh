@@ -1072,7 +1072,7 @@ namespace TREX {
        * @retval true   the plan database is consistent
        * @retval false  the plan database is now inconsistent
        */
-      bool playTransaction(std::string const &nddl);
+      bool playTransaction(std::string const &nddl, bool isFile);
 
       /** @brief Configure solvers
        * @param[in] synchronizer A XML solver configuration file name
