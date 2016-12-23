@@ -542,6 +542,7 @@ namespace TREX {
       std::list<reactor_id>      m_idle;
       
       mutable utils::SharedVar<bool> m_valid;
+      bool m_continue_if_empty;
       
       bool valid() const {
         utils::SharedVar<bool>::scoped_lock lck(m_valid);
