@@ -74,7 +74,7 @@ endif()
 project(trex)
 set(TREX_MAJOR 0)
 set(TREX_MINOR 6)
-set(TREX_PATCH 4)
+set(TREX_PATCH 5)
 set(TREX_RC 0)
 
 # TREX script for CPack management
