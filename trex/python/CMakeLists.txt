@@ -52,11 +52,13 @@ if(WITH_PYTHON)
       python_reactor.cc
       python_thread.cc
       python_env.cc
+      python_listener.cc
       # headers
       python_reactor.hh
       python_thread.hh
       exception_helper.hh
       python_env.hh
+      python_listener.hh
       )
     target_link_libraries(TREXpython TREXtransaction ${Boost_PYTHON_LIBRARY} ${PYTHON_LIBRARIES})
     trex_lib(TREXpython core)

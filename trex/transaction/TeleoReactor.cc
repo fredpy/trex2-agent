@@ -135,6 +135,7 @@ namespace TREX {
 
 using namespace TREX::transaction;
 
+
 /*
  * class TREX::transaction::ReactorException
  */

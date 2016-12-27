@@ -32,6 +32,7 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 #include "python_reactor.hh"
+#include "python_listener.hh"
 
 namespace bp=boost::python;
 
@@ -527,6 +528,24 @@ void export_transactions() {
   .def("as_seconds", &reactor_proxy::as_seconds,
        bp::args("self", "ticks"),
        "Convert the number of ticks into seconds")
+  ;
+  
+  bp::class_<py_tl_listener, boost::noncopyable>("timelines_listener",
+                                                 "A class that listen to new timelines declarations or use",
+                                                 bp::init<graph &>(bp::args("self", "g"),
+                                                        "Create new instance connected to graph g"))
+  .def("declared", &py_tl_listener::py_declared,
+       bp::args("self", "name"),
+       "Notify that the new timeline name has been declared")
+  .def("undeclared", &py_tl_listener::py_undeclared,
+       bp::args("self", "name"),
+       "Notify that the new timeline name has been undeclared")
+  .def("used", &py_tl_listener::py_used,
+       bp::args("self", "name"),
+       "Notify that the new timeline name has been subscribed")
+  .def("unused", &py_tl_listener::py_unused,
+       bp::args("self", "name"),
+       "Notify that the new timeline name has been unsubscribed")
   ;
   
   bp::class_<ReactorException, bp::bases<GraphException> > react_e
