@@ -693,7 +693,7 @@ void Agent::loadConf(boost::property_tree::ptree::value_type &config) {
       throw XmlError(config, "Agent name is empty.");
     set_name(name);
     
-    m_continue_if_empty = parse_attr<int>(0, config, "allow_empty")==0;
+    m_continue_if_empty = parse_attr<int>(0, config, "allow_empty")!=0;
     m_finalTick = parse_attr<TICK>(std::numeric_limits<TICK>::max(), config, "finalTick");
     if( m_finalTick<=0 )
       throw XmlError(config, "agent life time should be greater than 0");
