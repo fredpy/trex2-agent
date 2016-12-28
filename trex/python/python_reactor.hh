@@ -113,9 +113,14 @@ namespace TREX {
       virtual void new_plan(transaction::goal_id const &g) {}
       virtual void cancelled_plan(transaction::goal_id const &g) {}
       
+      virtual void terminate() {}
+      
+    protected:
+      void disconnect();
       
     private:
       py_reactor *m_impl;
+      bool        m_active;
       reactor_proxy();
     };
     
@@ -144,6 +149,9 @@ namespace TREX {
       void new_plan_default(transaction::goal_id const &g);
       void cancelled_plan(transaction::goal_id const &g);
       void cancelled_plan_default(transaction::goal_id const &g);
+      
+      void terminate();
+      
     };
    
     class py_reactor :public transaction::TeleoReactor {

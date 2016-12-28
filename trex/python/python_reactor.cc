@@ -52,11 +52,16 @@ namespace  {
 // structors
 
 reactor_proxy::reactor_proxy(py_wrapper const &r)
-:m_impl(r.me) {
+:m_impl(r.me), m_active(true) {
   m_impl->syslog()<<"Proxy created with address: "<<this;
 }
 
 reactor_proxy::~reactor_proxy() {}
+
+void reactor_proxy::disconnect() {
+  m_active = false;
+}
+
 
 // observers
 
@@ -126,6 +131,8 @@ double reactor_proxy::as_seconds(TICK delta) const {
 
 // modifiers
 
+
+
 void reactor_proxy::set_verbose(bool value) {
   if( value )
     m_impl->set_verbose();
@@ -135,49 +142,55 @@ void reactor_proxy::set_verbose(bool value) {
 
 
 void reactor_proxy::set_latency(TICK val) {
-  m_impl->update_latency(val);
+  if( m_active )
+    m_impl->update_latency(val);
 }
 
 void reactor_proxy::set_lookahead(TICK val) {
-  m_impl->update_horizon(val);
+  if( m_active )
+    m_impl->update_horizon(val);
 }
 
 void reactor_proxy::use_tl(Symbol const &tl, bool control,
                            bool plan_listen) {
-  m_impl->use(tl, control, plan_listen);
+  if( m_active )
+    m_impl->use(tl, control, plan_listen);
 }
 
 bool reactor_proxy::unuse_tl(utils::Symbol const &tl) {
-  return m_impl->unuse(tl);
+  return m_active && m_impl->unuse(tl);
 }
 
 void reactor_proxy::provide_tl(Symbol const &tl, bool control,
                                bool plan_publish) {
-  m_impl->provide(tl, control, plan_publish);
+  if( m_active )
+    m_impl->provide(tl, control, plan_publish);
 }
 
 bool reactor_proxy::unprovide_tl(utils::Symbol const &tl) {
-  return m_impl->unprovide(tl);
+  return m_active && m_impl->unprovide(tl);
 }
 
 void reactor_proxy::post(Observation const &o, bool verbose) {
-  m_impl->postObservation(o, verbose);
+  if( m_active )
+    m_impl->postObservation(o, verbose);
 }
 
 bool reactor_proxy::request(goal_id const &g) {
-  return m_impl->postGoal(g);
+  return m_active && m_impl->postGoal(g);
 }
 
 bool reactor_proxy::recall(goal_id const &g) {
-  return m_impl->postRecall(g);
+  return m_active && m_impl->postRecall(g);
 }
 
 bool reactor_proxy::post_plan(goal_id const &g) {
-  return m_impl->postPlanToken(g);
+  return m_active && m_impl->postPlanToken(g);
 }
 
 void reactor_proxy::cancel_plan(goal_id const &g) {
-  m_impl->cancelPlanToken(g);
+  if( m_active )
+    m_impl->cancelPlanToken(g);
 }
 
 void reactor_proxy::info(std::string const &msg) {
@@ -211,9 +224,17 @@ reactor_wrap::reactor_wrap(py_wrapper const &r)
   
 }
 
-reactor_wrap::~reactor_wrap() {}
+reactor_wrap::~reactor_wrap() {
+}
 
 // callbacks
+
+void reactor_wrap::terminate() {
+  bp::override f = this->get_override("__terminate__");
+  if( f )
+    f();
+  disconnect();
+}
 
 void reactor_wrap::handle_init() {
   bp::override f = this->get_override("handle_init");
@@ -329,6 +350,7 @@ void reactor_wrap::cancelled_plan(goal_id const &g) {
     cancelled_plan_default(g);
 }
 
+
 void reactor_wrap::cancelled_plan_default(goal_id const &g) {
   this->reactor_proxy::cancelled_plan(g);
 }
@@ -405,7 +427,12 @@ py_reactor::py_reactor(xml_arg_type arg)
   }
 }
 
-py_reactor::~py_reactor() {}
+py_reactor::~py_reactor() {
+  if( !m_obj.is_none() ) {
+    syslog()<<"Destroying obj";
+    self().terminate();
+  }
+}
 
 
 // observers

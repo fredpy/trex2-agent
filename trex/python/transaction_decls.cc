@@ -341,6 +341,8 @@ void export_transactions() {
   .add_property("verbose", &reactor_proxy::is_verbose,
                 &reactor_proxy::set_verbose,
                 "reactor verbosity level in TREX.log")
+  .def("__terminate__", &reactor_proxy::terminate, bp::args("self"),
+       "Called by trex when the reactor is terminated")
   .def("date_str", &reactor_proxy::date_str, bp::args("self", "tick"),
        "Convert a tick into a human readbale date")
   .def("use", &reactor_proxy::use_tl, (bp::arg("self"),
@@ -530,10 +532,11 @@ void export_transactions() {
        "Convert the number of ticks into seconds")
   ;
   
-  bp::class_<py_tl_listener, boost::noncopyable>("timelines_listener",
-                                                 "A class that listen to new timelines declarations or use",
-                                                 bp::init<graph &>(bp::args("self", "g"),
-                                                        "Create new instance connected to graph g"))
+  bp::class_<py_tl_listener, boost::shared_ptr<py_tl_listener>, boost::noncopyable>
+  ("timelines_listener",
+   "A class that listen to new timelines declarations or use",
+   bp::init<graph &>(bp::args("self", "g"),
+                     "Create new instance connected to graph g"))
   .def("declared", &py_tl_listener::py_declared,
        bp::args("self", "name"),
        "Notify that the new timeline name has been declared")
