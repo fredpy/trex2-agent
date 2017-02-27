@@ -38,4 +38,12 @@ Estimator estimator = new Estimator(Internal);//,true);
     <FlawFilter component="notGoals"/>
     <FlawHandler component="StandardOpenConditionHandler"/>
   </OpenConditionManager>
+
+  <UnboundVariableManager defaultPriority="2600">
+    <FlawFilter component="doNotMatch">
+      <Choice name="_bind"/>
+    </FlawFilter>
+    <FlawHandler component="toZero"/>
+  </UnboundVariableManager>
+
 </Solver>

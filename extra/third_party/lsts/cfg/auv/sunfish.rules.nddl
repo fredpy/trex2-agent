@@ -46,6 +46,7 @@ class NavActions {
       super();
 	  time_at_surface = _time_at_surface;
     }
+ 
 }
 
 NavActions::DoGoing {
@@ -65,12 +66,24 @@ NavActions::DoGoing {
     }    
     
     meets(effect Navigator.At at);
-      go.object == at.object;
-      go.latitude == at.latitude;
-      go.longitude == at.longitude;
-      go.z == at.z;
-      go.flat == at.flat;
-      go.speed == at.speed;
+    go.object == at.object;
+    go.latitude == at.latitude;
+    go.longitude == at.longitude;
+    go.z == at.z;
+    bool is_flat;
+    is_flat == at.flat;
+    go.flat == at.flat;
+    
+    go.speed == at.speed;
+
+    if( false==is_flat ) {
+      go.min_z == at.min_z;
+      go.max_z == at.max_z;
+    } else {
+      go.min_z == go.object.flat_z;      
+      go.max_z == go.object.flat_z;
+    }
+    
 
     int my_start;
     my_start >= c.start;
@@ -87,14 +100,8 @@ NavActions::DoGoing {
 	  contains(condition YoYoController.Exec cmd);
 	  cmd.latitude == go.latitude;
 	  cmd.longitude == go.longitude;
-	  if (go.flat == false) { 
-	  	cmd.min_z == go.object.min_z;
-	  	cmd.max_z == go.object.max_z;
-	  }
-	  else {
-	    cmd.min_z == go.object.flat_z;
-	  	cmd.max_z == go.object.flat_z;
-	  } 	
+	  cmd.min_z == go.min_z;
+	  cmd.max_z == go.max_z;
 	  cmd.speed == go.speed;
 	  concurrent(end, cmd.end);
     }

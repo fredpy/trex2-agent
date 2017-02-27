@@ -19,15 +19,33 @@ class Navigator extends AgentTimeline {
   predicate Going {
     bool flat;
     float latitude, longitude, z, speed;
+    float min_z, max_z;
+    min_z <= max_z;
   }
 	
   predicate At {
     bool flat;
     float latitude, longitude, z, speed;
-    int secs;    
+    int secs;
+    float min_z, max_z;
+    min_z <= max_z;
   }
   
   predicate Visit {
     float latitude, longitude;
   }
+}
+
+Navigator::At {
+  // rule to set min_z and max_z toward their object counterpart if not fully set
+  float _bind_min, _bind_max;
+  // An issue on my binding policy requires me to give a limited domain to those
+  -2000.0 <= _bind_min;
+  _bind_min <= 2000.0;
+  -2000.0 <= _bind_max;
+  _bind_max <= 2000.0;
+
+
+  object.min_z + _bind_min == min_z;
+  object.max_z + _bind_max == max_z;
 }
