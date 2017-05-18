@@ -137,7 +137,43 @@ class Medium extends AgentTimeline {
 	
 	predicate Ground {};
 	
-}
+};
 
+class Temperature extends AgentTimeline {
+ 
+        Temperature(Mode _mode) {
+                super(_mode, "Boot");
+        };
+        
+        predicate Boot {};
+        
+        predicate Value {
+                float value;
+        };
+};
 
+class Salinity extends AgentTimeline {
+ 
+        Salinity(Mode _mode) {
+                super(_mode, "Boot");
+        };
+        
+        predicate Boot {};
+        
+        predicate Value {
+                float value;
+        };
+};
 
+class Depth extends AgentTimeline {
+ 
+        Depth(Mode _mode) {
+                super(_mode, "Boot");
+        };
+        
+        predicate Boot {};
+        
+        predicate Value {
+                float value;
+        };
+};

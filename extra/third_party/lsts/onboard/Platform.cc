@@ -79,6 +79,9 @@ namespace TREX
       provide("control", false);
       provide("oplimits", false);
       provide("refstate", false);
+      provide("temperature", false);
+      provide("salinity", false);
+      provide("depth", false);
       
       // Timelines that can be controlled by other reactors
       provide("reference");
@@ -462,6 +465,21 @@ namespace TREX
       OperationalLimits * oplims =
     		  static_cast<IMC::OperationalLimits *>(received[OperationalLimits::getIdStatic()]);
       postUniqueObservation(m_adapter.opLimitsObservation(oplims));
+      
+      Temperature * temp =
+                  static_cast<IMC::Temperature *>(received[Temperature::getIdStatic()]);
+      if (temp != NULL)
+        postObservation(m_adapter.temperatureObservation(temp));
+      
+      Salinity * salinity =
+                  static_cast<IMC::Salinity *>(received[Salinity::getIdStatic()]);
+      if (salinity != NULL)
+        postObservation(m_adapter.salinityObservation(salinity));
+      
+      Depth * depth =
+                  static_cast<IMC::Depth *>(received[Depth::getIdStatic()]);
+      if (depth != NULL)
+        postObservation(m_adapter.depthObservation(depth));
       
       std::map<std::string, Announce *>::iterator it;
       

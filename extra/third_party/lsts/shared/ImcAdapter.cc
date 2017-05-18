@@ -228,6 +228,45 @@ namespace TREX
 
       return obs;
     }
+    
+    Observation
+    ImcAdapter::temperatureObservation(Temperature * msg)
+    {
+      if (msg == NULL)
+        return Observation("temperature", "Boot");
+
+      Observation obs("temperature", "Value");
+      
+      obs.restrictAttribute("value", FloatDomain(msg->value));
+
+      return obs;
+    }
+    
+    Observation
+    ImcAdapter::salinityObservation(Salinity * msg)
+    {
+      if (msg == NULL)
+        return Observation("salinity", "Boot");
+
+      Observation obs("salinity", "Value");
+      
+      obs.restrictAttribute("value", FloatDomain(msg->value));
+
+      return obs;
+    }
+    
+    Observation
+    ImcAdapter::depthObservation(Depth * msg)
+    {
+      if (msg == NULL)
+        return Observation("depth", "Boot");
+
+      Observation obs("depth", "Value");
+      
+      obs.restrictAttribute("value", FloatDomain(msg->value));
+
+      return obs;
+    }
 
     Observation
     ImcAdapter::announceObservation(Announce * msg)

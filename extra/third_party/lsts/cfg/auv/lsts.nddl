@@ -7,6 +7,9 @@ EstimatedState estate = new EstimatedState(Observe);
 ControlMode control = new ControlMode(Observe);
 Medium medium = new Medium(Observe);
 OperationalLimits oplimits = new OperationalLimits(Observe);
+Temperature temperature = new Temperature(Observe);
+Salinity salinity = new Salinity(Observe);
+Depth depth = new Depth(Observe);
 Navigator navigator = new Navigator(Internal);
 // replace with time to spend at surface in seconds
 NavActions nav_act = new NavActions(30);
