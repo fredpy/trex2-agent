@@ -1,6 +1,7 @@
 #include "auv/platform.nddl"
 #include "auv/navigator.nddl"
 #include "auv/sunfish.rules.nddl"
+#include "auv/tracking.plume.nddl"
 // #include "auv/path.nddl"
 
 EstimatedState estate = new EstimatedState(Observe);
@@ -22,5 +23,9 @@ navigator.max_z.specify(50);
 navigator.flat_z.specify(8);
 
 YoYoController yoyo = new YoYoController(External);
+
+PlumeIndicator plumeindicator = new PlumeIndicator(External);
+
+//TrackingPlumeController tracker = new TrackingPlumeController(External);
 
 close();
