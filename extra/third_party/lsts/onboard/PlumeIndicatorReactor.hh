@@ -18,7 +18,7 @@
 # include <trex/domain/EnumDomain.hh>
 
 # include <vector>
-#include <numeric>
+# include <numeric>
 
 # include "../shared/LstsReactor.hh"
 
@@ -48,9 +48,9 @@ namespace TREX {
     
     enum STATE {UNKNOWN, INSIDE, OUTSIDE};
     
-    const int sample_size = 60;
-    const double depth_for_plume = 1.5;
-    const double avg_below = 28;
+    const int sample_size = 3;
+    const double depth_for_plume = 1;
+    const double avg_below = 30;
 
     class PlumeIndicatorReactor : public LstsReactor
     {
@@ -77,7 +77,6 @@ namespace TREX {
       bool m_trex_control;
       
       static utils::Symbol const s_trex_pred;
-      static utils::Symbol const s_exec_pred;
       static utils::Symbol const s_control_tl;
       
       static utils::Symbol const s_depth_tl;

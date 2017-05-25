@@ -43,6 +43,7 @@ trex_plugin(platform
   DummyOperator.cc
   YoYoReactor.cc
   PlumeIndicatorReactor.cc
+  PlumeTrackerReactor.cc
   
   # headers
   ControlInterface.hh 
@@ -51,6 +52,7 @@ trex_plugin(platform
   DummyOperator.hh
   YoYoReactor.hh
   PlumeIndicatorReactor.hh
+  PlumeTrackerReactor.hh
 )
 
 target_link_libraries(platform_pg LSTSshared)

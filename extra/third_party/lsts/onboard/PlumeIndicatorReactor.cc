@@ -88,14 +88,15 @@ namespace TREX {
       {
         if (v_depth.rbegin()!=v_depth.rend() && (*v_depth.rbegin()) < depth_for_plume)
         {
-          //double avg = std::accumulate(v_salinity.begin(), v_salinity.end(), 0.0)/v_salinity.size();
           double avg = 0;
           int count_avg = 0;
+          //std::cout<<std::endl;
           for (std::vector<double>::const_reverse_iterator it_depth = v_depth.rbegin(), it_salinity = v_salinity.rbegin();
-              it_depth != v_depth.rend();
+              it_depth != v_depth.rend() && it_salinity != v_salinity.rend();
               ++it_depth, ++it_salinity) {
             if ((*it_depth) < depth_for_plume) {
               avg += (*it_salinity);
+              //std::cout<<(*it_salinity)<<std::endl;
               count_avg++;
             } else {
               break; 
@@ -103,8 +104,8 @@ namespace TREX {
           }
           
           avg /= count_avg;
-          std::cout<<"Average: "<<avg<<std::endl;
-          if (count_avg > 3) 
+          //std::cout<<"Average: "<<avg<<std::endl<<std::endl;
+          if (count_avg >= sample_size) 
           {
             if (avg<=avg_below)
             {
@@ -121,35 +122,34 @@ namespace TREX {
           }
         }
       }
+      
       /*
-      if (m_trex_control)
+      if (m_trex_control || true)
       {
         if(v_salinity.size()>sample_size/2)
         {
           std::vector<double> diff_depth(v_salinity.size());
           double avg = std::accumulate(v_salinity.begin(), v_salinity.end(), 0.0)/v_salinity.size();
           double half_variance = getVariance(avg, v_salinity)/2;
-          std::adjacent_difference(v_depth.begin(), v_depth.end(), diff_depth.begin());
-          double depth_diff_avg =  std::accumulate(diff_depth.begin(), diff_depth.end(), 0.0)/v_depth.size();
+          //std::adjacent_difference(v_depth.begin(), v_depth.end(), diff_depth.begin());
+          //double depth_diff_avg =  std::accumulate(diff_depth.begin(), diff_depth.end(), 0.0)/v_depth.size();
 
-          if(depth_diff_avg > 1 || depth_diff_avg < -1)
+          if((avg-half_variance) > 30)
           {
-            if(avg>30 && (avg-half_variance) > 30)
-            {
-              state = OUTSIDE;
-              plume_loc.lat = v_positions.rbegin()->lat;
-              plume_loc.lon = v_positions.rbegin()->lon;
-            } 
-            else
-            {
-              state = INSIDE;
-              plume_loc.lat = v_positions.rbegin()->lat;
-              plume_loc.lon = v_positions.rbegin()->lon;
-            }
+            state = OUTSIDE;
+            plume_loc.lat = v_positions.rbegin()->lat;
+            plume_loc.lon = v_positions.rbegin()->lon;
+          } 
+          else
+          {
+            state = INSIDE;
+            plume_loc.lat = v_positions.rbegin()->lat;
+            plume_loc.lon = v_positions.rbegin()->lon;
           }
         }
       }
       */
+      
       
       switch (state)
       {
