@@ -50,13 +50,13 @@ namespace TREX {
         double angle_inc = 10;
 
         //Minimum distance from river mouth
-        double min_dist = 100;
+        double min_dist = 10;
 
         //Maximum distance from river mouth
         double max_dist = 500;
         
         //Distance outside the plume
-        double outside_plume_dist = 100;
+        double outside_plume_dist = 200;
 
         //Salinity Threshold
         double salinity = 30.0;

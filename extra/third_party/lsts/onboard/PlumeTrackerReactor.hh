@@ -26,6 +26,7 @@
 # include <DUNE/Coordinates/WGS84.hpp>
 
 # include <vector>
+# include <sstream>
 
 using namespace TREX::transaction;
 using namespace TREX::utils;
@@ -46,8 +47,13 @@ namespace TREX {
   namespace LSTS {
     
     typedef struct {
-      double lat, lon, speed;
+      double lat, lon;
     } Position;
+    
+    namespace PLUME 
+    { 
+      enum PLUME_STATE {UNKNOWN, INSIDE, OUTSIDE};
+    };
     
     enum EXEC_STATE {IDLE, INSIDE_GOINGOUT, OUTSIDE, OUTSIDE_GOINGIN, INSIDE};
 
@@ -55,13 +61,13 @@ namespace TREX {
     {
     public:
       PlumeTrackerReactor(TeleoReactor::xml_arg_type arg);
-      EXEC_STATE state;
+      EXEC_STATE e_exec_state;
+      PLUME::PLUME_STATE e_plume_state;
       
       TREX::transaction::Observation m_lastControl;
       Position m_lastPosition;
       
       utils::async_ofstream m_debug_log;
-      utils::async_ofstream m_depth_log;
       
       void handleInit();
       void handleTickStart();
@@ -72,10 +78,10 @@ namespace TREX {
       ~PlumeTrackerReactor();
       
     private:
+      // If TREX is in control
       bool m_trex_control;
-      // True(1): inside, False(0): outside, Negative(-1): Unknown
-      double b_inside_plume;
-      double b_last_inside_plume;
+      // If yoyo state is IDLE
+      bool yoyo_done;
       
       double angle;
       
@@ -85,7 +91,9 @@ namespace TREX {
       
       std::vector<Symbol> yoyo_states;
       
-      static utils::Symbol const s_trex_pred;
+      std::stringstream ss_debug_log;
+      std::string s_past_log;
+      
       static utils::Symbol const s_control_tl;
       static utils::Symbol const s_position_tl;
       static utils::Symbol const s_reference_tl;
@@ -105,6 +113,8 @@ namespace TREX {
       
       void sendYoYoGoal(const double &lat, const double &lon);
       void sendReferenceGoal(const double &lat, const double &lon);
+      
+      void uniqueDebugPrint(TICK cur);
       
     };
 

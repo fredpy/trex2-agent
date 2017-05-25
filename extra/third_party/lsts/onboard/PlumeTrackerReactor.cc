@@ -23,7 +23,6 @@ namespace TREX {
 
     // Symbol equality test is faster than string : use global Symbols to improve performances
     // Use timelines
-    utils::Symbol const PlumeTrackerReactor::s_trex_pred("TREX");
     utils::Symbol const PlumeTrackerReactor::s_control_tl("control");
     utils::Symbol const PlumeTrackerReactor::s_position_tl("estate");
     utils::Symbol const PlumeTrackerReactor::s_reference_tl("reference");
@@ -42,11 +41,8 @@ namespace TREX {
     PlumeTrackerReactor::PlumeTrackerReactor(TeleoReactor::xml_arg_type arg) :
               LstsReactor(arg), 
               m_lastControl(s_control_tl, "Failed"), 
-              m_debug_log(s_log->service()),
-              m_depth_log(s_log->service())
-    {
-      b_last_inside_plume = b_inside_plume = -1;
-      
+              m_debug_log(s_log->service())
+    { 
       use(s_control_tl);
       use(s_plume_tl);
       use(s_yoyo_tl, true);
@@ -56,12 +52,14 @@ namespace TREX {
       use(s_position_tl);
       
       angle = start_ang;
-      state = IDLE;
+      yoyo_done = false;
+      s_past_log = "";
+      
+      e_exec_state = IDLE;
+      e_plume_state = PLUME::UNKNOWN;
       
       utils::LogManager::path_type fname = file_name("plumetracker.log");
       m_debug_log.open(fname.c_str());
-      fname = file_name("depth.csv");
-      m_depth_log.open(fname.c_str());
     }
 
     void
@@ -78,72 +76,74 @@ namespace TREX {
     bool
     PlumeTrackerReactor::synchronize()
     {
-      m_debug_log<<"++++++++ Plume Tracker ++++++++++"<<"\n";
-      TICK cur = getCurrentTick();
-      
+      // Check if we have control of the AUV
       if (!m_trex_control)
         return true;
       
-      switch (state) 
+      ss_debug_log<<"++++++++ Plume Tracker ++++++++++"<<"\n";
+      TICK cur = getCurrentTick();
+      
+      switch (e_exec_state) 
       {
         case IDLE:
-          m_debug_log<<"Idle"<<"\n";
-          if (b_inside_plume == 0) 
+          ss_debug_log<<"Currently Idle"<<"\n";
+          if (e_plume_state == PLUME::OUTSIDE) 
           {
             goingIn();
-            state = OUTSIDE_GOINGIN;
+            e_exec_state = OUTSIDE_GOINGIN;
           } 
-          else if (b_inside_plume == 1)
+          else if (e_plume_state == PLUME::INSIDE)
           {
             goingOut();
-            state = INSIDE_GOINGOUT;
+            e_exec_state = INSIDE_GOINGOUT;
           }
           break;
         case INSIDE_GOINGOUT:
-          m_debug_log<<"Going out!"<<"\n";
-          m_debug_log<<yoyo_states.size()<<"\n";
-          if (b_inside_plume == 0) 
+          ss_debug_log<<"Going out of Plume!"<<"\n";
+          if (e_plume_state == PLUME::OUTSIDE) 
           {
-            state = OUTSIDE;
+            e_exec_state = OUTSIDE;
             plume_edge_lat = plume_lat; 
             plume_edge_lon = plume_lon;
           }
           break;
         case OUTSIDE:
-          m_debug_log<<"Outside!"<<"\n";
+          ss_debug_log<<"Outside of the Plume!"<<"\n";
           {
             double dist_from_edge = WGS84::distance(m_lastPosition.lat, m_lastPosition.lon, 0, plume_edge_lat, plume_edge_lon, 0);
-            m_debug_log<<"Distance: "<<dist_from_edge<<"\n";
+            ss_debug_log<<"Distance: "<<dist_from_edge<<"\n";
             if (dist_from_edge > outside_plume_dist) 
             {
-              state = IDLE;
+              e_exec_state = IDLE;
             }
           }
           break;
         case OUTSIDE_GOINGIN:
-          m_debug_log<<"Going in!"<<"\n";
-          m_debug_log<<yoyo_states.size()<<"\n";
-          m_debug_log<<"Inside plume: "<<b_inside_plume<<"\n";
-          if (b_inside_plume == 1)
+          ss_debug_log<<"Going into the plume!"<<"\n";
+          ss_debug_log<<"Doing "<<yoyo_count<<" yoyos\n";
+          ss_debug_log<<"Currently at "<<yoyo_states.size()/2<<"\n";
+          if (e_plume_state == PLUME::INSIDE)
           {
             yoyo_states.clear();
-            state = INSIDE;
+            e_exec_state = INSIDE;
           }
           break;
         case INSIDE:
-          m_debug_log<<"Inside"<<"\n";
-          m_debug_log<<"Doing "<<yoyo_count<<"number of yoyos\n";
-          m_debug_log<<yoyo_states.size()<<"\n";
-          m_debug_log<<"Inside plume: "<<b_inside_plume<<"\n";
-          if (yoyo_states.size() >= yoyo_count*2)
+          ss_debug_log<<"Inside the plume"<<"\n";
+          ss_debug_log<<"Doing "<<yoyo_count<<" yoyos\n";
+          ss_debug_log<<"Currently at "<<yoyo_states.size()/2<<"\n";
+          ss_debug_log<<"Are yoyos done? "<<yoyo_done<<"\n";
+          if (yoyo_states.size() >= yoyo_count*2 || yoyo_done)
           {
             yoyo_states.clear();
-            state = IDLE;
+            e_exec_state = IDLE;
           }
           break;
         default:
           std::cerr<<"ERROR: Should not have gotten to this point"<<"\n";
       }
+      // Printing unique Debug messages
+      uniqueDebugPrint(cur);
       return true;
     }
     
@@ -151,10 +151,10 @@ namespace TREX {
     PlumeTrackerReactor::goingOut()
     {
       if (angle >= end_ang) {
-        m_debug_log<<"Finished!"<<"\n";
+        ss_debug_log<<"Finished!"<<"\n";
         return false;
       }
-      m_debug_log<<"Going out. Angle: " << angle <<"\n";
+      ss_debug_log<<"Going out. Angle: " << angle <<"\n";
       double angRads = Math::Angles::radians(angle);
       double offsetX = std::cos(angRads) * max_dist;
       double offsetY = std::sin(angRads) * max_dist;
@@ -163,7 +163,6 @@ namespace TREX {
       WGS84::displace(offsetX, offsetY, &tracking_lat, &tracking_lon);
       
       sendReferenceGoal(tracking_lat, tracking_lon);
-      //sendYoYoGoal(tracking_lat, tracking_lon);
       
       return true;
     }
@@ -172,7 +171,7 @@ namespace TREX {
     PlumeTrackerReactor::goingIn()
     {
       angle += angle_inc;
-      m_debug_log<<"Going in. Angle: "<<angle<<"\n";
+      ss_debug_log<<"Going in. Angle: "<<angle<<"\n";
       double angRads = Math::Angles::radians(angle);
       double offsetX = std::cos(angRads) * min_dist;
       double offsetY = std::sin(angRads) * min_dist;
@@ -187,7 +186,7 @@ namespace TREX {
     void 
     PlumeTrackerReactor::sendYoYoGoal(const double& lat, const double& lon)
     {
-      m_debug_log<<"Trying to Exec Goal ++++++++++"<<"\n";
+      ss_debug_log<<"+++++ Sending YoYo Goal +++++"<<"\n";
       Goal g(s_yoyo_tl, "Exec");
       
       g.restrictAttribute(Variable("latitude", FloatDomain(lat)));
@@ -202,7 +201,7 @@ namespace TREX {
     void 
     PlumeTrackerReactor::sendReferenceGoal(const double& lat, const double& lon)
     {
-      m_debug_log<<"Trying to Reference Goal ++++++++++"<<"\n";
+      ss_debug_log<<"+++++ Sending Reference Goal +++++"<<"\n";
       Goal g(s_reference_tl, "Going");
       
       g.restrictAttribute(Variable("latitude", FloatDomain(lat)));
@@ -220,53 +219,45 @@ namespace TREX {
       if (s_plume_tl == obs.object())
       {
         if(obs.predicate() == s_plume_unknown)
-          b_inside_plume = -1;
+          e_plume_state = PLUME::UNKNOWN;
         else if(obs.predicate() == s_plume_inside)
         {
-          b_inside_plume = 1;
+          e_plume_state = PLUME::INSIDE;
           plume_lat = obs.getAttribute("latitude").domain().getTypedSingleton<double,true>();
           plume_lon = obs.getAttribute("longitude").domain().getTypedSingleton<double,true>();
         }
         else if(obs.predicate() == s_plume_outside)
         {
-          b_inside_plume = 0;
+          e_plume_state = PLUME::OUTSIDE;
         }
-        
-        if (b_last_inside_plume == -1) 
-          b_last_inside_plume = b_inside_plume;
       }
 #if !SIMULATE_DATA
       else if (s_yoyo_state_tl == obs.object())
       {
-        m_debug_log<<"++ Yoyo state: "<<obs.predicate()<<"\n";
-        if(yoyo_states.size()>0)
-          m_debug_log<<yoyo_states.back()<<"\n";
+        ss_debug_log<<"Yoyo state: "<<obs.predicate()<<"\n";
         if ((obs.predicate() == "Ascending" && (yoyo_states.size()<1 || yoyo_states.back() != "Ascending"))
             || (obs.predicate() == "Descending" && (yoyo_states.size()<1 || yoyo_states.back() != "Descending")))
-          yoyo_states.push_back(obs.predicate());
-        if(yoyo_states.size()>0)
-          m_debug_log<<yoyo_states.back()<<"\n";
-      } 
-      else if (s_depth_tl == obs.object())
-      {
-        if (obs.predicate() == "Value")
         {
-          double value = obs.getAttribute("value").domain().getTypedSingleton<double,true>();
-          m_debug_log<<value<<"\n";
+          yoyo_states.push_back(obs.predicate());
+          yoyo_done = false;
+        } 
+        else if (obs.predicate() == "Idle")
+        {
+          yoyo_done = true;
         }
       }
 #else
       else if (s_depth_tl == obs.object())
       {
-        m_debug_log<<"++ Depth state"<<"\n";
+        ss_debug_log<<"++ Depth state"<<"\n";
         static double value = 0, last_value = 100, ascending = -1;
         double diff = 0;
-        m_debug_log<<"-- Last_value = "<<last_value<<"\n";
-        m_debug_log<<"-- Ascending = "<<ascending<<"\n";
+        ss_debug_log<<"-- Last_value = "<<last_value<<"\n";
+        ss_debug_log<<"-- Ascending = "<<ascending<<"\n";
         if (obs.predicate() == "Value")
         {
           value = obs.getAttribute("value").domain().getTypedSingleton<double,true>();
-          m_debug_log<<"-- Value = "<<value<<"\n";
+          ss_debug_log<<"-- Value = "<<value<<"\n";
           diff = last_value - value;
           if (last_value == 100) 
             last_value = value;
@@ -308,18 +299,29 @@ namespace TREX {
       else if (s_control_tl == obs.object())
       {
         m_lastControl = obs;
-        if (m_lastControl.predicate() != "TREX")
+        if (m_lastControl.predicate() == "TREX")
         {
-          //state = UNKNOWN;
-        } else {
           m_trex_control = true;
         }
       }
+    }
+    
+    void 
+    PlumeTrackerReactor::uniqueDebugPrint(TICK cur)
+    {
+      std::string debug_log = ss_debug_log.str();
+      if (s_past_log != debug_log) 
+      {
+        s_past_log = debug_log;
+        m_debug_log <<"Time: "<< cur << "\n" << s_past_log <<"\n";
+      }
+      ss_debug_log.str(std::string());
     }
 
     PlumeTrackerReactor::~PlumeTrackerReactor()
     {
       // TODO Auto-generated destructor stub
+      m_debug_log.close();
     }
   }
 }
