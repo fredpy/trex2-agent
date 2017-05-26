@@ -55,7 +55,8 @@ namespace TREX {
       enum PLUME_STATE {UNKNOWN, INSIDE, OUTSIDE};
     };
     
-    enum EXEC_STATE {IDLE, INSIDE_GOINGOUT, OUTSIDE, OUTSIDE_GOINGIN, INSIDE};
+    enum EXEC_STATE {IDLE, CONTROLLED, INSIDE_GOINGOUT, OUTSIDE, OUTSIDE_GOINGIN, INSIDE};
+    const char *exec_state_names[] = { "Idle", "Controlled", "InsideGoingOut", "Outside", "OutsideGoingIn", "Inside"};
 
     class PlumeTrackerReactor : public LstsReactor
     {
@@ -73,6 +74,7 @@ namespace TREX {
       void handleTickStart();
       bool synchronize();
       void notify(TREX::transaction::Observation const &obs);
+      void handleRequest(TREX::transaction::goal_id const &goal);
 
       virtual
       ~PlumeTrackerReactor();
@@ -80,6 +82,8 @@ namespace TREX {
     private:
       // If TREX is in control
       bool m_trex_control;
+      // If PlumeTracker is in control of itself
+      bool m_tracker_control;
       // If yoyo state is IDLE
       bool yoyo_done;
       
@@ -108,12 +112,16 @@ namespace TREX {
       static utils::Symbol const s_plume_inside;
       static utils::Symbol const s_plume_outside;
       
+      // Provided timeline
+      static utils::Symbol const s_plumetracker_tl;
+      
       bool goingOut();
       bool goingIn();
       
       void sendYoYoGoal(const double &lat, const double &lon);
       void sendReferenceGoal(const double &lat, const double &lon);
       
+      void postObservation();
       void uniqueDebugPrint(TICK cur);
       
     };

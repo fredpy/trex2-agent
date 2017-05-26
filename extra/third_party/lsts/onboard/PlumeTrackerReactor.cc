@@ -37,12 +37,17 @@ namespace TREX {
     utils::Symbol const PlumeTrackerReactor::s_plume_inside("Inside");
     utils::Symbol const PlumeTrackerReactor::s_plume_outside("Outside");
 
+    // Provide timelines
+    utils::Symbol const PlumeTrackerReactor::s_plumetracker_tl("plumetracker");
 
     PlumeTrackerReactor::PlumeTrackerReactor(TeleoReactor::xml_arg_type arg) :
               LstsReactor(arg), 
               m_lastControl(s_control_tl, "Failed"), 
               m_debug_log(s_log->service())
     { 
+      m_tracker_control = parse_attr<bool>(true, TeleoReactor::xml_factory::node(arg),
+                                          "autonomous");
+      
       use(s_control_tl);
       use(s_plume_tl);
       use(s_yoyo_tl, true);
@@ -51,11 +56,13 @@ namespace TREX {
       use(s_reference_tl, true);
       use(s_position_tl);
       
+      provide(s_plumetracker_tl);
+      
       angle = start_ang;
       yoyo_done = false;
       s_past_log = "";
       
-      e_exec_state = IDLE;
+      e_exec_state = (m_tracker_control) ? IDLE : CONTROLLED;
       e_plume_state = PLUME::UNKNOWN;
       
       utils::LogManager::path_type fname = file_name("plumetracker.log");
@@ -87,16 +94,26 @@ namespace TREX {
       {
         case IDLE:
           ss_debug_log<<"Currently Idle"<<"\n";
-          if (e_plume_state == PLUME::OUTSIDE) 
+          if (!m_tracker_control)
+            e_exec_state = CONTROLLED;
+          else 
           {
-            goingIn();
-            e_exec_state = OUTSIDE_GOINGIN;
-          } 
-          else if (e_plume_state == PLUME::INSIDE)
-          {
-            goingOut();
-            e_exec_state = INSIDE_GOINGOUT;
+            if (e_plume_state == PLUME::OUTSIDE) 
+            {
+              goingIn();
+              e_exec_state = OUTSIDE_GOINGIN;
+            } 
+            else if (e_plume_state == PLUME::INSIDE)
+            {
+              goingOut();
+              e_exec_state = INSIDE_GOINGOUT;
+            }
           }
+          break;
+        case CONTROLLED:
+          // Waits for outside commands provide as goals. They are
+          // executed when received with no wait time. Therefore,
+          // it is up to the sender to time the goal request.
           break;
         case INSIDE_GOINGOUT:
           ss_debug_log<<"Going out of Plume!"<<"\n";
@@ -114,7 +131,8 @@ namespace TREX {
             ss_debug_log<<"Distance: "<<dist_from_edge<<"\n";
             if (dist_from_edge > outside_plume_dist) 
             {
-              e_exec_state = IDLE;
+              // Checking if controlling itself
+              e_exec_state = (m_tracker_control) ? IDLE : CONTROLLED;
             }
           }
           break;
@@ -136,13 +154,15 @@ namespace TREX {
           if (yoyo_states.size() >= yoyo_count*2 || yoyo_done)
           {
             yoyo_states.clear();
-            e_exec_state = IDLE;
+            // Checking if controlling itself
+            e_exec_state = (m_tracker_control) ? IDLE : CONTROLLED;
           }
           break;
         default:
           std::cerr<<"ERROR: Should not have gotten to this point"<<"\n";
       }
       // Printing unique Debug messages
+      postObservation();
       uniqueDebugPrint(cur);
       return true;
     }
@@ -307,6 +327,18 @@ namespace TREX {
     }
     
     void 
+    PlumeTrackerReactor::postObservation()
+    {
+      Observation obs = Observation(s_plumetracker_tl, exec_state_names[e_exec_state]);
+      if (e_exec_state == INSIDE || e_exec_state == OUTSIDE )
+      {
+        obs.restrictAttribute("latitude", FloatDomain(plume_edge_lat));
+        obs.restrictAttribute("longitude", FloatDomain(plume_edge_lon));
+      }
+      postUniqueObservation(obs);
+    }
+    
+    void 
     PlumeTrackerReactor::uniqueDebugPrint(TICK cur)
     {
       std::string debug_log = ss_debug_log.str();
@@ -316,6 +348,34 @@ namespace TREX {
         m_debug_log <<"Time: "<< cur << "\n" << s_past_log <<"\n";
       }
       ss_debug_log.str(std::string());
+    }
+    
+    void 
+    PlumeTrackerReactor::handleRequest(const goal_id& goal)
+    {
+      if (!m_trex_control)
+      {
+        syslog(log::warn)<< "TREX is not controlling the vehicle so won't handle this request!";
+        return;
+      }
+
+      // Make a local copy to increase my reference counter instead of accessing the raw pointer directly !!!!!
+      goal_id g = goal;
+
+      if ( g->predicate() == "InsideGoingOut" && e_plume_state == PLUME::INSIDE)
+      {
+        e_exec_state = INSIDE_GOINGOUT;
+        goingOut();
+      }
+      else if (g->predicate() == "OutsideGoingIn" && e_plume_state == PLUME::OUTSIDE)
+      {
+        e_exec_state = OUTSIDE_GOINGIN;
+        goingIn();
+      }
+      else
+      {
+        syslog(log::warn)<< "Request is not valid: " << g->predicate();
+      }
     }
 
     PlumeTrackerReactor::~PlumeTrackerReactor()

@@ -16,18 +16,27 @@ class PlumeIndicator extends AgentTimeline {
   }
 };
 
-class TrackingPlumeController extends AgentTimeline { 
-  TrackingPlumeController(Mode _mode) {
+class PlumeTracker extends AgentTimeline { 
+  PlumeTracker(Mode _mode) {
     super(_mode, "Idle");
   }       
   
   predicate Idle {}
   
-  action Done {
-    float latitude, longitude, max_z, min_z, speed;
+  predicate Controlled {}
+  
+  // Sends the AUV into the Plume
+  action InsideGoingOut {}
+  
+  predicate Outside {
+    float latitude, longitude;
   }
   
-  predicate Exec {
-    float latitude, longitude, max_z, min_z, speed;
+  // Sends the AUV out of the Plume
+  action OutsideGoingIn {}
+  
+  predicate Inside {
+    float latitude, longitude;
   }
+  
 };

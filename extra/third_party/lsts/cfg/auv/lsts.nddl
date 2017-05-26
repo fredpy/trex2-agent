@@ -26,6 +26,6 @@ YoYoController yoyo = new YoYoController(External);
 
 PlumeIndicator plumeindicator = new PlumeIndicator(External);
 
-//TrackingPlumeController tracker = new TrackingPlumeController(External);
+PlumeTracker plumetracker = new PlumeTracker(External);
 
 close();
