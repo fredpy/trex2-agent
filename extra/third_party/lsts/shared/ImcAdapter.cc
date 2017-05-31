@@ -248,6 +248,10 @@ namespace TREX
       if (msg == NULL)
         return Observation("salinity", "Boot");
 
+      //uint8_t src_ent = msg->getDestinationEntity();
+      //msg->fieldsToJSON(std::cout, 5);
+      //std::cout<<src_ent<<std::endl;
+      //std::cout<<msg->value<<std::endl;
       Observation obs("salinity", "Value");
       
       obs.restrictAttribute("value", FloatDomain(msg->value));

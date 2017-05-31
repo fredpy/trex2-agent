@@ -215,9 +215,12 @@ namespace TREX {
       if (obs.predicate() == "Value")
       {
         value = obs.getAttribute("value").domain().getTypedSingleton<double,true>();
-        if (vec.size()>=sample_size)
-          vec.erase(vec.begin());
-        vec.push_back(value);
+        if (value != -1)
+        {
+          if (vec.size()>=sample_size)
+            vec.erase(vec.begin());
+          vec.push_back(value);
+        }
       }
     }
 

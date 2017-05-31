@@ -44,6 +44,7 @@ trex_plugin(platform
   YoYoReactor.cc
   PlumeIndicatorReactor.cc
   PlumeTrackerReactor.cc
+  CoordinationReactor.cc
   
   # headers
   ControlInterface.hh 
@@ -53,6 +54,7 @@ trex_plugin(platform
   YoYoReactor.hh
   PlumeIndicatorReactor.hh
   PlumeTrackerReactor.hh
+  CoordinationReactor.hh
 )
 
 target_link_libraries(platform_pg LSTSshared)

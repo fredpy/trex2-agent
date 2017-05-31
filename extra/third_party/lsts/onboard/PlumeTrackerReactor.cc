@@ -20,6 +20,8 @@ namespace
 
 namespace TREX {
   namespace LSTS {
+    
+    using namespace PlumeTrackerReactorState;
 
     // Symbol equality test is faster than string : use global Symbols to improve performances
     // Use timelines
@@ -114,6 +116,7 @@ namespace TREX {
           // Waits for outside commands provide as goals. They are
           // executed when received with no wait time. Therefore,
           // it is up to the sender to time the goal request.
+          sendReferenceGoal(m_lastPosition.lat, m_lastPosition.lon);
           break;
         case INSIDE_GOINGOUT:
           ss_debug_log<<"Going out of Plume!"<<"\n";
@@ -159,7 +162,7 @@ namespace TREX {
           }
           break;
         default:
-          std::cerr<<"ERROR: Should not have gotten to this point"<<"\n";
+          std::cerr<<"ERROR: TrackerReactor should not have gotten to this point"<<"\n";
       }
       // Printing unique Debug messages
       postObservation();
@@ -355,26 +358,28 @@ namespace TREX {
     {
       if (!m_trex_control)
       {
-        syslog(log::warn)<< "TREX is not controlling the vehicle so won't handle this request!";
+        m_debug_log<< "TREX is not controlling the vehicle so won't handle this request!";
         return;
       }
 
       // Make a local copy to increase my reference counter instead of accessing the raw pointer directly !!!!!
       goal_id g = goal;
-
+      m_debug_log << "Received a goal: ";
       if ( g->predicate() == "InsideGoingOut" && e_plume_state == PLUME::INSIDE)
       {
+        m_debug_log << "Inside going out!\n";
         e_exec_state = INSIDE_GOINGOUT;
         goingOut();
       }
       else if (g->predicate() == "OutsideGoingIn" && e_plume_state == PLUME::OUTSIDE)
       {
+        m_debug_log << "Outside going in!\n";
         e_exec_state = OUTSIDE_GOINGIN;
         goingIn();
       }
       else
       {
-        syslog(log::warn)<< "Request is not valid: " << g->predicate();
+        m_debug_log<< "Request is not valid: " << g->predicate();
       }
     }
 

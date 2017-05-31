@@ -49,7 +49,7 @@ namespace TREX {
     enum STATE {UNKNOWN, INSIDE, OUTSIDE};
     
     const int sample_size = 3;
-    const double depth_for_plume = 1;
+    const double depth_for_plume = 1.2;
     const double avg_below = 30;
 
     class PlumeIndicatorReactor : public LstsReactor

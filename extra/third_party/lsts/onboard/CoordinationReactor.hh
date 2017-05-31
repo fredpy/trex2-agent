@@ -1,12 +1,12 @@
 /*
- * PlumeTrackerReactor.hh
+ * CoordinationReactor.hh
  *
- *  Created on: May 22, 2017
+ *  Created on: May 26, 2017
  *      Author: pcooksey
  */
 
-#ifndef PLUMETRACKERREACTOR_HH_
-#define PLUMETRACKERREACTOR_HH_
+#ifndef COORDINATIONREACTOR_HH_
+#define COORDINATIONREACTOR_HH_
 
 # include <trex/transaction/TeleoReactor.hh>
 # include <trex/utils/Plugin.hh>
@@ -17,9 +17,13 @@
 # include <trex/domain/BooleanDomain.hh>
 # include <trex/domain/EnumDomain.hh>
 # include <trex/utils/asio_fstream.hh>
+# include <trex/utils/StringExtract.hh>
+
+#include <boost/uuid/uuid.hpp>            // uuid class
+#include <boost/uuid/uuid_generators.hpp> // generators
+#include <boost/uuid/uuid_io.hpp>         // streaming operators etc.
 
 # include "../shared/LstsReactor.hh"
-# include "PlumeTrackingVariables.hh"
 
 # include <DUNE/DUNE.hpp>
 # include <DUNE/Math/Angles.hpp>
@@ -32,9 +36,6 @@ using namespace TREX::transaction;
 using namespace TREX::utils;
 
 using DUNE_NAMESPACES;
-
-#define SIMULATE_DATA 0
-
 
 namespace TREX {
   /** @brief plume indicator plug-in
@@ -50,23 +51,29 @@ namespace TREX {
       double lat, lon;
     } Position;
     
+    typedef struct {
+      std::string id;
+      boost::posix_time::time_duration latency;
+      Position pos;
+      bool received;
+    } Teammate;
+    
     namespace PLUME 
     { 
       enum PLUME_STATE {UNKNOWN, INSIDE, OUTSIDE};
     };
     
-    namespace PlumeTrackerReactorState 
+    namespace CoordinationReactorState
     {
-      enum EXEC_STATE {IDLE, CONTROLLED, INSIDE_GOINGOUT, OUTSIDE, OUTSIDE_GOINGIN, INSIDE};
-      const char *exec_state_names[] = { "Idle", "Controlled", "InsideGoingOut", "Outside", "OutsideGoingIn", "Inside"};
+      enum EXEC_STATE {INITIAL, JOINING, GOING, EXEC};
+      const char *exec_state_names[] = {"Initial", "Joining", "Going", "Exec"};
     }
 
-    class PlumeTrackerReactor : public LstsReactor
+    class CoordinationReactor : public LstsReactor
     {
     public:
-      PlumeTrackerReactor(TeleoReactor::xml_arg_type arg);
-      PlumeTrackerReactorState::EXEC_STATE e_exec_state;
-      PLUME::PLUME_STATE e_plume_state;
+      CoordinationReactor(TeleoReactor::xml_arg_type arg);
+      CoordinationReactorState::EXEC_STATE e_exec_state;
       
       TREX::transaction::Observation m_lastControl;
       Position m_lastPosition;
@@ -78,54 +85,54 @@ namespace TREX {
       bool synchronize();
       void notify(TREX::transaction::Observation const &obs);
       void handleRequest(TREX::transaction::goal_id const &goal);
+      void followerHandleNotify(TREX::transaction::Observation const &obs);
 
       virtual
-      ~PlumeTrackerReactor();
+      ~CoordinationReactor();
       
     private:
       // If TREX is in control
       bool m_trex_control;
-      // If PlumeTracker is in control of itself
-      bool m_tracker_control;
-      // If yoyo state is IDLE
-      bool yoyo_done;
+      // If this reactor is the leader
+      bool m_leader_control;
+      bool m_stop_sending_goals;
+      bool m_tracker_controlled;
       
-      double angle;
+      PLUME::PLUME_STATE e_plume_state;
       
-      double tracking_lat, tracking_lon;
-      double plume_lat, plume_lon;
-      double plume_edge_lat, plume_edge_lon;
-      
-      std::vector<Symbol> yoyo_states;
+      boost::uuids::uuid uuid;
+      boost::posix_time::ptime m_initial_time;
+      boost::posix_time::ptime m_start_time;
       
       std::stringstream ss_debug_log;
       std::string s_past_log;
       
+      std::vector<Teammate> v_team;
+      
       static utils::Symbol const s_control_tl;
       static utils::Symbol const s_position_tl;
       static utils::Symbol const s_reference_tl;
-      
+      static utils::Symbol const s_plumetracker_tl;
       static utils::Symbol const s_plume_tl;
-      static utils::Symbol const s_yoyo_tl;
-      static utils::Symbol const s_yoyo_state_tl;
-      static utils::Symbol const s_depth_tl;
+      
+      // Shared timeline between vehicles 
+      static utils::Symbol const s_shared_tl;
       
       // Plume detection
       static utils::Symbol const s_plume_unknown;
       static utils::Symbol const s_plume_inside;
       static utils::Symbol const s_plume_outside;
       
-      // Provided timeline
-      static utils::Symbol const s_plumetracker_tl;
-      
-      bool goingOut();
-      bool goingIn();
-      
-      void sendYoYoGoal(const double &lat, const double &lon);
       void sendReferenceGoal(const double &lat, const double &lon);
+      void sendPlumeTrackerGoal();
       
-      void postObservation();
+      void leaderPostObservation(TICK cur);
+      void followerPostGoal(TICK cur);
       void uniqueDebugPrint(TICK cur);
+      inline boost::posix_time::ptime now();
+      
+      void leaderPlanningInsideGoingOut(TREX::transaction::Observation &obs);
+      void leaderPlanningOutsideGoingIn(TREX::transaction::Observation &obs);
       
     };
 
@@ -133,4 +140,4 @@ namespace TREX {
   }
 }
 
-#endif /* PLUMETRACKERREACTOR_HH_ */
+#endif /* COORDINATIONREACTOR_HH_ */
