@@ -48,7 +48,7 @@ namespace TREX {
   namespace LSTS {
     
     typedef struct {
-      double lat, lon;
+      double lat, lon, depth;
     } Position;
     
     typedef struct {
@@ -79,6 +79,7 @@ namespace TREX {
       Position m_lastPosition;
       
       utils::async_ofstream m_debug_log;
+      utils::async_ofstream m_depth_log;
       
       void handleInit();
       void handleTickStart();
@@ -98,11 +99,15 @@ namespace TREX {
       bool m_stop_sending_goals;
       bool m_tracker_controlled;
       
+      // The next point provided by the PlumeTrackerReactor
+      double next_lat, next_lon;
+      
       PLUME::PLUME_STATE e_plume_state;
       
       boost::uuids::uuid uuid;
       boost::posix_time::ptime m_initial_time;
       boost::posix_time::ptime m_start_time;
+      boost::posix_time::time_duration m_decent_time;
       
       std::stringstream ss_debug_log;
       std::string s_past_log;
@@ -123,7 +128,7 @@ namespace TREX {
       static utils::Symbol const s_plume_inside;
       static utils::Symbol const s_plume_outside;
       
-      void sendReferenceGoal(const double &lat, const double &lon);
+      void sendReferenceGoal(const double &lat, const double &lon, const double& z=0, const double& speed=1600);
       void sendPlumeTrackerGoal();
       
       void leaderPostObservation(TICK cur);

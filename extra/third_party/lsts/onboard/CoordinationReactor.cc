@@ -44,6 +44,7 @@ namespace TREX {
               LstsReactor(arg), 
               m_lastControl(s_control_tl, "Failed"), 
               m_debug_log(s_log->service()),
+              m_depth_log(s_log->service()),
               uuid(boost::uuids::nil_generator()())
     { 
       m_leader_control = parse_attr<bool>(false, TeleoReactor::xml_factory::node(arg),
@@ -66,8 +67,16 @@ namespace TREX {
       m_stop_sending_goals = false;
       m_tracker_controlled = true;
       
+      next_lat = 0;
+      next_lon = 0;
+      
+      m_decent_time = boost::posix_time::seconds(0);
+      
       utils::LogManager::path_type fname = file_name("coordination.log");
       m_debug_log.open(fname.c_str());
+      
+      fname = file_name("depth.csv");
+      m_depth_log.open(fname.c_str());
     }
 
     void
@@ -100,7 +109,7 @@ namespace TREX {
             e_exec_state = JOINING;
           break;
         case JOINING:
-          ss_debug_log<<"Joining the coordination as";
+          ss_debug_log<<"Joining the coordination (";
           ss_debug_log<< ((m_leader_control) ? "Leader)\n" : "Follower)\n");
           break;
         case GOING:
@@ -159,22 +168,58 @@ namespace TREX {
             if ((*it).received != true)
               all_received = false;
           }
+          
           if (all_received)
             e_exec_state = GOING;
+          else
+            ss_debug_log<<"All team members have not been received Size:"<<v_team.size()<<"\n";
         }
           break;
         case GOING:
         {
+          static bool justStartedDecending = true;
           Observation obs = Observation(s_shared_tl, exec_state_names[e_exec_state]);
           boost::posix_time::ptime t = tickToTime(cur);
           std::string ts = boost::posix_time::to_simple_string(t);
           obs.restrictAttribute("Time", StringDomain(ts));
           postUniqueObservation(obs);
-          if (m_start_time < now() && m_start_time != boost::posix_time::not_a_date_time)
+          if (m_start_time <= now() && m_start_time != boost::posix_time::not_a_date_time)
           {
-            ss_debug_log<<"--- Starting Plume Tracker now! ---\n";
-            sendPlumeTrackerGoal();
-            m_start_time = boost::posix_time::not_a_date_time;
+            if (e_plume_state == PLUME::INSIDE)
+            {
+              ss_debug_log<<"--- Starting Plume Tracker now! ---\n";
+              sendPlumeTrackerGoal();
+              m_start_time = boost::posix_time::not_a_date_time;
+            }
+            else
+            {
+              if (justStartedDecending)
+              {
+                ss_debug_log<<"--- Starting Decent now! ---\n";
+                m_start_time = now();
+                sendReferenceGoal(next_lat, next_lon, 5);
+                justStartedDecending = false;
+              }
+              else if (m_lastPosition.depth < 4.5)
+              {
+                ss_debug_log<<"--- Decending now! ---\n";
+                m_decent_time = now() - m_start_time;
+                sendReferenceGoal(next_lat, next_lon, 5);
+              }
+              else
+              {
+                m_decent_time -= boost::posix_time::seconds(1);
+                ss_debug_log<<"--- Maintaining depth for "<<m_decent_time<<"\n";
+                if (m_decent_time <= boost::posix_time::seconds(0))
+                {
+                  ss_debug_log<<"--- Starting Plume Tracker now! ---\n";
+                  sendPlumeTrackerGoal();
+                  m_start_time = boost::posix_time::not_a_date_time;
+                } else {
+                  sendReferenceGoal(next_lat, next_lon, 5);
+                }
+              }
+            }
           }
           // If plume tracker has taken over control transition and clear old variables
           if (!m_tracker_controlled)
@@ -183,12 +228,16 @@ namespace TREX {
             // Clear variables for coordination since they need to be redone when the AUVs surface again
             m_initial_time = boost::posix_time::not_a_date_time;
             v_team.clear();
+            justStartedDecending = true;
           }
         }
           break;
         case EXEC:
-          if (m_tracker_controlled) 
+          if (m_tracker_controlled) {
             e_exec_state = INITIAL;
+            // Should only be called once when transitioning. This keeps the AUV circling.
+            sendReferenceGoal(m_lastPosition.lat, m_lastPosition.lon);
+          }
           break;
         default:
           ss_debug_log<<"There is a problem this state is incorrect for this reactor\n";
@@ -203,6 +252,7 @@ namespace TREX {
       {
         case JOINING:
         {
+          //sendReferenceGoal(m_lastPosition.lat, m_lastPosition.lon);
           // If we have our start time we don't need to send a goal
           if (m_start_time != boost::posix_time::not_a_date_time)
           {
@@ -240,11 +290,12 @@ namespace TREX {
           ss_debug_log<<"Going\n";
           if (!m_stop_sending_goals)
           {
+            ss_debug_log<<"Sending Goal\n";
             Goal g(s_shared_tl, exec_state_names[e_exec_state]);
             g.restrictAttribute(Variable("ID", StringDomain(boost::uuids::to_string(uuid))));
             LstsReactor::postGoal(g);
           }
-          if (m_start_time < now() && m_start_time != boost::posix_time::not_a_date_time)
+          if (m_start_time <= now() && m_start_time != boost::posix_time::not_a_date_time)
           {
             ss_debug_log<<"--- Starting Plume Tracker now! ---\n";
             sendPlumeTrackerGoal();
@@ -262,8 +313,11 @@ namespace TREX {
         }
           break;
         case EXEC:
-          if (m_tracker_controlled) 
+          if (m_tracker_controlled) {
             e_exec_state = JOINING;
+            // Should only be called once when transitioning. This keeps the AUV circling.
+            sendReferenceGoal(m_lastPosition.lat, m_lastPosition.lon);
+          }
           break;
         default:
           ss_debug_log<<"There is a problem this state is incorrect for this reactor\n";
@@ -297,13 +351,29 @@ namespace TREX {
         boost::posix_time::ptime followertime = boost::posix_time::time_from_string(time);
         boost::posix_time::time_duration td = t - followertime;
         
-        Teammate teammate;
-        teammate.id = g->getAttribute("ID").domain().getStringSingleton();
-        teammate.latency = td + boost::posix_time::duration_from_string(g->getAttribute("Latency").domain().getStringSingleton());
-        teammate.pos.lat = g->getAttribute("Lat").domain().getTypedSingleton<double,true>();
-        teammate.pos.lon = g->getAttribute("Lon").domain().getTypedSingleton<double,true>();
-        teammate.received = false;
-        v_team.push_back(teammate);
+        bool add_teammate = true;
+        for (std::vector<Teammate>::iterator it = v_team.begin();
+               it != v_team.end();
+               ++it)
+        {
+          if ((*it).id == g->getAttribute("ID").domain().getStringSingleton())
+            add_teammate = false;
+        }
+        
+        if (add_teammate)
+        {
+          Teammate teammate;
+          teammate.id = g->getAttribute("ID").domain().getStringSingleton();
+          teammate.latency = td + boost::posix_time::duration_from_string(g->getAttribute("Latency").domain().getStringSingleton());
+          teammate.pos.lat = g->getAttribute("Lat").domain().getTypedSingleton<double,true>();
+          teammate.pos.lon = g->getAttribute("Lon").domain().getTypedSingleton<double,true>();
+          teammate.received = false;
+          v_team.push_back(teammate);
+        }
+        else
+        {
+          m_debug_log << "Already added \n";
+        }
       }
       else if (g->predicate() == exec_state_names[GOING])
       {
@@ -338,6 +408,8 @@ namespace TREX {
         {
           m_lastPosition.lat = obs.getAttribute("latitude").domain().getTypedSingleton<double,true>();
           m_lastPosition.lon = obs.getAttribute("longitude").domain().getTypedSingleton<double,true>();
+          m_lastPosition.depth = obs.getAttribute("depth").domain().getTypedSingleton<double,true>();
+          m_depth_log << m_lastPosition.depth << "\n";
         }
       }
       else if (s_control_tl == obs.object())
@@ -366,7 +438,14 @@ namespace TREX {
       else if (s_plumetracker_tl == obs.object())
       {
         if(obs.predicate() == "Controlled")
+        {
           m_tracker_controlled = true;
+          if(obs.hasAttribute("latitude") && obs.hasAttribute("longitude"))
+          {
+            next_lat = obs.getAttribute("latitude").domain().getTypedSingleton<double,true>();
+            next_lon = obs.getAttribute("longitude").domain().getTypedSingleton<double,true>();
+          }
+        }
         else
           m_tracker_controlled = false;
       }
@@ -376,7 +455,9 @@ namespace TREX {
     CoordinationReactor::followerHandleNotify(TREX::transaction::Observation const &obs)
     {
       // This is only used by the follower
-      if (s_shared_tl == obs.object())
+      // If the tracker is controlled then we will process messages otherwise the two
+      // AUVs should not be communicating
+      if (s_shared_tl == obs.object() && m_tracker_controlled)
       {
         if (obs.predicate() == exec_state_names[INITIAL])
         {
@@ -435,7 +516,7 @@ namespace TREX {
         {
           if (m_start_time == boost::posix_time::not_a_date_time || m_start_time > now())
             m_start_time = now() + (*it).latency*2; 
-          std::string time = boost::posix_time::to_simple_string(m_start_time + boost::posix_time::seconds(60));
+          std::string time = boost::posix_time::to_simple_string(m_start_time);
           obs.restrictAttribute((*it).id, StringDomain(time));
         }
         else
@@ -444,15 +525,15 @@ namespace TREX {
     }
     
     void 
-    CoordinationReactor::sendReferenceGoal(const double& lat, const double& lon)
+    CoordinationReactor::sendReferenceGoal(const double& lat, const double& lon, const double& z, const double& speed)
     {
       ss_debug_log<<"+++++ Sending Reference Goal +++++"<<"\n";
       Goal g(s_reference_tl, "Going");
       
       g.restrictAttribute(Variable("latitude", FloatDomain(lat)));
       g.restrictAttribute(Variable("longitude", FloatDomain(lon)));
-      g.restrictAttribute(Variable("z", FloatDomain(0)));
-      g.restrictAttribute(Variable("speed", FloatDomain(1600)));
+      g.restrictAttribute(Variable("z", FloatDomain(z)));
+      g.restrictAttribute(Variable("speed", FloatDomain(speed)));
 
       LstsReactor::postGoal(g);
     }
@@ -502,6 +583,7 @@ namespace TREX {
     {
       // TODO Auto-generated destructor stub
       m_debug_log.close();
+      m_depth_log.close();
     }
   }
 }

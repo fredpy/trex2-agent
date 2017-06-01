@@ -116,7 +116,7 @@ namespace TREX {
           // Waits for outside commands provide as goals. They are
           // executed when received with no wait time. Therefore,
           // it is up to the sender to time the goal request.
-          sendReferenceGoal(m_lastPosition.lat, m_lastPosition.lon);
+          // sendReferenceGoal(m_lastPosition.lat, m_lastPosition.lon);
           break;
         case INSIDE_GOINGOUT:
           ss_debug_log<<"Going out of Plume!"<<"\n";
@@ -337,6 +337,20 @@ namespace TREX {
       {
         obs.restrictAttribute("latitude", FloatDomain(plume_edge_lat));
         obs.restrictAttribute("longitude", FloatDomain(plume_edge_lon));
+      }
+      else if (e_exec_state == CONTROLLED)
+      {
+        if (e_plume_state != PLUME::UNKNOWN)
+        {
+          double angRads = Math::Angles::radians(angle);
+          double offsetX = std::cos(angRads) * ((e_plume_state==PLUME::INSIDE)? max_dist : min_dist);
+          double offsetY = std::sin(angRads) * ((e_plume_state==PLUME::INSIDE)? max_dist : min_dist);
+          double next_lat = river_lat;
+          double next_lon = river_lon;
+          WGS84::displace(offsetX, offsetY, &next_lat, &next_lon);
+          obs.restrictAttribute("latitude", FloatDomain(next_lat));
+          obs.restrictAttribute("longitude", FloatDomain(next_lon));
+        }
       }
       postUniqueObservation(obs);
     }
