@@ -70,7 +70,7 @@ namespace TREX {
       next_lat = 0;
       next_lon = 0;
       
-      m_decent_time = boost::posix_time::seconds(0);
+      m_descent_time = boost::posix_time::seconds(0);
       
       utils::LogManager::path_type fname = file_name("coordination.log");
       m_debug_log.open(fname.c_str());
@@ -97,8 +97,8 @@ namespace TREX {
       if (!m_trex_control)
         return true;
       
-      ss_debug_log<<"++++++++ Coordination Reactor ++++++++++"<<"\n";
       TICK cur = getCurrentTick();
+      ss_debug_log<<"["<<cur<<"] ++++++++ Coordination Reactor ++++++++++"<<"\n";
       
       switch (e_exec_state) 
       {
@@ -152,12 +152,10 @@ namespace TREX {
         case JOINING:
         {
           // I am assuming that I only have one other AUV now.
-          Observation obs = Observation(s_shared_tl, exec_state_names[e_exec_state]);
           if (e_plume_state == PLUME::INSIDE)
-            leaderPlanningInsideGoingOut(obs);
+            leaderPlanningInsideGoingOut();
           else if (e_plume_state == PLUME::OUTSIDE)
-            leaderPlanningOutsideGoingIn(obs);
-          TeleoReactor::postObservation(obs);
+            leaderPlanningOutsideGoingIn();;
           
           // Checking if everyone has received the message
           bool all_received = true;
@@ -183,6 +181,7 @@ namespace TREX {
           std::string ts = boost::posix_time::to_simple_string(t);
           obs.restrictAttribute("Time", StringDomain(ts));
           postUniqueObservation(obs);
+          // Checks if it is time to start and that it hasn't already started (m_start_time is not_a_date_time)
           if (m_start_time <= now() && m_start_time != boost::posix_time::not_a_date_time)
           {
             if (e_plume_state == PLUME::INSIDE)
@@ -200,17 +199,21 @@ namespace TREX {
                 sendReferenceGoal(next_lat, next_lon, 5);
                 justStartedDecending = false;
               }
-              else if (m_lastPosition.depth < 4.5)
+              else if (m_lastPosition.depth <= 0.5)
+              {
+                m_start_time = now();
+              }
+              else if (m_lastPosition.depth < (max_depth - .5))
               {
                 ss_debug_log<<"--- Decending now! ---\n";
-                m_decent_time = now() - m_start_time;
+                m_descent_time = now() - m_start_time;
                 sendReferenceGoal(next_lat, next_lon, 5);
               }
               else
               {
-                m_decent_time -= boost::posix_time::seconds(1);
-                ss_debug_log<<"--- Maintaining depth for "<<m_decent_time<<"\n";
-                if (m_decent_time <= boost::posix_time::seconds(0))
+                m_descent_time -= boost::posix_time::seconds(1);
+                ss_debug_log<<"--- Maintaining depth for "<<m_descent_time<<"\n";
+                if (m_descent_time <= boost::posix_time::seconds(0))
                 {
                   ss_debug_log<<"--- Starting Plume Tracker now! ---\n";
                   sendPlumeTrackerGoal();
@@ -386,6 +389,8 @@ namespace TREX {
         {
           if ((*it).id == id)
             (*it).received = true;
+          else
+            m_debug_log<<"Not equal"<<(*it).id<<" = "<<id<<"\n";
         }
       }
       else
@@ -483,8 +488,9 @@ namespace TREX {
     }
     
     void 
-    CoordinationReactor::leaderPlanningInsideGoingOut(Observation& obs)
+    CoordinationReactor::leaderPlanningInsideGoingOut()
     {
+      Observation obs = Observation(s_shared_tl, exec_state_names[e_exec_state]);
       for (std::vector<Teammate>::iterator it = v_team.begin();
                it != v_team.end();
                ++it)
@@ -501,18 +507,20 @@ namespace TREX {
         else
           m_debug_log<<"ERROR: Too far away ("<<dist<<")\n";
       }
+      TeleoReactor::postObservation(obs);
     }
 
     void 
-    CoordinationReactor::leaderPlanningOutsideGoingIn(Observation& obs)
+    CoordinationReactor::leaderPlanningOutsideGoingIn()
     {
+      Observation obs = Observation(s_shared_tl, exec_state_names[e_exec_state]);
       for (std::vector<Teammate>::iterator it = v_team.begin();
                it != v_team.end();
                ++it)
       {
         double dist = WGS84::distance(m_lastPosition.lat, m_lastPosition.lon, 0, (*it).pos.lat, (*it).pos.lon, 0);
         // TODO Make the AUV move if it is too far
-        if (dist < 1000)
+        if (dist < 20)
         {
           if (m_start_time == boost::posix_time::not_a_date_time || m_start_time > now())
             m_start_time = now() + (*it).latency*2; 
@@ -520,8 +528,19 @@ namespace TREX {
           obs.restrictAttribute((*it).id, StringDomain(time));
         }
         else
+        {
           m_debug_log<<"ERROR: Too far away ("<<dist<<")\n";
+          double angRads = Math::Angles::radians(90);
+          double offsetX = std::cos(angRads) * 10;
+          double offsetY = std::sin(angRads) * 10;
+          double moving_lat = (*it).pos.lat;
+          double moving_lon = (*it).pos.lon;
+          WGS84::displace(offsetX, offsetY, &moving_lat, &moving_lon);
+          sendReferenceGoal(moving_lat, moving_lon, 0);
+          return;
+        }
       }
+      TeleoReactor::postObservation(obs);
     }
     
     void 
@@ -568,7 +587,7 @@ namespace TREX {
       if (s_past_log != debug_log) 
       {
         s_past_log = debug_log;
-        m_debug_log <<"Time: "<< cur << "\n" << s_past_log <<"\n";
+        m_debug_log << s_past_log <<"\n";
       }
       ss_debug_log.str(std::string());
     }

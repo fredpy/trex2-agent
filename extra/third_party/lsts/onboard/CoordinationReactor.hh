@@ -47,6 +47,8 @@ namespace TREX {
    */
   namespace LSTS {
     
+    extern double max_depth;
+    
     typedef struct {
       double lat, lon, depth;
     } Position;
@@ -107,7 +109,7 @@ namespace TREX {
       boost::uuids::uuid uuid;
       boost::posix_time::ptime m_initial_time;
       boost::posix_time::ptime m_start_time;
-      boost::posix_time::time_duration m_decent_time;
+      boost::posix_time::time_duration m_descent_time;
       
       std::stringstream ss_debug_log;
       std::string s_past_log;
@@ -136,8 +138,8 @@ namespace TREX {
       void uniqueDebugPrint(TICK cur);
       inline boost::posix_time::ptime now();
       
-      void leaderPlanningInsideGoingOut(TREX::transaction::Observation &obs);
-      void leaderPlanningOutsideGoingIn(TREX::transaction::Observation &obs);
+      void leaderPlanningInsideGoingOut();
+      void leaderPlanningOutsideGoingIn();
       
     };
 

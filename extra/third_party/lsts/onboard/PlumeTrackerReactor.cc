@@ -134,8 +134,8 @@ namespace TREX {
             ss_debug_log<<"Distance: "<<dist_from_edge<<"\n";
             if (dist_from_edge > outside_plume_dist) 
             {
-              // Checking if controlling itself
-              e_exec_state = (m_tracker_control) ? IDLE : CONTROLLED;
+              e_exec_state = SURFACING;
+              sendReferenceGoal(m_lastPosition.lat, m_lastPosition.lon, 0);
             }
           }
           break;
@@ -157,6 +157,14 @@ namespace TREX {
           if (yoyo_states.size() >= yoyo_count*2 || yoyo_done)
           {
             yoyo_states.clear();
+            e_exec_state = SURFACING;
+            sendReferenceGoal(m_lastPosition.lat, m_lastPosition.lon, 0);
+          }
+          break;
+        case SURFACING:
+          ss_debug_log<<"Surfacing"<<"\n";
+          if (m_lastPosition.depth <= .2)
+          {
             // Checking if controlling itself
             e_exec_state = (m_tracker_control) ? IDLE : CONTROLLED;
           }
@@ -222,15 +230,15 @@ namespace TREX {
     }
     
     void 
-    PlumeTrackerReactor::sendReferenceGoal(const double& lat, const double& lon)
+    PlumeTrackerReactor::sendReferenceGoal(const double& lat, const double& lon, const double& z, const double& speed)
     {
       ss_debug_log<<"+++++ Sending Reference Goal +++++"<<"\n";
       Goal g(s_reference_tl, "Going");
       
       g.restrictAttribute(Variable("latitude", FloatDomain(lat)));
       g.restrictAttribute(Variable("longitude", FloatDomain(lon)));
-      g.restrictAttribute(Variable("z", FloatDomain(surface_depth)));
-      g.restrictAttribute(Variable("speed", FloatDomain(yoyo_speed)));
+      g.restrictAttribute(Variable("z", FloatDomain(z)));
+      g.restrictAttribute(Variable("speed", FloatDomain(speed)));
 
       postGoal(g);
     }
@@ -317,6 +325,7 @@ namespace TREX {
         {
           m_lastPosition.lat = obs.getAttribute("latitude").domain().getTypedSingleton<double,true>();
           m_lastPosition.lon = obs.getAttribute("longitude").domain().getTypedSingleton<double,true>();
+          m_lastPosition.depth = obs.getAttribute("depth").domain().getTypedSingleton<double,true>();
         }
       }
       else if (s_control_tl == obs.object())

@@ -47,7 +47,7 @@ namespace TREX {
   namespace LSTS {
     
     typedef struct {
-      double lat, lon;
+      double lat, lon, depth;
     } Position;
     
     namespace PLUME 
@@ -57,8 +57,8 @@ namespace TREX {
     
     namespace PlumeTrackerReactorState 
     {
-      enum EXEC_STATE {IDLE, CONTROLLED, INSIDE_GOINGOUT, OUTSIDE, OUTSIDE_GOINGIN, INSIDE};
-      const char *exec_state_names[] = { "Idle", "Controlled", "InsideGoingOut", "Outside", "OutsideGoingIn", "Inside"};
+      enum EXEC_STATE {IDLE, CONTROLLED, INSIDE_GOINGOUT, OUTSIDE, OUTSIDE_GOINGIN, INSIDE, SURFACING};
+      const char *exec_state_names[] = { "Idle", "Controlled", "InsideGoingOut", "Outside", "OutsideGoingIn", "Inside", "Surfacing" };
     }
 
     class PlumeTrackerReactor : public LstsReactor
@@ -122,7 +122,10 @@ namespace TREX {
       bool goingIn();
       
       void sendYoYoGoal(const double &lat, const double &lon);
-      void sendReferenceGoal(const double &lat, const double &lon);
+      void sendReferenceGoal(const double &lat, 
+                             const double &lon, 
+                             const double& z=surface_depth, 
+                             const double& speed=yoyo_speed);
       
       void postObservation();
       void uniqueDebugPrint(TICK cur);

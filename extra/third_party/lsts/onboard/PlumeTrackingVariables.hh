@@ -5,6 +5,9 @@
  *      Author: pcooksey
  */
 
+#ifndef PLUMETRACKINGVARIABLES_HH_
+#define PLUMETRACKINGVARIABLES_HH_
+
 namespace TREX {
   /** @brief plume indicator plug-in
    *
@@ -90,3 +93,5 @@ namespace TREX {
   }
   
 }
+
+#endif /* PLUMETRACKINGVARIABLES_HH_ */
