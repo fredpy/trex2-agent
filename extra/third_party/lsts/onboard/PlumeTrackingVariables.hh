@@ -19,11 +19,11 @@ namespace TREX {
   namespace LSTS {
     
     
-        //Latitude, in degrees, of river mouth , longitude=
-        double river_lat = 0.7180188974;//41.13945
+        //Latitude, in degrees, of river mouth
+        double river_lat = 0.7188094803;//0.7180188974;//41.13945
 
         //Longitude, in degrees, of river mouth
-        double river_lon = -0.1514448372;//-8.67715
+        double river_lon = -0.1519547835;//-0.1514448372;//-8.67715
 
         //Maximum depth, in meters, for yoyo profiles
         double min_depth = 0;
@@ -43,8 +43,8 @@ namespace TREX {
         //Number of yoyos to perform on each side of the plume
         int yoyo_count = 5;
 
-        //Start angle, in degrees
-        double start_ang = -180;
+        //Start angle, in degrees -230 = x + 134
+        double start_ang = -230;
 
         //End angle, in degrees
         double end_ang = -45;
@@ -56,10 +56,10 @@ namespace TREX {
         double min_dist = 10;
 
         //Maximum distance from river mouth
-        double max_dist = 500;
+        double max_dist = 300;
         
         //Distance outside the plume
-        double outside_plume_dist = 200;
+        double outside_plume_dist = 100;
 
         //Salinity Threshold
         double salinity = 30.0;
@@ -74,7 +74,9 @@ namespace TREX {
         double plume_dist = 1000;       
 
         //Seconds to idle at each vertex
-        int wait_secs = 60;
+        int wait_secs = 0;
+        
+        int trail_behind_time = 30;
 
         //DUNE Host Address
         std::string host_addr = "127.0.0.1";

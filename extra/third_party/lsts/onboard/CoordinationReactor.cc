@@ -69,6 +69,10 @@ namespace TREX {
       
       next_lat = 0;
       next_lon = 0;
+      going_lat = 0;
+      going_lon = 0;
+      
+      moving_locations = false;
       
       m_descent_time = boost::posix_time::seconds(0);
       
@@ -239,7 +243,7 @@ namespace TREX {
           if (m_tracker_controlled) {
             e_exec_state = INITIAL;
             // Should only be called once when transitioning. This keeps the AUV circling.
-            sendReferenceGoal(m_lastPosition.lat, m_lastPosition.lon);
+            //sendReferenceGoal(m_lastPosition.lat, m_lastPosition.lon);
           }
           break;
         default:
@@ -265,7 +269,7 @@ namespace TREX {
           }
           ss_debug_log<<"Joining\n";
           // Join the team of AUV's after receiving the initial time message
-          if (m_initial_time != boost::posix_time::not_a_date_time)
+          if (m_initial_time != boost::posix_time::not_a_date_time && !moving_locations)
           {
             Goal g(s_shared_tl, exec_state_names[e_exec_state]);
             boost::posix_time::ptime t = tickToTime(cur);
@@ -283,6 +287,12 @@ namespace TREX {
             g.restrictAttribute(Variable("Lat", FloatDomain(m_lastPosition.lat)));
             g.restrictAttribute(Variable("Lon", FloatDomain(m_lastPosition.lon)));
             LstsReactor::postGoal(g);
+          }
+          else if(moving_locations)
+          {
+            double dist = WGS84::distance(m_lastPosition.lat, m_lastPosition.lon, 0, going_lat, going_lon, 0);
+            if (dist < 5)
+              moving_locations = false;
           }
           else
             ss_debug_log<<"No join message received yet!\n";
@@ -319,7 +329,10 @@ namespace TREX {
           if (m_tracker_controlled) {
             e_exec_state = JOINING;
             // Should only be called once when transitioning. This keeps the AUV circling.
-            sendReferenceGoal(m_lastPosition.lat, m_lastPosition.lon);
+            //sendReferenceGoal(m_lastPosition.lat, m_lastPosition.lon);
+            double dist = WGS84::distance(m_lastPosition.lat, m_lastPosition.lon, 0, going_lat, going_lon, 0);
+            if (dist > 10 )
+              moving_locations = true;
           }
           break;
         default:
@@ -417,6 +430,14 @@ namespace TREX {
           m_depth_log << m_lastPosition.depth << "\n";
         }
       }
+      else if (s_reference_tl == obs.object())
+      {
+        if (obs.predicate() == "Going")
+        {
+          going_lat = obs.getAttribute("latitude").domain().getTypedSingleton<double,true>();
+          going_lon = obs.getAttribute("longitude").domain().getTypedSingleton<double,true>();
+        }
+      }
       else if (s_control_tl == obs.object())
       {
         m_lastControl = obs;
@@ -500,8 +521,8 @@ namespace TREX {
         if (dist < 1000)
         {
           if (m_start_time == boost::posix_time::not_a_date_time || m_start_time > now())
-            m_start_time = now() + (*it).latency*2; 
-          std::string time = boost::posix_time::to_simple_string(m_start_time + boost::posix_time::seconds(60));
+            m_start_time = now() + ((*it).latency*2) + boost::posix_time::seconds(wait_secs); 
+          std::string time = boost::posix_time::to_simple_string(m_start_time + boost::posix_time::seconds(trail_behind_time));
           obs.restrictAttribute((*it).id, StringDomain(time));
         }
         else
@@ -523,7 +544,7 @@ namespace TREX {
         if (dist < 20)
         {
           if (m_start_time == boost::posix_time::not_a_date_time || m_start_time > now())
-            m_start_time = now() + (*it).latency*2; 
+            m_start_time = now() + ((*it).latency*2) + boost::posix_time::seconds(wait_secs); 
           std::string time = boost::posix_time::to_simple_string(m_start_time);
           obs.restrictAttribute((*it).id, StringDomain(time));
         }

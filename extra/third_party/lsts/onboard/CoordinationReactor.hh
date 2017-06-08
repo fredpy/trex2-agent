@@ -48,6 +48,9 @@ namespace TREX {
   namespace LSTS {
     
     extern double max_depth;
+    extern int trail_behind_time;
+    extern int wait_secs;
+    
     
     typedef struct {
       double lat, lon, depth;
@@ -103,6 +106,8 @@ namespace TREX {
       
       // The next point provided by the PlumeTrackerReactor
       double next_lat, next_lon;
+      double going_lat, going_lon;
+      bool moving_locations;
       
       PLUME::PLUME_STATE e_plume_state;
       
