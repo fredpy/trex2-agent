@@ -219,6 +219,14 @@ namespace TREX
         msg_count++;
         if (remote_id == 0)
           remote_id = msg->getSource();
+        else 
+        {
+          if (remote_id != msg->getSource()) 
+          {
+            syslog(log::warn) << "Ignoring message from " << msg->getSource();
+            continue;
+          }
+        }
 
         if (msg->getId() == Announce::getIdStatic())
         {
