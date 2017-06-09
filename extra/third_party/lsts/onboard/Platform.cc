@@ -97,7 +97,7 @@ namespace TREX
       } else {
         syslog(log::info)<< "Setting platform Going handler for AUVs (underwater)";
         m_going_platform = boost::bind(&Platform::goingAUV, this, _1);
-        m_max_delta = 1;
+        m_max_delta = 10;
       }
       
     }

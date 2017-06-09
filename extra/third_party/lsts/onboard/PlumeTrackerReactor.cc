@@ -277,6 +277,13 @@ namespace TREX {
           yoyo_done = true;
         }
       }
+      else if (s_depth_tl == obs.object())
+      {
+        if (obs.predicate() == "Value")
+        {
+          m_lastPosition.depth = obs.getAttribute("value").domain().getTypedSingleton<double,true>();
+        }
+      }
 #else
       else if (s_depth_tl == obs.object())
       {
@@ -325,7 +332,7 @@ namespace TREX {
         {
           m_lastPosition.lat = obs.getAttribute("latitude").domain().getTypedSingleton<double,true>();
           m_lastPosition.lon = obs.getAttribute("longitude").domain().getTypedSingleton<double,true>();
-          m_lastPosition.depth = obs.getAttribute("depth").domain().getTypedSingleton<double,true>();
+          //m_lastPosition.depth = obs.getAttribute("depth").domain().getTypedSingleton<double,true>();
         }
       }
       else if (s_control_tl == obs.object())

@@ -32,6 +32,7 @@ namespace TREX {
     utils::Symbol const CoordinationReactor::s_reference_tl("reference");
     utils::Symbol const CoordinationReactor::s_plumetracker_tl("plumetracker");
     utils::Symbol const CoordinationReactor::s_plume_tl("plumeindicator");
+    utils::Symbol const CoordinationReactor::s_depth_tl("depth");
     
     // Plume detection
     utils::Symbol const CoordinationReactor::s_plume_unknown("Unknown");
@@ -55,6 +56,7 @@ namespace TREX {
       use(s_position_tl);
       use(s_plumetracker_tl);
       use(s_plume_tl);
+      use(s_depth_tl);
       
       if (m_leader_control)
         provide(s_shared_tl);
@@ -426,8 +428,14 @@ namespace TREX {
         {
           m_lastPosition.lat = obs.getAttribute("latitude").domain().getTypedSingleton<double,true>();
           m_lastPosition.lon = obs.getAttribute("longitude").domain().getTypedSingleton<double,true>();
-          m_lastPosition.depth = obs.getAttribute("depth").domain().getTypedSingleton<double,true>();
           m_depth_log << m_lastPosition.depth << "\n";
+        }
+      }
+      else if (s_depth_tl == obs.object())
+      {
+        if (obs.predicate() == "Value")
+        {
+          m_lastPosition.depth = obs.getAttribute("value").domain().getTypedSingleton<double,true>();
         }
       }
       else if (s_reference_tl == obs.object())

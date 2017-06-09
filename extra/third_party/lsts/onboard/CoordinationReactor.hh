@@ -126,6 +126,7 @@ namespace TREX {
       static utils::Symbol const s_reference_tl;
       static utils::Symbol const s_plumetracker_tl;
       static utils::Symbol const s_plume_tl;
+      static utils::Symbol const s_depth_tl;
       
       // Shared timeline between vehicles 
       static utils::Symbol const s_shared_tl;
