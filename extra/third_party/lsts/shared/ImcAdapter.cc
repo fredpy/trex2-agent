@@ -122,7 +122,7 @@ namespace TREX
     Observation
     ImcAdapter::ecopuckObservation(Chlorophyll * msg_chla, DissolvedOrganicMatter * msg_cdom, OpticalBackscatter * msg_tsm)
     {
-      if (msg_t == NULL)
+      if (msg_chla == NULL)
         return Observation("ecopuck", "Boot");
 
       Observation obs("ecopuck", "Measurement");
