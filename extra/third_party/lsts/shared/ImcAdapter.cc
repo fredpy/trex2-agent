@@ -94,6 +94,30 @@ namespace TREX
       return Observation("medium", "Unknown");
     }
 
+    // Trygve Modification - Add CTD measurements
+    Observation
+    ImcAdapter::ctdObservation(Conductivity * msg_c, Temperature * msg_t, Depth * msg_d, Salinity * msg_s)
+    {
+      if (msg_t == NULL)
+        return Observation("ctd", "Boot");
+
+      Observation obs("ctd", "Measurement");
+
+      double conductivity, temperature, depth, salinity;
+
+      conductivity = msg_c->value;
+      temperature = msg_t->value;
+      depth = msg_d->value;
+      salinity = msg_s->value;
+
+      obs.restrictAttribute("conductivity", FloatDomain(conductivity));
+      obs.restrictAttribute("temperature", FloatDomain(temperature));
+      obs.restrictAttribute("depth", FloatDomain(depth));
+      obs.restrictAttribute("salinity", FloatDomain(salinity));
+
+      return obs;
+    }
+
     Observation
     ImcAdapter::estimatedStateObservation(EstimatedState * msg)
     {

@@ -155,6 +155,9 @@ namespace TREX {
       //@brief Translates OperationalLimits messages into "oplimits" timeline observations
       Observation opLimitsObservation(OperationalLimits * msg);
 
+      //@brief Trygve Modification. Declaring method for ctdObservation
+      Observation ctdObservation(Conductivity * msg_c, Temperature * msg_t, Depth * msg_d, Salinity * msg_s);
+
       //@brief Translates TrexToken messages into a generic observation
       Observation genericObservation(TICK &date, TrexToken * msg);
 
