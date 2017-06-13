@@ -158,6 +158,9 @@ namespace TREX {
       //@brief Trygve Modification. Declaring method for ctdObservation
       Observation ctdObservation(Conductivity * msg_c, Temperature * msg_t, Depth * msg_d, Salinity * msg_s);
 
+      //@brief Trygve Modification. Declaring method for ctdObservation
+      Observation ecopuckObservation(Chlorophyll * msg_chla, DissolvedOrganicMatter * msg_cdom, OpticalBackscatter * msg_tsm);
+
       //@brief Translates TrexToken messages into a generic observation
       Observation genericObservation(TICK &date, TrexToken * msg);
 

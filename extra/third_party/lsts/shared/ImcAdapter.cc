@@ -118,6 +118,28 @@ namespace TREX
       return obs;
     }
 
+    // Trygve Modification - Add ECO-puck measurements
+    Observation
+    ImcAdapter::ecopuckObservation(Chlorophyll * msg_chla, DissolvedOrganicMatter * msg_cdom, OpticalBackscatter * msg_tsm)
+    {
+      if (msg_t == NULL)
+        return Observation("ecopuck", "Boot");
+
+      Observation obs("ecopuck", "Measurement");
+
+      double chla, cdom, tsm;
+
+      chla = msg_chla->value;
+      cdom = msg_cdom->value;
+      tsm = msg_tsm->value;
+
+      obs.restrictAttribute("chla", FloatDomain(chla));
+      obs.restrictAttribute("cdom", FloatDomain(cdom));
+      obs.restrictAttribute("tsm", FloatDomain(tsm));
+
+      return obs;
+    }
+
     Observation
     ImcAdapter::estimatedStateObservation(EstimatedState * msg)
     {
