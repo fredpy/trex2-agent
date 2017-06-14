@@ -44,10 +44,10 @@ namespace TREX {
         int yoyo_count = 5;
 
         //Start angle, in degrees -230 = x + 134
-        double start_ang = -230;
+        double start_ang = -200;
 
         //End angle, in degrees
-        double end_ang = -45;
+        double end_ang = -90;
 
         //Variation, in degrees, between survey angles
         double angle_inc = 10;

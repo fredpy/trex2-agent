@@ -114,6 +114,7 @@ namespace TREX {
       boost::uuids::uuid uuid;
       boost::posix_time::ptime m_initial_time;
       boost::posix_time::ptime m_start_time;
+      boost::posix_time::time_duration m_beginning_descent_time; // This is important for timing the yoyos
       boost::posix_time::time_duration m_descent_time;
       
       std::stringstream ss_debug_log;

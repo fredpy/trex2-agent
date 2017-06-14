@@ -33,9 +33,6 @@ using namespace TREX::utils;
 
 using DUNE_NAMESPACES;
 
-#define SIMULATE_DATA 0
-
-
 namespace TREX {
   /** @brief plume indicator plug-in
    *

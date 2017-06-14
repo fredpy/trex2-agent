@@ -31,7 +31,6 @@ using namespace TREX::utils;
 
 using DUNE_NAMESPACES;
 
-
 namespace TREX {
   /** @brief plume indicator plug-in
    *

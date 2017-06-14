@@ -193,6 +193,7 @@ namespace TREX {
             if (e_plume_state == PLUME::INSIDE)
             {
               ss_debug_log<<"--- Starting Plume Tracker now! ---\n";
+              ss_debug_log<<"Time: "<<now()<<"\n";
               sendPlumeTrackerGoal();
               m_start_time = boost::posix_time::not_a_date_time;
             }
@@ -202,21 +203,32 @@ namespace TREX {
               {
                 ss_debug_log<<"--- Starting Decent now! ---\n";
                 m_start_time = now();
-                sendReferenceGoal(next_lat, next_lon, 5);
+                ss_debug_log<<"Start Time: "<<m_start_time<<"\n";
+                sendReferenceGoal(next_lat, next_lon, max_depth);
                 justStartedDecending = false;
               }
               else if (m_lastPosition.depth <= 0.5)
               {
+                m_beginning_descent_time += now() - m_start_time;
                 m_start_time = now();
+                ss_debug_log<<"Adjusting Start Time: "<<m_start_time<<"\n";
               }
-              else if (m_lastPosition.depth < (max_depth - .5))
+              else if (m_lastPosition.depth <= (max_depth - .5))
               {
                 ss_debug_log<<"--- Decending now! ---\n";
                 m_descent_time = now() - m_start_time;
-                sendReferenceGoal(next_lat, next_lon, 5);
+                ss_debug_log<<"Descent Time: "<<m_descent_time<<"\n";
               }
               else
               {
+                /*
+                if (m_beginning_descent_time != boost::posix_time::seconds(0)) 
+                {
+                  // Multiple by two because 
+                  m_descent_time -= m_beginning_descent_time;
+                  m_beginning_descent_time = boost::posix_time::seconds(0);
+                }
+                */
                 m_descent_time -= boost::posix_time::seconds(1);
                 ss_debug_log<<"--- Maintaining depth for "<<m_descent_time<<"\n";
                 if (m_descent_time <= boost::posix_time::seconds(0))
@@ -224,8 +236,6 @@ namespace TREX {
                   ss_debug_log<<"--- Starting Plume Tracker now! ---\n";
                   sendPlumeTrackerGoal();
                   m_start_time = boost::posix_time::not_a_date_time;
-                } else {
-                  sendReferenceGoal(next_lat, next_lon, 5);
                 }
               }
             }
@@ -293,7 +303,7 @@ namespace TREX {
           else if(moving_locations)
           {
             double dist = WGS84::distance(m_lastPosition.lat, m_lastPosition.lon, 0, going_lat, going_lon, 0);
-            if (dist < 5)
+            if (dist <= 5)
               moving_locations = false;
           }
           else
@@ -310,6 +320,7 @@ namespace TREX {
             g.restrictAttribute(Variable("ID", StringDomain(boost::uuids::to_string(uuid))));
             LstsReactor::postGoal(g);
           }
+          ss_debug_log<<"Start: "<<m_start_time<<"- Now: "<<now()<<"\n";
           if (m_start_time <= now() && m_start_time != boost::posix_time::not_a_date_time)
           {
             ss_debug_log<<"--- Starting Plume Tracker now! ---\n";
@@ -328,14 +339,19 @@ namespace TREX {
         }
           break;
         case EXEC:
-          if (m_tracker_controlled) {
+        {
+          static int timeCount = 0;
+          ss_debug_log<<"Counter: "<<timeCount<<"\n";
+          if (m_tracker_controlled && timeCount<=10)
+            timeCount++;
+          else if (m_tracker_controlled && timeCount>10) {
+            timeCount = 0;
             e_exec_state = JOINING;
-            // Should only be called once when transitioning. This keeps the AUV circling.
-            //sendReferenceGoal(m_lastPosition.lat, m_lastPosition.lon);
             double dist = WGS84::distance(m_lastPosition.lat, m_lastPosition.lon, 0, going_lat, going_lon, 0);
-            if (dist > 10 )
+            if (dist > 5 )
               moving_locations = true;
           }
+        }
           break;
         default:
           ss_debug_log<<"There is a problem this state is incorrect for this reactor\n";
@@ -428,7 +444,6 @@ namespace TREX {
         {
           m_lastPosition.lat = obs.getAttribute("latitude").domain().getTypedSingleton<double,true>();
           m_lastPosition.lon = obs.getAttribute("longitude").domain().getTypedSingleton<double,true>();
-          m_depth_log << m_lastPosition.depth << "\n";
         }
       }
       else if (s_depth_tl == obs.object())
@@ -436,6 +451,7 @@ namespace TREX {
         if (obs.predicate() == "Value")
         {
           m_lastPosition.depth = obs.getAttribute("value").domain().getTypedSingleton<double,true>();
+          m_depth_log << m_lastPosition.depth << "\n";
         }
       }
       else if (s_reference_tl == obs.object())

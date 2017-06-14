@@ -262,7 +262,6 @@ namespace TREX {
           e_plume_state = PLUME::OUTSIDE;
         }
       }
-#if !SIMULATE_DATA
       else if (s_yoyo_state_tl == obs.object())
       {
         ss_debug_log<<"Yoyo state: "<<obs.predicate()<<"\n";
@@ -284,55 +283,12 @@ namespace TREX {
           m_lastPosition.depth = obs.getAttribute("value").domain().getTypedSingleton<double,true>();
         }
       }
-#else
-      else if (s_depth_tl == obs.object())
-      {
-        ss_debug_log<<"++ Depth state"<<"\n";
-        static double value = 0, last_value = 100, ascending = -1;
-        double diff = 0;
-        ss_debug_log<<"-- Last_value = "<<last_value<<"\n";
-        ss_debug_log<<"-- Ascending = "<<ascending<<"\n";
-        if (obs.predicate() == "Value")
-        {
-          value = obs.getAttribute("value").domain().getTypedSingleton<double,true>();
-          ss_debug_log<<"-- Value = "<<value<<"\n";
-          diff = last_value - value;
-          if (last_value == 100) 
-            last_value = value;
-          else if (diff > 1) 
-          {
-            last_value = value;
-            if (ascending == 0 || ascending == -1)
-            {
-              yoyo_states.push_back("Ascending");
-              ascending = 1;
-            }
-          }
-          else if (diff < -1)
-          {
-            last_value = value;
-            if (ascending == 1 || ascending == -1)
-            {
-              yoyo_states.push_back("Decending");
-              ascending = 0;
-            }
-          }
-          
-          // Keep updating the values for the greatest or lower depth
-          if (ascending == 1 && last_value > value)
-            last_value = value;
-          else if (ascending == 0 && last_value < value)
-            last_value = value;
-        }
-      }
-#endif
       else if (s_position_tl == obs.object())
       {
         if (obs.predicate() == "Position")
         {
           m_lastPosition.lat = obs.getAttribute("latitude").domain().getTypedSingleton<double,true>();
           m_lastPosition.lon = obs.getAttribute("longitude").domain().getTypedSingleton<double,true>();
-          //m_lastPosition.depth = obs.getAttribute("depth").domain().getTypedSingleton<double,true>();
         }
       }
       else if (s_control_tl == obs.object())
