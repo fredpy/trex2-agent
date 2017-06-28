@@ -1,12 +1,16 @@
 #include "auv/platform.nddl"
 #include "auv/navigator.nddl"
 #include "auv/sunfish.rules.nddl"
+#include "auv/tracking.plume.nddl"
 // #include "auv/path.nddl"
 
 EstimatedState estate = new EstimatedState(Observe);
 ControlMode control = new ControlMode(Observe);
 Medium medium = new Medium(Observe);
 OperationalLimits oplimits = new OperationalLimits(Observe);
+Temperature temperature = new Temperature(Observe);
+Salinity salinity = new Salinity(Observe);
+Depth depth = new Depth(Observe);
 Navigator navigator = new Navigator(Internal);
 // replace with time to spend at surface in seconds
 NavActions nav_act = new NavActions(30);
@@ -19,5 +23,9 @@ navigator.max_z.specify(50);
 navigator.flat_z.specify(8);
 
 YoYoController yoyo = new YoYoController(External);
+
+PlumeIndicator plumeindicator = new PlumeIndicator(External);
+
+PlumeTracker plumetracker = new PlumeTracker(External);
 
 close();

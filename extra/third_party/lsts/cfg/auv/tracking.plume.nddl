@@ -1,0 +1,42 @@
+#include "TREX.nddl"
+
+class PlumeIndicator extends AgentTimeline {
+  PlumeIndicator(Mode _mode) {
+    super(_mode, "Unknown");
+  }
+
+  predicate Unknown {}
+
+  predicate Inside {
+    float latitude, longitude;
+  }
+
+  predicate Outside {
+    float latitude, longitude;
+  }
+};
+
+class PlumeTracker extends AgentTimeline { 
+  PlumeTracker(Mode _mode) {
+    super(_mode, "Idle");
+  }       
+  
+  predicate Idle {}
+  
+  predicate Controlled {}
+  
+  // Sends the AUV into the Plume
+  action InsideGoingOut {}
+  
+  predicate Outside {
+    float latitude, longitude;
+  }
+  
+  // Sends the AUV out of the Plume
+  action OutsideGoingIn {}
+  
+  predicate Inside {
+    float latitude, longitude;
+  }
+  
+};

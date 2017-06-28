@@ -154,6 +154,15 @@ namespace TREX {
 
       //@brief Translates OperationalLimits messages into "oplimits" timeline observations
       Observation opLimitsObservation(OperationalLimits * msg);
+      
+      //@brief Translates Temperature messages into "temperature" timeline observations
+      Observation temperatureObservation(Temperature * msg);
+      
+      //@brief Translates Salinity messages into "salinity" timeline observations
+      Observation salinityObservation(Salinity * msg);
+      
+      //@brief Translates Depth messages into "depth" timeline observations
+      Observation depthObservation(Depth * msg);
 
       //@brief Translates TrexToken messages into a generic observation
       Observation genericObservation(TICK &date, TrexToken * msg);
