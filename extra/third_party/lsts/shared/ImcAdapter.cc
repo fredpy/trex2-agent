@@ -150,12 +150,14 @@ namespace TREX
 
       setPlatformId(msg->getSource());
 
-      double latitude, longitude;
+      double latitude, longitude, psi;
+      psi = msg->psi;
       latitude = msg->lat;
       longitude = msg->lon;
       WGS84::displace(msg->x, msg->y, &latitude, &longitude);
       obs.restrictAttribute("latitude", FloatDomain(latitude));
       obs.restrictAttribute("longitude", FloatDomain(longitude));
+      obs.restrictAttribute("psi", FloatDomain(psi));
 
       //msg->toText(std::cout);
       if (msg->depth > 0)
