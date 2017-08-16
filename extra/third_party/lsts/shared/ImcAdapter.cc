@@ -150,6 +150,7 @@ namespace TREX
 
       setPlatformId(msg->getSource());
 
+      // Trygve modification - Added psi to estimated state
       double latitude, longitude, psi;
       psi = msg->psi;
       latitude = msg->lat;
