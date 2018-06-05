@@ -1,5 +1,5 @@
 # T-REX:
-## Version Chla  
+## Version Chla NTNU AURLab (written for LAUV Harald)  
 This is the NTNU branch of the TREX code.
 
 Contains - Updated measurements added to Estimated state:
