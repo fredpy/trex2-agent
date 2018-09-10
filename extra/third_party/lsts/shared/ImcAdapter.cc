@@ -94,6 +94,52 @@ namespace TREX
       return Observation("medium", "Unknown");
     }
 
+    // Trygve Modification - Add CTD measurements
+    Observation
+    ImcAdapter::ctdObservation(Conductivity * msg_c, Temperature * msg_t, Depth * msg_d, Salinity * msg_s)
+    {
+      if (msg_t == NULL)
+        return Observation("ctd", "Boot");
+
+      Observation obs("ctd", "Measurement");
+
+      double conductivity, temperature, depth, salinity;
+
+      conductivity = msg_c->value;
+      temperature = msg_t->value;
+      depth = msg_d->value;
+      salinity = msg_s->value;
+
+      obs.restrictAttribute("conductivity", FloatDomain(conductivity));
+      obs.restrictAttribute("temperature", FloatDomain(temperature));
+      obs.restrictAttribute("depth", FloatDomain(depth));
+      obs.restrictAttribute("salinity", FloatDomain(salinity));
+
+      return obs;
+    }
+
+    // Trygve Modification - Add ECO-puck measurements
+    Observation
+    ImcAdapter::ecopuckObservation(Chlorophyll * msg_chla, DissolvedOrganicMatter * msg_cdom, OpticalBackscatter * msg_tsm)
+    {
+      if (msg_chla == NULL)
+        return Observation("ecopuck", "Boot");
+
+      Observation obs("ecopuck", "Measurement");
+
+      double chla, cdom, tsm;
+
+      chla = msg_chla->value;
+      cdom = msg_cdom->value;
+      tsm = msg_tsm->value;
+
+      obs.restrictAttribute("chla", FloatDomain(chla));
+      obs.restrictAttribute("cdom", FloatDomain(cdom));
+      obs.restrictAttribute("tsm", FloatDomain(tsm));
+
+      return obs;
+    }
+
     Observation
     ImcAdapter::estimatedStateObservation(EstimatedState * msg)
     {
@@ -104,12 +150,15 @@ namespace TREX
 
       setPlatformId(msg->getSource());
 
-      double latitude, longitude;
+      // Trygve modification - Added psi to estimated state
+      double latitude, longitude, psi;
+      psi = msg->psi;
       latitude = msg->lat;
       longitude = msg->lon;
       WGS84::displace(msg->x, msg->y, &latitude, &longitude);
       obs.restrictAttribute("latitude", FloatDomain(latitude));
       obs.restrictAttribute("longitude", FloatDomain(longitude));
+      obs.restrictAttribute("psi", FloatDomain(psi));
 
       //msg->toText(std::cout);
       if (msg->depth > 0)

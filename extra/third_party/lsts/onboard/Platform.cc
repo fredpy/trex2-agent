@@ -79,6 +79,10 @@ namespace TREX
       provide("control", false);
       provide("oplimits", false);
       provide("refstate", false);
+      // Trygve modification: Adding CTD timeline
+      provide("ctd", false);
+      // Trygve modification: Adding CTD timeline
+      provide("ecopuck", false);
       
       // Timelines that can be controlled by other reactors
       provide("reference");
@@ -442,8 +446,22 @@ namespace TREX
       TREX::transaction::Observation planControlStateObservation = m_adapter.planControlStateObservation(pcstate);
       postUniqueObservation(planControlStateObservation);
       m_blocked = !isActiveInPlanControlStateMsg(pcstate);
-      
+
       // Translate incoming messages into observations
+
+      // Trygve Modification: Collect and send incoming messages - CTD
+      Temperature * msg_temp =  static_cast<Temperature *>(received[Temperature::getIdStatic()]);
+      Salinity * msg_sal =  static_cast<Salinity *>(received[Salinity::getIdStatic()]);
+      Depth * msg_depth =  static_cast<Depth *>(received[Depth::getIdStatic()]);
+      Conductivity * msg_cond =  static_cast<Conductivity *>(received[Conductivity::getIdStatic()]);
+      postUniqueObservation(m_adapter.ctdObservation(msg_cond, msg_temp, msg_depth, msg_sal));
+
+      // Trygve Modification: Collect and send incoming messages - Ecopuck
+      Chlorophyll * msg_chla = static_cast<Chlorophyll *>(received[Chlorophyll::getIdStatic()]);
+      DissolvedOrganicMatter * msg_cdom = static_cast<DissolvedOrganicMatter *>(received[DissolvedOrganicMatter::getIdStatic()]);
+      OpticalBackscatter * msg_tsm = static_cast<OpticalBackscatter *>(received[OpticalBackscatter::getIdStatic()]);
+      postUniqueObservation(m_adapter.ecopuckObservation(msg_chla, msg_cdom, msg_tsm));
+
       EstimatedState * estate =
     		  static_cast<EstimatedState *>(received[EstimatedState::getIdStatic()]);
       
