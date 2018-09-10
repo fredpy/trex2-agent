@@ -1,7 +1,26 @@
 # T-REX:
-## Version Chla NTNU AURLab (written for LAUV Harald)  
+## A deliberative executive for goal directed control
 This is the NTNU branch of the TREX code.
 
+This project implements the t-rex agent that allows the execution of
+multiple loosely coupled deliberative control loops called reactors.
+
+The general idea is to distribute deliberation (such as automated
+planning) into simpler control loops called _reactors_.
+
+In contrast to classical planner+executive found in 3-tiered robotics
+architectures, the system also tends to truly interleave planning and
+execution in the sense that often (especially with the europa based
+deliberative reactor) the execution will interrupt deliberation in
+order to ensure that the agent is always aware of the world state
+evolution.
+
+While a reactor is not necessarily based on planning techniques, the
+timeline based medium of interaction is perfectly fit for timelien
+based planners and allow the user to abstract tasks into a more high
+level goal directed control.
+### Additions merged from NTNU AURLab fork
+(https://github.com/trygvefossum/trex2-agent)
 Contains - Updated measurements added to Estimated state:
 CTD (Temperature, Salinity, Depth and Conductivity)
 ECOpuck (TSM, cDOM, and Chl a)
