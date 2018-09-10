@@ -76,6 +76,11 @@ namespace TREX {
       bool sendMsg(Message& msg);
     private:
       
+      template<class IMCMsg>
+      IMCMsg *get_msg() {
+        return static_cast<IMCMsg *>(received[IMCMsg::getIdStatic()]);
+      }
+      
       bool synchronize();
       void handleRequest(TREX::transaction::goal_id const &g);
       void handleRecall(TREX::transaction::goal_id const &g);
