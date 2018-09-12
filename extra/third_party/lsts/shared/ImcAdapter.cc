@@ -102,18 +102,14 @@ namespace TREX
         return Observation("ctd", "Boot");
 
       Observation obs("ctd", "Measurement");
+      obs.restrictAttribute("temperature", FloatDomain(msg_t->value));
 
-      double conductivity, temperature, depth, salinity;
-
-      conductivity = msg_c->value;
-      temperature = msg_t->value;
-      depth = msg_d->value;
-      salinity = msg_s->value;
-
-      obs.restrictAttribute("conductivity", FloatDomain(conductivity));
-      obs.restrictAttribute("temperature", FloatDomain(temperature));
-      obs.restrictAttribute("depth", FloatDomain(depth));
-      obs.restrictAttribute("salinity", FloatDomain(salinity));
+      if( NULL!=msg_c )
+        obs.restrictAttribute("conductivity", FloatDomain(msg_c->value));
+      if( NULL!=msg_d )
+        obs.restrictAttribute("depth", FloatDomain(msg_d->value));
+      if( NULL!=msg_s )
+        obs.restrictAttribute("salinity", FloatDomain(msg_s->value));
 
       return obs;
     }
@@ -126,16 +122,12 @@ namespace TREX
         return Observation("ecopuck", "Boot");
 
       Observation obs("ecopuck", "Measurement");
-
-      double chla, cdom, tsm;
-
-      chla = msg_chla->value;
-      cdom = msg_cdom->value;
-      tsm = msg_tsm->value;
-
-      obs.restrictAttribute("chla", FloatDomain(chla));
-      obs.restrictAttribute("cdom", FloatDomain(cdom));
-      obs.restrictAttribute("tsm", FloatDomain(tsm));
+      obs.restrictAttribute("chla", FloatDomain(msg_chla->value));
+      
+      if( NULL!=msg_cdom )
+        obs.restrictAttribute("cdom", FloatDomain(msg_cdom->value));
+      if( NULL!=msg_tsm )
+        obs.restrictAttribute("tsm", FloatDomain(msg_tsm->value));
 
       return obs;
     }
