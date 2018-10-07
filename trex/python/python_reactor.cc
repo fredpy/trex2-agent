@@ -33,12 +33,14 @@
  */
 #include "python_reactor.hh"
 #include "python_thread.hh"
+#include <boost/filesystem.hpp>
 
 using namespace TREX::python;
 using namespace TREX::transaction;
 using namespace TREX::utils;
 
 namespace bp=boost::python;
+namespace fs=boost::filesystem;
 
 namespace  {
   /** @brief Light reactor declaration */
@@ -382,23 +384,28 @@ py_reactor::py_reactor(xml_arg_type arg)
           throw XmlError(node, "Unable to locate "+(*source)+"[.py]");
       }
       syslog()<<"exec python script: "<<py;
-      scoped_gil_release lock;
-      m_scope = m_python->add_module(m_python->main(), "_trex");
-      m_scope = m_python->add_module(m_scope, getAgentName().str());
-      m_scope = m_python->add_module(m_scope, getName().str());
-      
-      
-      bp::scope my_scope = m_scope;
-      scope_d = m_scope.attr("__dict__");
-      scope_d["__builtins__"] = m_python->main_env()["__builtins__"];
-      bp::str py_name(py);
-      
-      bp::exec_file(py_name, scope_d);
-      
-//      std::string dir = bp::extract<std::string>(bp::str(m_python->dir(m_scope)));
-//      syslog()<<"env: "<<dir;
-//      dir = bp::extract<std::string>(bp::str(m_python->dir(m_python->main())));
-//      syslog()<<"main: "<<dir;
+
+      fs::path fpy(py);
+      {
+	scoped_gil_release lock;
+
+	m_scope = m_python->add_module(m_python->main(), "_trex");
+	m_scope = m_python->add_module(m_scope, getAgentName().str());
+	m_scope = m_python->add_module(m_scope, getName().str());
+
+	bp::scope my_scope(m_scope);
+	
+	scope_d = my_scope.attr("__dict__");
+	
+	scope_d["modulename"] = bp::str(fpy.stem().string());
+	scope_d["path"] = bp::str(py);
+
+
+	bp::exec("import imp\n"
+		 "module = imp.load_module(modulename, open(path), path, ('py', 'U', imp.PY_SOURCE))\n",
+		 m_python->main_env(), scope_d);
+	class_name = "module."+class_name;
+      }
     }
     
     
