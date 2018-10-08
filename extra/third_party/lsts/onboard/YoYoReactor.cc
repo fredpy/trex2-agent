@@ -176,7 +176,8 @@ namespace TREX {
         }
       }
 
-      syslog(log::info) << "nearZ: " << nearZ<< ", atZ: "<< atZ << ", nearXY: " << nearXY << ", nearEnd: " <<
+      if( is_verbose() )
+	syslog(log::info) << "nearZ: " << nearZ<< ", atZ: "<< atZ << ", nearXY: " << nearXY << ", nearEnd: " <<
           nearEnd << ", nearBottom: "<<nearBottom << std::endl;
 
       switch(state)
@@ -229,7 +230,8 @@ namespace TREX {
                 }
         break;
         default:
-          syslog(log::info)<< "Just idling...";
+	  if( is_verbose() )
+	    syslog(log::info)<< "Just idling...";
           postUniqueObservation(Observation(s_yoyo_tl, "Idle"));
           break;
       }
