@@ -217,7 +217,7 @@ message(STATUS "CHRONO_LIB: ${CHRONO_LIB}")
 # Europa                                                               #
 ########################################################################
 
-option(WITH_EUROPA "Enable Europa plugin." ON) 
+option(WITH_EUROPA "Enable Europa plugin." OFF) 
 
 if(WITH_EUROPA) 
   find_package(Europa
