@@ -665,7 +665,7 @@ namespace TREX {
       boost::property_tree::ptree export_goal(goal_id const &g) const;
       
       
-      boost::asio::strand &strand();
+      boost::asio::io_service::strand &strand();
       
       utils::log::stream syslog(utils::log::id_type const &context,
                                 utils::log::id_type const &kind) const;

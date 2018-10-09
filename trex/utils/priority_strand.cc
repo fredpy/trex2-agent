@@ -52,12 +52,12 @@ bool priority_strand::task::operator< (priority_strand::task const &other) const
 // structors
 
 priority_strand::priority_strand(asio::io_service &io, bool active)
-:m_impl(MAKE_SHARED<pimpl>(MAKE_SHARED<asio::strand>(boost::ref(io)))) {
+:m_impl(MAKE_SHARED<pimpl>(MAKE_SHARED<strand_type>(boost::ref(io)))) {
   if( active )
     m_impl->start();
 }
 
-priority_strand::priority_strand(SHARED_PTR<asio::strand> const &s,
+priority_strand::priority_strand(SHARED_PTR<strand_type> const &s,
                                  bool active)
 :m_impl(MAKE_SHARED<pimpl>(s)) {
   if( active )
@@ -98,7 +98,7 @@ void priority_strand::stop() {
 
 // manipulators
 
-boost::asio::strand &priority_strand::strand() {
+priority_strand::strand_type &priority_strand::strand() {
   return m_impl->strand();
 }
 

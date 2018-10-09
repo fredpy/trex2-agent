@@ -37,6 +37,7 @@
 # include "platform/cpp11_deleted.hh"
 # include "platform/memory.hh"
 
+# include <boost/asio/io_service.hpp>
 # include <boost/asio/strand.hpp>
 # include <boost/tuple/tuple.hpp>
 
@@ -88,6 +89,7 @@ namespace TREX {
       };
       
       typedef task::priority priority_type;
+      typedef boost::asio::io_service::strand strand_type;
     
       /** @brief Constructor 
        *
@@ -101,7 +103,7 @@ namespace TREX {
        */
       explicit priority_strand(boost::asio::io_service &io,
                                bool active = true);
-      explicit priority_strand(SHARED_PTR<boost::asio::strand> const &s,
+      explicit priority_strand(SHARED_PTR<strand_type> const &s,
                                bool active = true);
       /** @brief Detructor 
        *
@@ -112,7 +114,7 @@ namespace TREX {
        */
       ~priority_strand();
       
-      boost::asio::strand &strand();
+      strand_type &strand();
       
       /** @brief Check if active
        *

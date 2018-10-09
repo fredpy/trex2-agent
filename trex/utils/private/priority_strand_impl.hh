@@ -48,11 +48,12 @@ namespace TREX {
     public ENABLE_SHARED_FROM_THIS<priority_strand::pimpl> {
     public:
       typedef priority_strand::task *task_ref;
+      typedef priority_strand::strand_type strand_type;
       
-      pimpl(SHARED_PTR<boost::asio::strand> const &s);
+      pimpl(SHARED_PTR<strand_type> const &s);
       ~pimpl();
       
-      boost::asio::strand &strand() {
+      strand_type &strand() {
         return *m_strand;
       }
       
@@ -74,7 +75,7 @@ namespace TREX {
       typedef std::priority_queue<task_ref, std::vector<task_ref>,
                                   task_cmp> task_queue;
       
-      SHARED_PTR<boost::asio::strand> m_strand;
+      SHARED_PTR<strand_type>         m_strand;
       mutable boost::shared_mutex     m_mutex;
       task_queue                      m_queue;
       bool                            m_active, m_running;
