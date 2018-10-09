@@ -1,5 +1,6 @@
 # T-REX:
 ## A deliberative executive for goal directed control
+This is the NTNU branch of the TREX code.
 
 This project implements the t-rex agent that allows the execution of
 multiple loosely coupled deliberative control loops called reactors.
@@ -18,6 +19,12 @@ While a reactor is not necessarily based on planning techniques, the
 timeline based medium of interaction is perfectly fit for timelien
 based planners and allow the user to abstract tasks into a more high
 level goal directed control.
+### Additions merged from NTNU AURLab fork
+(https://github.com/trygvefossum/trex2-agent)
+Contains - Updated measurements added to Estimated state:
+CTD (Temperature, Salinity, Depth and Conductivity)
+ECOpuck (TSM, cDOM, and Chl a)
+Inclusion of PSI in Estimated state (for automatic front tracking)
 
 ### Dependencies
 

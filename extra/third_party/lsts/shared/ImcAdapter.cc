@@ -94,6 +94,44 @@ namespace TREX
       return Observation("medium", "Unknown");
     }
 
+    // Trygve Modification - Add CTD measurements
+    Observation
+    ImcAdapter::ctdObservation(Conductivity * msg_c, Temperature * msg_t, Depth * msg_d, Salinity * msg_s)
+    {
+      if (msg_t == NULL)
+        return Observation("ctd", "Boot");
+
+      Observation obs("ctd", "Measurement");
+      obs.restrictAttribute("temperature", FloatDomain(msg_t->value));
+
+      if( NULL!=msg_c )
+        obs.restrictAttribute("conductivity", FloatDomain(msg_c->value));
+      if( NULL!=msg_d )
+        obs.restrictAttribute("depth", FloatDomain(msg_d->value));
+      if( NULL!=msg_s )
+        obs.restrictAttribute("salinity", FloatDomain(msg_s->value));
+
+      return obs;
+    }
+
+    // Trygve Modification - Add ECO-puck measurements
+    Observation
+    ImcAdapter::ecopuckObservation(Chlorophyll * msg_chla, DissolvedOrganicMatter * msg_cdom, OpticalBackscatter * msg_tsm)
+    {
+      if (msg_chla == NULL)
+        return Observation("ecopuck", "Boot");
+
+      Observation obs("ecopuck", "Measurement");
+      obs.restrictAttribute("chla", FloatDomain(msg_chla->value));
+      
+      if( NULL!=msg_cdom )
+        obs.restrictAttribute("cdom", FloatDomain(msg_cdom->value));
+      if( NULL!=msg_tsm )
+        obs.restrictAttribute("tsm", FloatDomain(msg_tsm->value));
+
+      return obs;
+    }
+
     Observation
     ImcAdapter::estimatedStateObservation(EstimatedState * msg)
     {
@@ -104,12 +142,15 @@ namespace TREX
 
       setPlatformId(msg->getSource());
 
-      double latitude, longitude;
+      // Trygve modification - Added psi to estimated state
+      double latitude, longitude, psi;
+      psi = msg->psi;
       latitude = msg->lat;
       longitude = msg->lon;
       WGS84::displace(msg->x, msg->y, &latitude, &longitude);
       obs.restrictAttribute("latitude", FloatDomain(latitude));
       obs.restrictAttribute("longitude", FloatDomain(longitude));
+      obs.restrictAttribute("psi", FloatDomain(psi));
 
       //msg->toText(std::cout);
       if (msg->depth > 0)

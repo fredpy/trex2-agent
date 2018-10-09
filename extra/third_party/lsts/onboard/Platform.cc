@@ -79,6 +79,10 @@ namespace TREX
       provide("control", false);
       provide("oplimits", false);
       provide("refstate", false);
+      // Trygve modification: Adding CTD timeline
+      provide("ctd", false);
+      // Trygve modification: Adding CTD timeline
+      provide("ecopuck", false);
       
       // Timelines that can be controlled by other reactors
       provide("reference");
@@ -438,29 +442,39 @@ namespace TREX
         received.clear();
       }
 
-      PlanControlState * pcstate = static_cast<IMC::PlanControlState *>(received[PlanControlState::getIdStatic()]);
+      PlanControlState * pcstate = get_msg<IMC::PlanControlState>();
       TREX::transaction::Observation planControlStateObservation = m_adapter.planControlStateObservation(pcstate);
       postUniqueObservation(planControlStateObservation);
       m_blocked = !isActiveInPlanControlStateMsg(pcstate);
-      
+
       // Translate incoming messages into observations
-      EstimatedState * estate =
-    		  static_cast<EstimatedState *>(received[EstimatedState::getIdStatic()]);
+
+      // Trygve Modification: Collect and send incoming messages - CTD
+      Temperature * msg_temp =  get_msg<Temperature>();
+      Salinity * msg_sal =  get_msg<Salinity>();
+      Depth * msg_depth =  get_msg<Depth>();
+      Conductivity * msg_cond =  get_msg<Conductivity>();
+      postUniqueObservation(m_adapter.ctdObservation(msg_cond, msg_temp, msg_depth, msg_sal));
+
+      // Trygve Modification: Collect and send incoming messages - Ecopuck
+      Chlorophyll * msg_chla = get_msg<Chlorophyll>();
+      DissolvedOrganicMatter * msg_cdom = get_msg<DissolvedOrganicMatter>();
+      OpticalBackscatter * msg_tsm = get_msg<OpticalBackscatter>();
+      postUniqueObservation(m_adapter.ecopuckObservation(msg_chla, msg_cdom, msg_tsm));
+
+      EstimatedState * estate = get_msg<EstimatedState>();
       
       // force posting of position observations (duration == 1)
       if (estate != NULL)
         postObservation(m_adapter.estimatedStateObservation(estate));
 
-      VehicleMedium * medium =
-    		  static_cast<VehicleMedium *>(received[VehicleMedium::getIdStatic()]);
+      VehicleMedium * medium = get_msg<VehicleMedium>();
       postUniqueObservation(m_adapter.vehicleMediumObservation(medium));
       
-      FollowRefState * frefstate =
-    		  static_cast<IMC::FollowRefState *>(received[FollowRefState::getIdStatic()]);
+      FollowRefState * frefstate = get_msg<IMC::FollowRefState>();
       postUniqueObservation(m_adapter.followRefStateObservation(frefstate));
       
-      OperationalLimits * oplims =
-    		  static_cast<IMC::OperationalLimits *>(received[OperationalLimits::getIdStatic()]);
+      OperationalLimits * oplims = get_msg<IMC::OperationalLimits>();
       postUniqueObservation(m_adapter.opLimitsObservation(oplims));
       
       std::map<std::string, Announce *>::iterator it;

@@ -5,6 +5,8 @@
  *      Author: zp
  */
 
+#include "trex/lsts/EuropaExtensions.hh"
+
 #include "YoYoReactor.hh"
 
 namespace
@@ -109,7 +111,7 @@ namespace TREX {
         FloatDomain const &alt = dynamic_cast<FloatDomain const &>(v.domain());
 
         double alt_ = v.domain().getTypedSingleton<double, true>();
-        if (alt_ > 0 && alt_ < 2)
+        if (alt_ > 0 && alt_ < 4)
         {
           nearBottom = true;
           syslog(log::warn) << "Close to bottom: " << alt;
@@ -174,7 +176,8 @@ namespace TREX {
         }
       }
 
-      syslog(log::info) << "nearZ: " << nearZ<< ", atZ: "<< atZ << ", nearXY: " << nearXY << ", nearEnd: " <<
+      if( is_verbose() )
+	syslog(log::info) << "nearZ: " << nearZ<< ", atZ: "<< atZ << ", nearXY: " << nearXY << ", nearEnd: " <<
           nearEnd << ", nearBottom: "<<nearBottom << std::endl;
 
       switch(state)
@@ -227,7 +230,8 @@ namespace TREX {
                 }
         break;
         default:
-          syslog(log::info)<< "Just idling...";
+	  if( is_verbose() )
+	    syslog(log::info)<< "Just idling...";
           postUniqueObservation(Observation(s_yoyo_tl, "Idle"));
           break;
       }
@@ -303,6 +307,24 @@ namespace TREX {
         	syslog(log::warn)<< "won't handle this request because longitude is not singleton!";
         	return;
         }
+	DUNE::IMC::OperationalLimits * lim = InsideOpLimits::get_oplimits();
+	if( NULL!=lim && ( lim->mask & DUNE::IMC::OPL_AREA ) ) {
+	  double x,y;
+	  WGS84::displacement(lim->lat, lim->lon, 0, m_lat, m_lon, 0, &x, &y);
+	  Angles::rotate(lim->orientation, true, x, y);
+
+	  double d2limits = std::max(std::fabs(x) - 0.5 * lim->length,
+				     std::fabs(y) - 0.5 * lim->width);
+	  if( 0 <= d2limits ) {
+	    
+	    syslog(log::warn) << "Invalid Yo Yo: ("<<DUNE::Math::Angles::degrees(m_lat)
+			      <<','<<DUNE::Math::Angles::degrees(m_lon)
+			      <<") is outside of safety limits)";
+	    return;
+	  }
+	} 
+
+	
 
         v = g->getAttribute("speed");
         if (v.domain().isSingleton())
