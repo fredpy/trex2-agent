@@ -238,7 +238,7 @@ TICK graph::getCurrentTick() const {
   return *m_impl->get_date();
 }
 
-boost::asio::strand &graph::strand() {
+boost::asio::io_service::strand &graph::strand() {
   return m_impl->strand();
 }
 

@@ -42,7 +42,7 @@ namespace asio=boost::asio;
 
 // structors
 
-priority_strand::pimpl::pimpl(SHARED_PTR<asio::strand> const &s)
+priority_strand::pimpl::pimpl(SHARED_PTR<strand_type> const &s)
 :m_strand(s), m_active(false), m_running(false) {}
 
 priority_strand::pimpl::~pimpl() {

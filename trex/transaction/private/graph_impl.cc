@@ -48,12 +48,12 @@ using utils::Symbol;
 // structors
 
 details::graph_impl::graph_impl()
-:m_strand(new asio::strand(m_log->service())) {
+:m_strand(new asio::io_service::strand(m_log->service())) {
   m_date = MAKE_SHARED<details::clock>(boost::ref(m_log->service()));
 }
 
 details::graph_impl::graph_impl(Symbol const &name)
-:m_name(name), m_strand(new asio::strand(m_log->service())) {
+:m_name(name), m_strand(new asio::io_service::strand(m_log->service())) {
   m_date = MAKE_SHARED<details::clock>(boost::ref(m_log->service()));
 }
 

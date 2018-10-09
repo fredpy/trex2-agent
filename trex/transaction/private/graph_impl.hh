@@ -153,7 +153,7 @@ namespace TREX {
          * @return The strand associated to this graph and used to any 
          * access or update oof this grsah structure
          */
-        boost::asio::strand &strand() const {
+        boost::asio::io_service::strand &strand() const {
           return *m_strand;
         }
         /** @brief Create a new transaction node
@@ -204,7 +204,7 @@ namespace TREX {
          * The strand which is used by this graph for accesses and updates
          * of its structure
          */
-        UNIQ_PTR<boost::asio::strand>          m_strand;
+        UNIQ_PTR<boost::asio::io_service::strand>          m_strand;
 
         std::set< SHARED_PTR<node_impl> > m_nodes;
         

@@ -138,8 +138,8 @@ namespace TREX {
         void set_started(bool flag = true);
         
       private:
-        boost::asio::strand        m_strand;
-        mutable mutex_type         m_mutex;
+        boost::asio::io_service::strand  m_strand;
+        mutable mutex_type               m_mutex;
         
         bool                       m_started;
         boost::optional<date_type> m_date;

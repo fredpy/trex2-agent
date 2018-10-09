@@ -87,7 +87,7 @@ namespace TREX {
       void horizon_updated(TICK val);
       
     private:
-      boost::asio::strand           m_strand;
+      boost::asio::io_service::strand           m_strand;
       utils::async_ofstream         m_file;
       
       enum {
