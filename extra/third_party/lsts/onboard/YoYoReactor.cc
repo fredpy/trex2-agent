@@ -4,10 +4,13 @@
  *  Created on: Jun 11, 2013
  *      Author: zp
  */
-
 #include "trex/lsts/EuropaExtensions.hh"
 
 #include "YoYoReactor.hh"
+
+#include <trex/domain/BooleanDomain.hh>
+#include <trex/domain/EnumDomain.hh>
+#include <trex/domain/FloatDomain.hh>
 
 namespace
 {
@@ -307,7 +310,7 @@ namespace TREX {
         	syslog(log::warn)<< "won't handle this request because longitude is not singleton!";
         	return;
         }
-	DUNE::IMC::OperationalLimits * lim = InsideOpLimits::get_oplimits();
+	DUNE::IMC::OperationalLimits const * lim = InsideOpLimits::get_oplimits();
 	if( NULL!=lim && ( lim->mask & DUNE::IMC::OPL_AREA ) ) {
 	  double x,y;
 	  WGS84::displacement(lim->lat, lim->lon, 0, m_lat, m_lon, 0, &x, &y);
@@ -316,10 +319,15 @@ namespace TREX {
 	  double d2limits = std::max(std::fabs(x) - 0.5 * lim->length,
 				     std::fabs(y) - 0.5 * lim->width);
 	  if( 0 <= d2limits ) {
+	    std::ostringstream oss;
 	    
-	    syslog(log::warn) << "Invalid Yo Yo: ("<<DUNE::Math::Angles::degrees(m_lat)
-			      <<','<<DUNE::Math::Angles::degrees(m_lon)
-			      <<") is outside of safety limits)";
+	    oss<< "Ignoring invalid Yo Yo: "<<*g
+	       <<"\n   reason: ("<<DUNE::Math::Angles::degrees(m_lat)
+	       <<','<<DUNE::Math::Angles::degrees(m_lon)
+	       <<") is outside of safety limits)";
+	    syslog(log::error)<<oss.str();
+	    std::cerr<<oss.str()<<std::endl;
+	    
 	    return;
 	  }
 	} 

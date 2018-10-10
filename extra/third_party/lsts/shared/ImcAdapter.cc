@@ -447,8 +447,10 @@ namespace TREX
 
        if (msg->getSource() <= 0 || msg->getSource() == 65535)
          msg->setSource(m_trex_id);
-       else
+ #if 0
+       else 
          std::cerr << "Not touching given source id (" << msg->getSource() << ")" << std::endl;
+#endif
 
        if (messenger == NULL)
         messenger = new ImcMessenger();
@@ -552,9 +554,10 @@ namespace TREX
 
       if (msg->getSource() <= 0 || msg->getSource() == 65535)
         msg->setSource(m_trex_id);
+ #if 0
       else
         std::cerr << "Not touching given source id (" << msg->getSource() << ")" << std::endl;
-
+#endif
       DUNE::Utils::ByteBuffer bb;
       try
       {

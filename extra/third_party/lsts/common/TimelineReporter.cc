@@ -155,10 +155,10 @@ void TimelineReporter::notify(Observation const &obs)
   op.token.set(token);
   if (m_hostport != -1) {
     m_adapter.send(&op, m_hostaddr, m_hostport);
-    std::cout << " >> forwarded to " << m_hostaddr << ":" << m_hostport << std::endl;
+    // std::cout << " >> forwarded to " << m_hostaddr << ":" << m_hostport << std::endl;
   }
   else {
-    std::cout << " || not forwarded." << std::endl;
+    // std::cout << " || not forwarded." << std::endl;
   }
 }
 
