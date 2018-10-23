@@ -140,6 +140,7 @@ namespace boost {
 #   include <boost/make_shared.hpp>
 #   include <boost/weak_ptr.hpp>
 #   include <boost/enable_shared_from_this.hpp>
+#   include <boost/pointer_cast.hpp>
 
 #   define SHARED_NS boost
 #  endif // CPP11_HAS_SHARED_PTR
@@ -177,5 +178,8 @@ namespace boost {
  * @sa SHARED_PTR
  */
 # define ENABLE_SHARED_FROM_THIS SHARED_NS::enable_shared_from_this
+
+# define DYNAMIC_PTR_CAST SHARED_NS::dynamic_pointer_cast
+# define STATIC_PTR_CAST SHARED_NS::static_pointer_cast
 
 #endif // H_trex_memory
