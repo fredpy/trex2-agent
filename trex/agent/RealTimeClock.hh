@@ -56,7 +56,7 @@
 
 # include <boost/thread/recursive_mutex.hpp>
 
-# include <boost/math/common_factor_rt.hpp>
+# include <boost/integer/common_factor_rt.hpp>
 
 namespace TREX {
   namespace agent {
@@ -323,7 +323,7 @@ namespace TREX {
         utils::display(oss<<"\n\ttick period: ", m_period);
         oss<<"\n\tfrequency: ";
         
-        boost::math::gcd_evaluator<rep> gcd_f;
+        boost::integer::gcd_evaluator<rep> gcd_f;
         
         rep const base_num(period::num);
         rep const base_den(period::den);
