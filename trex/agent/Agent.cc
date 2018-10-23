@@ -442,9 +442,8 @@ TICK Agent::initialTick(clock_ref clk) {
 
 // structors :
 
-Agent::Agent(Symbol const &name, TICK final, clock_ref clk, bool verbose)
-:graph(name, initialTick(clk), verbose), m_continue_if_empty(false),
- m_stat_log(manager().service()), m_clock(clk), m_finalTick(final), m_valid(true) {
+Agent::Agent(Symbol const &name, TICK final_t, clock_ref clk, bool verbose)
+:graph(name, initialTick(clk), verbose), m_stat_log(manager().service()), m_clock(clk), m_finalTick(final_t), m_valid(true), m_continue_if_empty(false) {
   m_proxy = new AgentProxy(*this);
   add_reactor(m_proxy);
 }
