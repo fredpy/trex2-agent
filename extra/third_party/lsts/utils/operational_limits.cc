@@ -81,7 +81,7 @@ boost::optional<op_limits::safe_area> op_limits::pimpl::valid_area() const {
 
 void op_limits::pimpl::set_limits(DUNE::IMC::OperationalLimits const &lim) {
   lock_guard lock(mtx());
-  m_limits.reset(lim.clone());
+  m_limits.reset(new DUNE::IMC::OperationalLimits(lim));
   m_changed.store(true);
 }
 
