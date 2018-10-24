@@ -22,7 +22,7 @@ op_limits::pimpl::~pimpl() {}
 // observers
 
 bool op_limits::pimpl::is_set() const {
-  return (bool)m_limits;
+  return NULL!=m_limits.get();
 }
 
 bool op_limits::pimpl::is_fresh() const {
@@ -32,7 +32,7 @@ bool op_limits::pimpl::is_fresh() const {
 
 op_limits::range op_limits::pimpl::valid_depths() const {
   range::bound lo(0.0), hi = range::plus_inf;
-  if( m_limits ) {
+  if( is_set() ) {
     if( m_limits->mask & DUNE::IMC::OPL_MAX_DEPTH )
       hi = range::bound(m_limits->max_depth);
   }
@@ -41,7 +41,7 @@ op_limits::range op_limits::pimpl::valid_depths() const {
 
 op_limits::range op_limits::pimpl::valid_altitudes() const {
   range::bound lo(0.0), hi = range::plus_inf;
-  if( m_limits ) {
+  if( is_set() ) {
     if( m_limits->mask & DUNE::IMC::OPL_MIN_ALT )
       lo = range::bound(m_limits->min_altitude);
     if( m_limits->mask & DUNE::IMC::OPL_MAX_ALT )
@@ -52,7 +52,7 @@ op_limits::range op_limits::pimpl::valid_altitudes() const {
 
 op_limits::range op_limits::pimpl::valid_speeds() const {
   range::bound lo(0.0), hi = range::plus_inf;
-  if( m_limits ) {
+  if( is_set() ) {
     if( m_limits->mask & DUNE::IMC::OPL_MIN_SPEED )
       lo = range::bound(m_limits->min_speed);
     if( m_limits->mask & DUNE::IMC::OPL_MAX_SPEED )
@@ -62,7 +62,7 @@ op_limits::range op_limits::pimpl::valid_speeds() const {
 }
 
 boost::optional<op_limits::safe_area> op_limits::pimpl::valid_area() const {
-  if( m_limits && ( m_limits->mask & DUNE::IMC::OPL_AREA )) {
+  if( is_set() && ( m_limits->mask & DUNE::IMC::OPL_AREA )) {
     safe_area ret;
     ret.latitude = m_limits->lat;
     ret.longitude = m_limits->lon;
@@ -94,7 +94,7 @@ using DUNE::Math::Angles;
 
 // statics
 
-op_limits::range const s_positives(0.0, op_limits::range::plus_inf);
+op_limits::range const op_limits::s_positives(0.0, op_limits::range::plus_inf);
 
 
 // structors
@@ -113,7 +113,7 @@ bool op_limits::is_set() const {
 
 op_limits::range op_limits::valid_depths() const {
   refresh();
-  if( m_depths )
+  if( NULL!=m_depths.get() )
     return *m_depths;
   else
     return s_positives;
@@ -121,7 +121,7 @@ op_limits::range op_limits::valid_depths() const {
 
 op_limits::range op_limits::valid_altitudes() const {
   refresh();
-  if( m_altitudes )
+  if( NULL!=m_altitudes.get() )
     return *m_altitudes;
   else
     return s_positives;
@@ -129,7 +129,7 @@ op_limits::range op_limits::valid_altitudes() const {
 
 op_limits::range op_limits::valid_speed() const {
   refresh();
-  if( m_speeds )
+  if( NULL!=m_speeds.get() )
     return *m_speeds;
   else
     return s_positives;

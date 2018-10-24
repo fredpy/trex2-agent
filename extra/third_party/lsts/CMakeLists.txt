@@ -58,6 +58,7 @@ install(FILES ${DUNE_CORE_LIB} DESTINATION lib)
 #message(STATUS "PIC protection: ${DUNE_CORE_LIB}")
 
 add_subdirectory(utils)
+add_subdirectory(onboard)
 
 
 

@@ -48,7 +48,7 @@ namespace trex_lsts {
     
     
     
-    friend TREX::utils::SingletonWrapper<op_limits>;
+    friend class TREX::utils::SingletonWrapper<op_limits>;
   }; // class trex_lsts::op_limits
   
 }

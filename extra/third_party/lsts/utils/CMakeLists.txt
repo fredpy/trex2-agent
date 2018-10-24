@@ -33,9 +33,20 @@
 
 add_library(TREX_dune SHARED
   dune_clock.cc
+  imc_adapter.cc
+  imc_handler.cc
+  lsts_reactor.cc
   operational_limits.cc
+  trex_proxy.cc
+  # headers
   dune_clock.hh
+  imc_adapter.hh
+  imc_handler.hh
+  lsts_reactor.hh
   operational_limits.hh
+  trex_proxy.hh
+  private/imc_sender.hh
+  private/imc_receiver.hh
   private/op_limits_pimpl.hh
   )
 
