@@ -33,7 +33,8 @@
 # POSSIBILITY OF SUCH DAMAGE.                                         #
 #######################################################################
 
-add_library(TREXdomain SHARED
+trex_lib(domain)
+target_sources(domain PRIVATE
   BasicInterval.cc
   BasicEnumerated.cc
   DomainBase.cc
@@ -55,10 +56,7 @@ add_library(TREXdomain SHARED
   # template source
   bits/IntervalDomain.tcc
 )
-
-add_dependencies(core TREXdomain)
-target_link_libraries(TREXdomain TREXutils)
-trex_lib(TREXdomain core)
+target_link_libraries(domain utils)
 
 install(DIRECTORY . DESTINATION include/trex/domain
   FILES_MATCHING PATTERN "*.hh" PATTERN "*.tcc"

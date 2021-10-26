@@ -25,7 +25,7 @@ namespace TREX
       bool isObservationNew(TREX::transaction::Observation obs);
       bool postUniqueObservation(TREX::transaction::Observation obs);
     private:
-      typedef std::map<std::string, SHARED_PTR<TREX::transaction::Observation> > obs_map;
+      typedef std::map<std::string, std::shared_ptr<TREX::transaction::Observation> > obs_map;
       obs_map postedObservations;
     };
 

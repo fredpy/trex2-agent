@@ -88,12 +88,12 @@ namespace TREX
                                      "uav");
       if( is_uav ) {
         syslog(log::info)<< "Setting platform Going handler for UAVs (aerial)";
-        m_going_platform = boost::bind(&Platform::goingUAV, this, _1);
+        m_going_platform = [this](goal_id g) { return goingUAV(g); };
         m_max_delta = 3;
         syslog(log::info)<< "Setting max delta without message to "<<m_max_delta;
       } else {
         syslog(log::info)<< "Setting platform Going handler for AUVs (underwater)";
-        m_going_platform = boost::bind(&Platform::goingAUV, this, _1);
+        m_going_platform = [this](goal_id g) { return goingAUV(g); };
         m_max_delta = 1;
       }
       

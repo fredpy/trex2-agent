@@ -184,7 +184,7 @@ bool Assembly::actions_supported() {
 Assembly::Assembly(std::string const &name, size_t steps,
                    size_t depth)
   :m_in_synchronization(false), m_name(name),
-   m_debug_file(m_trex_schema->service()),
+   m_debug_file(m_trex_schema->context()),
    m_synchSteps(steps), m_synchDepth(depth),
    m_archiving(false) {
      m_debug_file.open(m_trex_schema->file_name(m_name+"/europa.log"));
@@ -421,7 +421,7 @@ bool Assembly::playTransaction(std::string const &nddl, bool isFile) {
 void Assembly::configure_solvers(std::string const &synchronizer,
 				 std::string const &planner) {
   debugMsg("trex:init", "Loading planner configuration from \""<<planner<<"\".");
-  UNIQ_PTR<EUROPA::TiXmlElement>
+  std::unique_ptr<EUROPA::TiXmlElement>
     xml_cfg(EUROPA::initXml(planner.c_str()));
 
   debugMsg("trex:init", "Injecting global filter for planning horizon");
@@ -468,7 +468,7 @@ EUROPA::ConstrainedVariableId Assembly::get_tick_const() {
   EUROPA::DataTypeId type = m_clock->getDataType();
 
   if( m_tick_const.isNoId() || m_tick_const->getName()!=name ) {
-    UNIQ_PTR<EUROPA::Domain> base(type->baseDomain().copy());
+    std::unique_ptr<EUROPA::Domain> base(type->baseDomain().copy());
     base->set(now());
 
     debugMsg("trex:always", "Creating const "<<name.toString());

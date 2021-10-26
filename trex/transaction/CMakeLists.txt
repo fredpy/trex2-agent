@@ -33,7 +33,8 @@
 # POSSIBILITY OF SUCH DAMAGE.                                         #
 #######################################################################
 
-add_library(TREXtransaction SHARED
+trex_lib(transaction)
+target_SOURCES(transaction PRIVATE
   Goal.cc
   Observation.cc
   Predicate.cc
@@ -64,11 +65,7 @@ add_library(TREXtransaction SHARED
   # template source
   bits/reactor_graph.tcc
 )
-
-add_dependencies(core TREXtransaction)
-target_link_libraries(TREXtransaction TREXdomain 
-  ${CHRONO_LIB})
-trex_lib(TREXtransaction core)
+target_link_libraries(transaction domain)
 
 install(DIRECTORY . DESTINATION include/trex/transaction
   FILES_MATCHING PATTERN "*.hh" PATTERN "*.tcc"

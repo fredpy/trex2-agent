@@ -511,7 +511,7 @@ LogPlayer::phase::phase(LogPlayer *owner,
   iter pos = node.second.begin();
   tr_fact::iter_traits<iter>::type
   it = tr_fact::iter_traits<iter>::build(pos, owner);
-  SHARED_PTR<details::tr_event> event;
+  std::shared_ptr<details::tr_event> event;
   while( events_f->iter_produce(it, node.second.end(), event) )
     m_events.push_back(event);
 }
@@ -576,7 +576,7 @@ LogPlayer::LogPlayer(TeleoReactor::xml_arg_type arg)
     LogPlayer *me = this;
     tr_fact::iter_traits<iter>::type
     it = tr_fact::iter_traits<iter>::build(pos, me);
-    SHARED_PTR<details::tr_event> event;
+    std::shared_ptr<details::tr_event> event;
     while( event_f->iter_produce(it, i->second.end(), event) )
       event->play();
   }
@@ -601,7 +601,7 @@ LogPlayer::LogPlayer(TeleoReactor::xml_arg_type arg)
         continue;
       }
       first = false;
-      SHARED_PTR<phase> p(new phase(this, *j));
+      std::shared_ptr<phase> p(new phase(this, *j));
       m_log.push_back(std::make_pair(cur, p));
     }
   }
@@ -622,7 +622,7 @@ LogPlayer::~LogPlayer() {
 bool LogPlayer::next_phase(TICK tck, utils::Symbol const &kind) {
   if( !m_log.empty() ) {
     if( m_log.front().first==tck  ) {
-      SHARED_PTR<phase> nxt = m_log.front().second;
+      std::shared_ptr<phase> nxt = m_log.front().second;
       if( nxt->type()==kind ) {
         m_log.pop_front();
         /*size_t n = */nxt->execute();

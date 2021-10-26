@@ -41,8 +41,8 @@
 # define TREX_PP_SYSTEM_FILE <PLASMA/PlanDatabaseWriter.hh>
 # include <trex/europa/bits/system_header.hh>
 
-#include <trex/utils/platform/chrono.hh>
-#include <boost/unordered_map.hpp>
+#include <chrono>
+#include <unordered_map>
 
 using namespace TREX::europa;
 using namespace TREX::europa::details;
@@ -366,8 +366,8 @@ void CurrentState::do_dispatch(EUROPA::eint lb, EUROPA::eint ub) {
     typedef Assembly::thread_clock thread_clock;
     
       // Used to find the percision of the clock
-	  //std::cout << (double) CHRONO::high_resolution_clock::period::num
-      //                / CHRONO::high_resolution_clock::period::den;
+	  //std::cout << (double) std::chrono::high_resolution_clock::period::num
+      //                / std::chrono::high_resolution_clock::period::den;
      typedef thread_clock::duration thread_duration;
     if(bfs)
     {
@@ -537,7 +537,7 @@ EUROPA::TokenId  CurrentState::getGoal(const EUROPA::TokenId& token, EUROPA::ein
 
 EUROPA::TokenId CurrentState::searchGoal(const EUROPA::TokenSet& tokens)
 {
-    boost::unordered_map<long, bool> mark;
+    std::unordered_map<long, bool> mark;
     std::list<EUROPA::TokenId> list;
     for(EUROPA::TokenSet::const_iterator it = tokens.begin(); it!=tokens.end(); ++it)
     {

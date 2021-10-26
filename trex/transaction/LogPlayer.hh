@@ -59,7 +59,7 @@ namespace TREX {
 	 * The factory used to generate transactions vents from a log 
 	 * file.
 	 */
-	typedef utils::XmlFactory<tr_event, SHARED_PTR<tr_event>,
+	typedef utils::XmlFactory<tr_event, std::shared_ptr<tr_event>,
 				  LogPlayer *> factory;
 
 	/** @brief Constructor 
@@ -306,10 +306,10 @@ namespace TREX {
 	}
       private:
 	utils::Symbol m_type;
-	std::list< SHARED_PTR<details::tr_event> > m_events;
+	std::list< std::shared_ptr<details::tr_event> > m_events;
       };
 
-      typedef std::pair< TICK, SHARED_PTR<phase> > tick_event;
+      typedef std::pair< TICK, std::shared_ptr<phase> > tick_event;
       std::list<tick_event>    m_log;
       std::map<std::string, goal_id> m_goal_map;
 

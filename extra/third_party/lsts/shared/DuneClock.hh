@@ -23,7 +23,7 @@ namespace TREX {
        * 
        * The type used to for duration by this clock
        */
-      typedef CHRONO::nanoseconds duration;
+      typedef std::chrono::nanoseconds duration;
       /** @brief duration storage type
        * 
        * The type used to count ticks by this clock
@@ -39,7 +39,7 @@ namespace TREX {
        * The type to represent a time point (or date) for this
        * clock.
        */
-      typedef CHRONO::time_point<dune_posix_clock> time_point;
+      typedef std::chrono::time_point<dune_posix_clock> time_point;
 
       /** @brief Steadyness flag
        *
@@ -69,7 +69,7 @@ namespace TREX {
      * @relates dune_posix_clock
      * @sa steady_clock
      */
-    typedef agent::rt_clock<CHRONO_NS::milli, dune_posix_clock> posix_clock;
+    typedef agent::rt_clock<std::milli, dune_posix_clock> posix_clock;
 
     /** @brief dune steady clock
      *
@@ -88,7 +88,7 @@ namespace TREX {
        * 
        * The type used to for duration by this clock
        */
-      typedef CHRONO::nanoseconds                   duration;
+      typedef std::chrono::nanoseconds                   duration;
       /** @brief duration storage type
        * 
        * The type used to count ticks by this clock
@@ -103,7 +103,7 @@ namespace TREX {
        *
        * The type to represent a time point (or date) for this clock.
        */
-      typedef CHRONO::time_point<dune_steady_clock> time_point;
+      typedef std::chrono::time_point<dune_steady_clock> time_point;
 
       /** @brief Steadyness flag
        *
@@ -133,7 +133,7 @@ namespace TREX {
      * @relates dune_steady_clock
      * @sa posix_clock
      */
-    typedef agent::rt_clock<CHRONO_NS::milli, dune_steady_clock> steady_clock;
+    typedef agent::rt_clock<std::milli, dune_steady_clock> steady_clock;
 
   } // TREX::LSTS
 } // TREX

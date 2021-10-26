@@ -35,26 +35,24 @@
 
 add_custom_target(plugins COMMENT "TREX plugins")
 
-macro(trex_plugin name src)
-  add_library(${name}_pg SHARED ${src} ${ARGN})
-  add_dependencies(plugins ${name}_pg)
-  install(TARGETS ${name}_pg DESTINATION ${TREX_SHARED}/plugins OPTIONAL 
-    EXPORT trex-plugins)
-  trex_cfg(cfg ${TREX_SHARED})
-  set_property(GLOBAL APPEND PROPERTY ${PROJECT_NAME}_CFGS 
-    ${CMAKE_CURRENT_BINARY_DIR})
-  trex_lib(${name}_pg FALSE)
+macro(trex_plugin name)
+  add_library(${name} SHARED)
+  set_target_properties(${name} PROPERTIES OUTPUT_NAME "${name}_pg")
+  add_dependencies(plugins ${name})
+  install(
+    TARGETS ${name} 
+    EXPORT trex_pg
+    LIBRARY DESTINATION shared/trex/plugins
+  )
 endmacro(trex_plugin)
 
-# the directories where plugins are located
-add_subdirectory(Wt)
-add_subdirectory(REST)
-add_subdirectory(witre.old)
-# add_subdirectory(witre)
-add_subdirectory(europa)
+option(WITH_EUROPA "Enable Europa plugin." ON) 
+
+if(WITH_EUROPA)
+  add_subdirectory(europa)
+endif(WITH_EUROPA)
 
 # 3rd party plug-ins
 add_subdirectory(third_party)
 
-# examples 
-add_subdirectory(examples)
+

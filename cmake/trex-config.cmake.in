@@ -33,19 +33,9 @@
 # POSSIBILITY OF SUCH DAMAGE.                                         #
 #######################################################################
 # include directories used by trex libraries
-set(trex_INCLUDE_DIRS @TREX_INCS@ CACHE STRING "include paths for trex" FORCE)
-# flags required to use trex : mostly the ones related to c++11 support when enabled
-set(trex_CPPFLAGS @trex_FLAGS@ CACHE STRING "trex extra C++ flags" FORCE)
-
-set(trex_VERSION @VERSION@)
+@PACKAGE_INIT@
 
 get_filename_component(TREX_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
 # Import trex libraries
-include(${TREX_CMAKE_DIR}/imports/trex-targets.cmake)
-# the set of core libraries targets
-set(trex_LIBRARIES @trex-core@ CACHE STRING "trex core libraries" FORCE)
-# the set of extra libraries (such as europa extensions, ros, ...)
-set(trex_extra_LIBRARIES @trex-extra@ CACHE STRING "trex extensions for plugins" FORCE)
+include(${TREX_CMAKE_DIR}/imports/trex.cmake)
 
-# Note the plugin are not included ... should work on that later
-set(trex_python_LIBRARIES @trex-python@ CACHE STRING "trex python modules" FORCE)

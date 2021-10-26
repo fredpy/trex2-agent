@@ -33,31 +33,21 @@
 # POSSIBILITY OF SUCH DAMAGE.                                         #
 #######################################################################
 
-configure_file(platform/bits/cpp11.hh.in 
-  ${CMAKE_CURRENT_BINARY_DIR}/bits/cpp11.hh)
-install(
-  FILES ${CMAKE_CURRENT_BINARY_DIR}/bits/cpp11.hh
-  DESTINATION include/trex/utils/platform/bits
-)
-
-
 option(ASIO_DEBUG "enable debug of asio" OFF)
 mark_as_advanced(ASIO_DEBUG)
-
 configure_file(bits/asio_conf.hh.in
   ${CMAKE_CURRENT_BINARY_DIR}/bits/asio_conf.hh)
 install(
   FILES ${CMAKE_CURRENT_BINARY_DIR}/bits/asio_conf.hh
   DESTINATION include/trex/utils/bits
 )
-
+include(git_version)
 git_header(bits/git_version.hh)
 set_source_files_properties(TREXversion.cc
   PROPERTIES OBJECT_DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/bits/git_version.hh)
 
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
-
-add_library(TREXutils SHARED
+trex_lib(utils)
+target_sources(utils PRIVATE
   # real source
   ErrnoExcept.cc
   Exception.cc
@@ -122,11 +112,6 @@ add_library(TREXutils SHARED
   log/out_file.hh
   log/log_pipe.hh
   ${CMAKE_CURRENT_BINARY_DIR}/bits/asio_conf.hh
-  # platform specific information
-  platform/chrono.hh 
-  platform/memory.hh
-  platform/cpp11_deleted.hh
-  platform/system_error.hh
   # template source code
   bits/Factory.tcc
   bits/priority_strand.tcc
@@ -135,58 +120,17 @@ add_library(TREXutils SHARED
   bits/Symbol.tcc
   bits/XmlFactory.tcc
 )
-
-# if(TREX_FROM_PKG)
-#   # svn data is given by the package
-#   set(GIT_HH ${CMAKE_SOURCE_DIR}/${TREX_EXTRA_SRC}/git/version.hh)
-
-#   if(EXISTS ${GIT_HH})
-#     include_directories(${CMAKE_SOURCE_DIR}/${TREX_EXTRA_SRC})
-#     add_definitions(-DWITH_GIT_TRACK)
-#   endif()
-# else(TREX_FROM_PKG)
-#  # I need to generate the file
-
-#  option(WITH_GIT_TRACK "Enable tracking of git compiled version in TREXversion" ON)
-#  mark_as_advanced(WITH_GIT_TRACK)
-
-#  if(WITH_GIT_TRACK)
-#     set(GIT_HH git/version.hh)
-#     add_custom_target(githeader ALL 
-#       DEPENDS ${GIT_HH})
-#     add_dependencies(trex_prep githeader)
-
-#     # this run my svn script
-#     add_custom_command(OUTPUT ${GIT_HH}
-#       PRE_BUILD
-#       COMMAND ${CMAKE_COMMAND} -DSOURCE_DIR=${CMAKE_SOURCE_DIR}
-#       -DOUTPUT_DIR=${TREX_EXTRA_DIR}
-#       -P ${CMAKE_SOURCE_DIR}/cmake/getgit.cmake)
-    
-#     include_directories(${TREX_EXTRA_DIR})
-#     set_source_files_properties(${GIT_HH}
-#       PROPERTIES GENERATED TRUE
-#      # HEADER_FILE_ONLY TRUE
-#      LOCATION ${TREX_EXTRA_DIR}
-#      )
-
-#     add_dependencies(TREXutils githeader)
-
-#     set_source_files_properties(TREXversion.cc
-#       PROPERTIES OBJECT_DEPENDS ${TREX_EXTRA_DIR}/${GIT_HH})
-#     add_definitions(-DWITH_GIT_TRACK)
-#  endif(WITH_GIT_TRACK)
-# endif(TREX_FROM_PKG)
-
-
-add_dependencies(core TREXutils)
-target_link_libraries(TREXutils ${SYSTEM_LIBRARIES}  
-  ${Boost_FILESYSTEM_LIBRARY} 
-  ${Boost_SYSTEM_LIBRARY}
-  ${CHRONO_LIB}
-  ${Boost_DATE_TIME_LIBRARY}
-  ${Boost_THREAD_LIBRARY})
-trex_lib(TREXutils core)
+target_compile_features(utils PUBLIC cxx_std_17)
+target_include_directories(utils PRIVATE 
+ ${CMAKE_CURRENT_BINARY_DIR}
+ ${CMAKE_BINARY_DIR}
+PUBLIC
+ $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}>
+ $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>
+ $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+ $<INSTALL_INTERFACE:include>
+)
+target_link_libraries(utils dl Boost::system Boost::date_time Boost::thread)
 
 set_property(SOURCE Pdlfcn.cc 
   PROPERTY COMPILE_DEFINITIONS SUFSHARE="${CMAKE_SHARED_LIBRARY_SUFFIX}")

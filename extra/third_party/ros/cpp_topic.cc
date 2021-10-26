@@ -78,9 +78,9 @@ using TREX::ROS::details::ros_timeline;
 
 // statics
 
-void cpp_topic_base::async_exec(WEAK_PTR<ros_timeline> me,
+void cpp_topic_base::async_exec(std::weak_ptr<ros_timeline> me,
                                 boost::function<void (cpp_topic_base *)> fn) {
-  SHARED_PTR<ros_timeline> ptr = me.lock();
+  std::shared_ptr<ros_timeline> ptr = me.lock();
   
   if( ptr ) {
     cpp_topic_base *my_self = dynamic_cast<cpp_topic_base *>(ptr.get());
@@ -125,7 +125,7 @@ Observation cpp_topic_base::new_undefined() const {
 }
 
 boost::function<void ()> cpp_topic_base::wrap(boost::function<void (cpp_topic_base *)> fn) {
-  WEAK_PTR<ros_timeline> me(shared_from_this());
+  std::weak_ptr<ros_timeline> me(shared_from_this());
   return boost::bind(&cpp_topic_base::async_exec, me, fn);
 }
 
@@ -144,7 +144,7 @@ void cpp_topic_base::do_notify(Observation const &obs) {
 // callbacks
 
 void cpp_topic_base::handle_init() {
-  SHARED_PTR<ros_timeline> me(shared_from_this());
+  std::shared_ptr<ros_timeline> me(shared_from_this());
   
   if( controllable() ) {
     try {

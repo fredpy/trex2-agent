@@ -73,8 +73,8 @@ namespace TREX {
       class Schema :boost::noncopyable {
       public:
         void registerComponents(Assembly const &assembly);
-        boost::asio::io_service &service() {
-          return m_log->service();
+        boost::asio::io_context &context() {
+          return m_log->context();
         }
         std::string file_name(std::string const &path) {
           return m_log->file_name(path).string();
@@ -127,7 +127,7 @@ namespace TREX {
         std::string              m_path;
         
         TREX::utils::SingletonUse<TREX::utils::LogManager> m_log;
-        typedef std::map<std::string, boost::filesystem::path>
+        typedef std::map<std::string, std::filesystem::path>
         include_map;
         include_map m_includes;
         

@@ -45,7 +45,7 @@ namespace TREX {
       class graph_impl;
       
       class node_impl;
-      typedef WEAK_PTR<node_impl> node_id;
+      typedef std::weak_ptr<node_impl> node_id;
       
       /** @brief Reactor transaction flags
        *

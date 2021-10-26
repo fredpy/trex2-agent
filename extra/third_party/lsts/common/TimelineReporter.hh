@@ -11,7 +11,6 @@
 # include <trex/transaction/TeleoReactor.hh>
 # include <trex/utils/Plugin.hh>
 # include <trex/utils/LogManager.hh>
-# include <DUNE/DUNE.hpp>
 # include <trex/lsts/ImcAdapter.hh>
 
 namespace TREX {
@@ -48,7 +47,7 @@ namespace TREX {
 
       void notify(TREX::transaction::Observation const &obs);
       void newPlanToken(TREX::transaction::goal_id const &t);
-      void cancelledPlanToken(goal_id const &t);
+      void cancelledPlanToken(transaction::goal_id const &t);
 
     };
   }

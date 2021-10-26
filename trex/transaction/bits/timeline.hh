@@ -484,8 +484,8 @@ namespace TREX {
 	client_set    m_clients;
 	
 
-        boost::optional<Observation> m_last_obs;
-        boost::optional<Observation> m_next_obs;
+        std::optional<Observation> m_last_obs;
+        std::optional<Observation> m_next_obs;
         TICK m_last_synch;
         TICK m_obs_date;
 

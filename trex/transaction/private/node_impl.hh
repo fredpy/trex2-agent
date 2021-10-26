@@ -41,7 +41,7 @@ namespace TREX {
     namespace details {
 
       class node_impl :boost::noncopyable,
-      public ENABLE_SHARED_FROM_THIS<node_impl> {
+      public std::enable_shared_from_this<node_impl> {
       public:
         ~node_impl();
 
@@ -61,7 +61,7 @@ namespace TREX {
                                   utils::Symbol const &kind) const;
         utils::LogManager &manager() const;
         
-        SHARED_PTR<graph_impl> graph() const {
+        std::shared_ptr<graph_impl> graph() const {
           return m_graph.lock();
         }
         
@@ -69,16 +69,16 @@ namespace TREX {
         void use(utils::Symbol const &tl, bool read_only, bool listen_plan);
         
       private:
-        explicit node_impl(WEAK_PTR<graph_impl> const &g);
+        explicit node_impl(std::weak_ptr<graph_impl> const &g);
         
-        void isolate(SHARED_PTR<graph_impl> const &g);
+        void isolate(std::shared_ptr<graph_impl> const &g);
         
         utils::Symbol               m_name;
-        WEAK_PTR<graph_impl> m_graph;
+        std::weak_ptr<graph_impl> m_graph;
         
         friend class graph_impl;
 
-        node_impl() DELETED;
+        node_impl() =delete;
       }; // TREX::transaction::details::node_impl
       
     } // TREX::transaction::details

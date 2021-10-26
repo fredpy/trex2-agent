@@ -33,79 +33,38 @@
 # POSSIBILITY OF SUCH DAMAGE.                                         #
 #######################################################################
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.0)
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/;${CMAKE_SOURCE_DIR}/cmake/Modules/")
-
-########################################################################
-# remove annoying warning since cmake 3                                #
-########################################################################
-if(CMAKE_MAJOR_VERSION GREATER 2)
-  cmake_policy(SET CMP0042 NEW)
-endif()
-
-# Do the prep for OSX 10.11
-set(DEST_LIB ${CMAKE_INSTALL_PREFIX}/lib)
-
-if(APPLE)
-    set(CMAKE_MACOSX_RPATH ON) 
-    # use, i.e. don't skip the full RPATH for the build tree
-    SET(CMAKE_SKIP_BUILD_RPATH  FALSE)
-
-    # when building, don't use the install RPATH already
-    # (but later on when installing)
-    SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE) 
-    SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
-
-    # add the automatically determined parts of the RPATH
-    # which point to directories outside the build tree to the install RPATH
-    SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
-
-    # the RPATH to be used when installing, but only if it's not a system directory
-    LIST(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/lib" isSystemDir)
-    IF("${isSystemDir}" STREQUAL "-1")
-      SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
-    ENDIF("${isSystemDir}" STREQUAL "-1")
-endif()
-
-
-########################################################################
-# Project definitions                                                  #
-########################################################################
-project(trex)
-set(TREX_MAJOR 0)
-set(TREX_MINOR 6)
-set(TREX_PATCH 5)
-set(TREX_RC 0)
-
-# TREX script for CPack management
-include(trex_pack)
-
-include_directories(
-  ${PROJECT_SOURCE_DIR}
-  ${CMAKE_CURRENT_BINARY_DIR}
-  # Need this for config generated files
-  ${CMAKE_BINARY_DIR}/trex/utils
-  )
+project(trex VERSION 0.7.0)
 
 include(trex_requirements)
-include(trex_macros)
-
-set(TREX_SHARED share/trex)
-include_directories(${CMAKE_BINARY_DIR})
 
 ########################################################################
 # TREX sub directories                                                 #
 ########################################################################
-
 # core libraries 
 add_subdirectory(trex)
-trex_cfg(cfg ${TREX_SHARED})
 
 # include extra/plugins
 add_subdirectory(extra) 
 
+configure_file(scripts/trex_init.bash.in ${CMAKE_CURRENT_BINARY_DIR}/trex_init.bash @ONLY)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/trex_init.bash DESTINATION shared/trex)
+
 ########################################################################
 # Finalize                                                             #
 ########################################################################
-include(trex_finalize)
+install(EXPORT trex NAMESPACE trex:: DESTINATION shared/trex/cmake/imports OPTIONAL)
 
+include(CMakePackageConfigHelpers)
+
+configure_package_config_file(cmake/trex-config.cmake.in
+"${CMAKE_CURRENT_BINARY_DIR}/trexConfig.cmake"
+INSTALL_DESTINATION shared/trex/cmake
+)
+write_basic_package_version_file(trexConfigVersion.cmake VERSION ${VERSION} COMPATIBILITY AnyNewerVersion)
+install(FILES
+    "${CMAKE_CURRENT_BINARY_DIR}/trexConfig.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/trexConfigVersion.cmake"
+    DESTINATION shared/trex/cmake
+)

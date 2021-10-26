@@ -48,13 +48,13 @@ using utils::Symbol;
 // structors
 
 details::graph_impl::graph_impl()
-:m_strand(new asio::io_service::strand(m_log->service())) {
-  m_date = MAKE_SHARED<details::clock>(boost::ref(m_log->service()));
+:m_strand(new asio::io_context::strand(m_log->context())) {
+  m_date = std::make_shared<details::clock>(std::ref(m_log->context()));
 }
 
 details::graph_impl::graph_impl(Symbol const &name)
-:m_name(name), m_strand(new asio::io_service::strand(m_log->service())) {
-  m_date = MAKE_SHARED<details::clock>(boost::ref(m_log->service()));
+:m_name(name), m_strand(new asio::io_service::strand(m_log->context())) {
+  m_date = std::make_shared<details::clock>(std::ref(m_log->context()));
 }
 
 details::graph_impl::~graph_impl() {
@@ -67,7 +67,7 @@ tlog::stream details::graph_impl::syslog(Symbol const &ctx,
                                          Symbol const &kind) const {
   // Access quickly to the date : I'd rather have an innacurate date in the logs
   // than being blocked by pending events in the graph strand 
-  boost::optional<date_type> cur = get_date();
+  std::optional<date_type> cur = get_date();
   Symbol who = m_name;
   if( !ctx.empty() )
     who = who.str()+"."+ctx.str();
@@ -79,16 +79,16 @@ tlog::stream details::graph_impl::syslog(Symbol const &ctx,
 
 
 details::node_id details::graph_impl::create_node() {
-  SHARED_PTR<graph_impl> me = shared_from_this();
-  SHARED_PTR<node_impl> ret(new node_impl(me));
+  std::shared_ptr<graph_impl> me = shared_from_this();
+  std::shared_ptr<node_impl> ret(new node_impl(me));
 
   strand().dispatch(boost::bind(&graph_impl::add_node_sync, me, ret));
   return ret;
 }
 
 bool details::graph_impl::remove_node(details::node_id const &n) {
-  SHARED_PTR<graph_impl> me = shared_from_this();
-  SHARED_PTR<node_impl> node = n.lock();
+  std::shared_ptr<graph_impl> me = shared_from_this();
+  std::shared_ptr<node_impl> node = n.lock();
 
   if( node && me==node->graph() ) {
     node->m_graph.reset();
@@ -100,35 +100,35 @@ bool details::graph_impl::remove_node(details::node_id const &n) {
 
 // private calls
 
-void details::graph_impl::declare(SHARED_PTR<details::node_impl> n,
+void details::graph_impl::declare(std::shared_ptr<details::node_impl> n,
                                   Symbol const &name,
                                   details::transaction_flags flag) {
-  SHARED_PTR<graph_impl> me = shared_from_this();
+  std::shared_ptr<graph_impl> me = shared_from_this();
   strand().dispatch(boost::bind(&graph_impl::decl_sync, me, n, name, flag));
 }
 
-void details::graph_impl::subscribe(SHARED_PTR<details::node_impl> n,
+void details::graph_impl::subscribe(std::shared_ptr<details::node_impl> n,
                                     Symbol const &name,
                                     details::transaction_flags flag) {
-  SHARED_PTR<graph_impl> me = shared_from_this();
+  std::shared_ptr<graph_impl> me = shared_from_this();
   strand().dispatch(boost::bind(&graph_impl::use_sync, me, n, name, flag));
 }
 
 
 // strand protected calls
 
-void details::graph_impl::add_node_sync(SHARED_PTR<details::node_impl> n) {
+void details::graph_impl::add_node_sync(std::shared_ptr<details::node_impl> n) {
   m_nodes.insert(n);
 }
 
-void details::graph_impl::rm_node_sync(SHARED_PTR<details::node_impl> n) {
+void details::graph_impl::rm_node_sync(std::shared_ptr<details::node_impl> n) {
   n->isolate(shared_from_this());
   m_nodes.erase(n);
 }
 
-void details::graph_impl::decl_sync(SHARED_PTR<details::node_impl> n,
+void details::graph_impl::decl_sync(std::shared_ptr<details::node_impl> n,
                                     Symbol name, details::transaction_flags flag) {
-  SHARED_PTR<graph_impl> owned = n->graph();
+  std::shared_ptr<graph_impl> owned = n->graph();
   if( shared_from_this()==owned ) {
     
   } else
@@ -136,10 +136,10 @@ void details::graph_impl::decl_sync(SHARED_PTR<details::node_impl> n,
     <<"\" as it was requested by a reactor that is no longer part of this graph.";
 }
 
-void details::graph_impl::use_sync(SHARED_PTR<details::node_impl> n,
+void details::graph_impl::use_sync(std::shared_ptr<details::node_impl> n,
                                    Symbol name, details::transaction_flags flag) {
   
-  SHARED_PTR<graph_impl> owned = n->graph();
+  std::shared_ptr<graph_impl> owned = n->graph();
   if( shared_from_this()==owned ) {
     
   } else

@@ -444,13 +444,13 @@ TICK Agent::initialTick(clock_ref clk) {
 
 Agent::Agent(Symbol const &name, TICK final, clock_ref clk, bool verbose)
 :graph(name, initialTick(clk), verbose), m_continue_if_empty(false),
- m_stat_log(manager().service()), m_clock(clk), m_finalTick(final), m_valid(true) {
+ m_stat_log(manager().context()), m_clock(clk), m_finalTick(final), m_valid(true) {
   m_proxy = new AgentProxy(*this);
   add_reactor(m_proxy);
 }
 
 Agent::Agent(std::string const &file_name, clock_ref clk, bool verbose)
-:m_stat_log(manager().service()), m_clock(clk), m_valid(true), m_continue_if_empty(false) {
+:m_stat_log(manager().context()), m_clock(clk), m_valid(true), m_continue_if_empty(false) {
   set_verbose(verbose);
   updateTick(initialTick(m_clock), false);
   m_proxy = new AgentProxy(*this);
@@ -474,7 +474,7 @@ Agent::Agent(std::string const &file_name, clock_ref clk, bool verbose)
 }
 
 Agent::Agent(boost::property_tree::ptree::value_type &conf, clock_ref clk, bool verbose)
-:m_stat_log(manager().service()), m_clock(clk), m_valid(true), m_continue_if_empty(false) {
+:m_stat_log(manager().context()), m_clock(clk), m_valid(true), m_continue_if_empty(false) {
   set_verbose(verbose);
   updateTick(initialTick(m_clock), false);
   m_proxy = new AgentProxy(*this);
@@ -585,8 +585,8 @@ bool Agent::setClock(clock_ref clock) {
 void Agent::loadPlugin(boost::property_tree::ptree::value_type &pg,
                        std::string path) {
   std::string name = parse_attr<std::string>(pg, "name");
-  boost::optional<boost::property_tree::ptree &> else_tree = pg.second.get_child_optional("Else");
-  boost::property_tree::ptree *sub = NULL;
+  auto else_tree = pg.second.get_child_optional("Else");
+  boost::property_tree::ptree *sub = nullptr;
   
   if( m_pg->load(name, !else_tree) ) {
     // Sucessfully loaded the plug-in
@@ -785,7 +785,7 @@ void Agent::initComplete() {
   
   // Create initial graph file
   LogManager::path_type graph_dot = manager().file_name("reactors.gv");
-  async_ofstream dotf(manager().service(), graph_dot.string());
+  async_ofstream dotf(manager().context(), graph_dot.string());
   
   m_stat_log.open(manager().file_name("agent_stats.csv").c_str());
   m_stat_log<<"tick, synch_ns, synch_rt_ns,"
@@ -885,7 +885,7 @@ void Agent::synchronize() {
     name<<"reactors."<<now<<".gv";
     
     LogManager::path_type graph_dot = manager().file_name(name.str());
-    async_ofstream dotf(manager().service(), graph_dot.string());
+    async_ofstream dotf(manager().context(), graph_dot.string());
     
     {
       graph_names_writer gn;
@@ -986,7 +986,7 @@ bool Agent::doNext() {
     {
       utils::chronograph<rt_clock> sleep_chrono(sleep_time);
       while( valid() && m_clock->tick()==now ) {
-        sleep_req += CHRONO::duration_cast<rt_clock::duration>(m_clock->sleep());
+        sleep_req += std::chrono::duration_cast<rt_clock::duration>(m_clock->sleep());
         ++sl_count;
       }
     }

@@ -69,15 +69,15 @@ namespace {
 
   private:  
     base_class::result_type produce(base_class::argument_type arg) const {
-      boost::optional<date_type> 
-	val = utils::parse_attr< boost::optional<date_type> >(arg.second, "value");
+      std::optional<date_type> 
+	val = utils::parse_attr< std::optional<date_type> >(arg.second, "value");
 
       if( val ) 
 	return result_type(new IntegerDomain(m_owner.timeToTick(*val)));
       else {	
-	boost::optional<date_type> 
-	  min = utils::parse_attr< boost::optional<date_type> >(arg.second, "min"),
-	  max = utils::parse_attr< boost::optional<date_type> >(arg.second, "max");
+	std::optional<date_type> 
+	  min = utils::parse_attr< std::optional<date_type> >(arg.second, "min"),
+	  max = utils::parse_attr< std::optional<date_type> >(arg.second, "max");
 	IntegerDomain::bound lo(IntegerDomain::minus_inf), 
           hi(IntegerDomain::plus_inf);
 	boost::posix_time::ptime date;
@@ -107,21 +107,21 @@ namespace {
 
   private:
     base_class::result_type produce(base_class::argument_type arg) const {
-      boost::optional<boost::posix_time::time_duration> 
-      min = utils::parse_attr< boost::optional<boost::posix_time::time_duration> >(arg.second, "min"),
-      max = utils::parse_attr< boost::optional<boost::posix_time::time_duration> >(arg.second, "max");
+      std::optional<boost::posix_time::time_duration> 
+      min = utils::parse_attr< std::optional<boost::posix_time::time_duration> >(arg.second, "min"),
+      max = utils::parse_attr< std::optional<boost::posix_time::time_duration> >(arg.second, "max");
       IntegerDomain::bound lo(IntegerDomain::minus_inf), 
           hi(IntegerDomain::plus_inf);
-      CHRONO::duration<double> 
+      std::chrono::duration<double> 
       ratio = m_owner.tickDuration();
-      typedef TREX::utils::chrono_posix_convert< CHRONO::duration<double> > cvt;
+      typedef TREX::utils::chrono_posix_convert< std::chrono::duration<double> > cvt;
       if( min ) {
-        CHRONO::duration<double> min_s(cvt::to_chrono(*min));
+        std::chrono::duration<double> min_s(cvt::to_chrono(*min));
 
         double value = min_s.count()/ratio.count();
         lo = static_cast<long long>(std::floor(value));
       } if( max ) {
-        CHRONO::duration<double> max_s(cvt::to_chrono(*max));
+        std::chrono::duration<double> max_s(cvt::to_chrono(*max));
 
         double value = max_s.count()/ratio.count();
         hi = static_cast<long long>(std::ceil(value));
@@ -162,7 +162,7 @@ MultipleReactors::MultipleReactors(graph const &g, TeleoReactor const &r) throw(
 
 graph::graph()
 #ifdef WITH_MAKE_SHARED
-:m_impl(MAKE_SHARED<details::graph_impl>())
+:m_impl(std::make_shared<details::graph_impl>())
 #else 
 :m_impl(new details::graph_impl)
 #endif
@@ -170,7 +170,7 @@ graph::graph()
 
 graph::graph(utils::Symbol const &name, TICK init, bool verbose)
 #ifdef WITH_MAKE_SHARED
-:m_impl(MAKE_SHARED<details::graph_impl>(name))
+:m_impl(std::make_shared<details::graph_impl>(name))
 #else 
 :m_impl(new details::graph_impl(name))
 #endif
@@ -270,7 +270,7 @@ graph::reactor_id graph::add_reactor(boost::property_tree::ptree::value_type &de
   graph *me = this;
   TeleoReactor::xml_arg_type 
   arg = xml_factory::arg_traits::build(description, me);
-  SHARED_PTR<TeleoReactor> tmp(m_factory->produce(arg));
+  std::shared_ptr<TeleoReactor> tmp(m_factory->produce(arg));
   std::pair<details::reactor_set::iterator, bool> ret = m_reactors.insert(tmp);
 
   if( ret.second ) 
@@ -281,7 +281,7 @@ graph::reactor_id graph::add_reactor(boost::property_tree::ptree::value_type &de
 }
 
 graph::reactor_id graph::add_reactor(graph::reactor_id r) {
-  SHARED_PTR<TeleoReactor> tmp(r);
+  std::shared_ptr<TeleoReactor> tmp(r);
   std::pair<details::reactor_set::iterator, bool> ret = m_reactors.insert(tmp);
   // As it is an internal call make is silent for now ...
   return ret.first->get();
@@ -463,9 +463,9 @@ TICK graph::as_date(std::string const &str) const {
 TICK graph::as_duration(std::string const &str, bool up) const {
   boost::posix_time::time_duration
     dur=utils::string_cast<boost::posix_time::time_duration>(str);
-  typedef TREX::utils::chrono_posix_convert< CHRONO::duration<double> > cvt;
+  typedef TREX::utils::chrono_posix_convert< std::chrono::duration<double> > cvt;
 
-  CHRONO::duration<double> ratio = tickDuration(), val(cvt::to_chrono(dur));
+  std::chrono::duration<double> ratio = tickDuration(), val(cvt::to_chrono(dur));
   
   double value = val.count()/ratio.count();
   
@@ -479,7 +479,7 @@ TICK graph::as_duration(std::string const &str, bool up) const {
 boost::property_tree::ptree graph::export_goal(goal_id const &g) const {
   bp::ptree ret = g->as_tree(false);
   bp::ptree &attr = ret.front().second;
-  boost::optional<bp::ptree &> vars = attr.get_child_optional("Variable");
+  auto vars = attr.get_child_optional("Variable");
 
   if( !vars )
     vars = attr.add_child("Variable", bp::ptree());

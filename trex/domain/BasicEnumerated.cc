@@ -58,14 +58,14 @@ void BasicEnumerated::completeParsing(bpt::ptree::value_type &node) {
   if( last==i ) {
     // In case there's no elem childs check if someone specified
     // its value directly
-    boost::optional<std::string>
-    txt = TREX::utils::parse_attr< boost::optional<std::string> >(node, "value");
+    std::optional<std::string>
+    txt = TREX::utils::parse_attr< std::optional<std::string> >(node, "value");
     if( txt )
       addTextValue(*txt);
   } else {
     for(; last!=i; ++i) {
-      boost::optional<std::string>
-        txt = TREX::utils::parse_attr< boost::optional<std::string> >( i->second,   "value");
+      std::optional<std::string>
+        txt = TREX::utils::parse_attr< std::optional<std::string> >( i->second,   "value");
       if( txt )
         addTextValue(*txt);
     }

@@ -31,61 +31,53 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef H_trex_utils_private_priority_stand_impl
-# define H_trex_utils_private_priority_stand_impl
+#pragma once
+#include "../priority_strand.hh"
 
-# include "../priority_strand.hh"
+#include <boost/thread/mutex.hpp>
+#include <boost/thread/shared_mutex.hpp>
 
-# include <boost/thread/mutex.hpp>
-# include <boost/thread/shared_mutex.hpp>
+#include <queue>
 
-# include <queue>
+namespace TREX::utils {
 
-namespace TREX {
-  namespace utils {
-    
-    class priority_strand::pimpl: boost::noncopyable,
-    public ENABLE_SHARED_FROM_THIS<priority_strand::pimpl> {
-    public:
-      typedef priority_strand::task *task_ref;
-      typedef priority_strand::strand_type strand_type;
-      
-      pimpl(SHARED_PTR<strand_type> const &s);
-      ~pimpl();
-      
-      strand_type &strand() {
-        return *m_strand;
-      }
-      
-      void enqueue(task_ref tsk);
-      
-      bool active() const;
-      bool completed() const;
-      void start();
-      void stop();
-      
-      size_t tasks() const;
-      bool empty() const;
-      void clear();
-      
-    private:
-      struct task_cmp {
-        bool operator()(task_ref a, task_ref b) const;
-      };
-      typedef std::priority_queue<task_ref, std::vector<task_ref>,
-                                  task_cmp> task_queue;
-      
-      SHARED_PTR<strand_type>         m_strand;
-      mutable boost::shared_mutex     m_mutex;
-      task_queue                      m_queue;
-      bool                            m_active, m_running;
-      
-      void dequeue_sync();
-      pimpl() DELETED;
-    }; // TREX::utils::priority_strand::pimpl
-    
-  } // TREX::utils
-} // TREX
+class priority_strand::pimpl
+    : public std::enable_shared_from_this<priority_strand::pimpl> {
+public:
+  typedef priority_strand::task *task_ref;
+  typedef priority_strand::strand_type strand_type;
 
+  pimpl(std::shared_ptr<strand_type> const &s);
+  pimpl(pimpl const &) = delete;
+  ~pimpl();
 
-#endif // H_trex_utils_private_priority_stand_impl
+  strand_type &strand() { return *m_strand; }
+
+  void enqueue(task_ref tsk);
+
+  bool active() const;
+  bool completed() const;
+  void start();
+  void stop();
+
+  size_t tasks() const;
+  bool empty() const;
+  void clear();
+
+private:
+  struct task_cmp {
+    bool operator()(task_ref a, task_ref b) const;
+  };
+  typedef std::priority_queue<task_ref, std::vector<task_ref>, task_cmp>
+      task_queue;
+
+  std::shared_ptr<strand_type> m_strand;
+  mutable boost::shared_mutex m_mutex;
+  task_queue m_queue;
+  bool m_active, m_running;
+
+  void dequeue_sync();
+  pimpl() = delete;
+}; // TREX::utils::priority_strand::pimpl
+
+} // namespace TREX::utils

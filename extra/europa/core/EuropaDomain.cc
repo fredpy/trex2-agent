@@ -110,14 +110,14 @@ bool details::EuropaDomain::equals(DomainBase const &other) const {
 boost::any details::EuropaDomain::singleton() const {
   // copy shoud not be too costful as I should have already checked
   // that the domain is a singleton
-  UNIQ_PTR<tr::DomainBase> tmp(copy());
+  std::unique_ptr<tr::DomainBase> tmp(copy());
   return tmp->getSingleton();
 }
 
 std::string details::EuropaDomain::stringSingleton() const {
   // copy shoud not be too costful as I should have already checked
   // that the domain is a singleton
-  UNIQ_PTR<tr::DomainBase> tmp(copy());
+  std::unique_ptr<tr::DomainBase> tmp(copy());
   return tmp->getStringSingleton();
 }
 
@@ -129,7 +129,7 @@ tr::DomainBase *details::EuropaDomain::copy() const {
 }
 
 boost::property_tree::ptree details::EuropaDomain::build_tree() const {
-  UNIQ_PTR<tr::DomainBase> tmp(copy());
+  std::unique_ptr<tr::DomainBase> tmp(copy());
   return tmp->build_tree();
 }
 
@@ -137,14 +137,14 @@ boost::property_tree::ptree details::EuropaDomain::build_tree() const {
 //std::ostream &details::EuropaDomain::toXml(std::ostream &out, size_t tabs) const {
 //  // this copy can be costfull but guarantees that the output can be
 //  // parsed by TREX
-//  UNIQ_PTR<tr::DomainBase> tmp(copy());
+//  std::unique_ptr<tr::DomainBase> tmp(copy());
 //  return tmp->toXml(out, tabs);
 //}
 
 std::ostream &details::EuropaDomain::print_domain(std::ostream &out) const {
   // this copy is costfiull and we may want to avoid this
   // (so we see that the output is from europa)
-  UNIQ_PTR<tr::DomainBase> tmp(copy());
+  std::unique_ptr<tr::DomainBase> tmp(copy());
   return out<<(*tmp);
 }
 

@@ -151,7 +151,7 @@ namespace TREX {
        * @post the pending goal queue is not empty
        */
       void add_goal(TREX::transaction::goal_id const &g,
-                    boost::optional<std::string> const &id);
+                    std::optional<std::string> const &id);
       void add_recall(std::string const &id);
 
       bool next(std::set<TREX::transaction::goal_id> &l,
@@ -207,7 +207,7 @@ namespace TREX {
 
       mutable mutex_type m_mutex;
       
-      UNIQ_PTR<boost::thread> m_thread;
+      std::unique_ptr<boost::thread> m_thread;
       
       
       bool m_running;

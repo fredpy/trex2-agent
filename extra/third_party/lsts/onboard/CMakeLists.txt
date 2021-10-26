@@ -35,22 +35,21 @@
 option(WITH_LSTS_ONBOARD "Enable LSTS AUV control" OFF)
 
 if(WITH_LSTS_ONBOARD)
-trex_plugin(platform 
-  # source
-  ControlInterface.cc 
-  Platform.cc 
-  SafetyBug.cc
-  DummyOperator.cc
-  YoYoReactor.cc
+  trex_plugin(LSTSplatform)
+  target_sources(LSTSplatform PRIVATE
+    # source
+    ControlInterface.cc 
+    Platform.cc 
+    SafetyBug.cc
+    DummyOperator.cc
+    YoYoReactor.cc
   
-  # headers
-  ControlInterface.hh 
-  Platform.hh 
-  SafetyBug.hh
-  DummyOperator.hh
-  YoYoReactor.hh 
-)
-
-target_link_libraries(platform_pg LSTSshared)
-
+    # headers
+    ControlInterface.hh 
+    Platform.hh 
+    SafetyBug.hh
+    DummyOperator.hh
+    YoYoReactor.hh 
+  )
+  target_link_libraries(LSTSplatform lsts)
 endif(WITH_LSTS_ONBOARD)

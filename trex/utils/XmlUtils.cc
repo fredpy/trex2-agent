@@ -7,14 +7,14 @@
  */
 /*********************************************************************
  * Software License Agreement (BSD License)
- * 
+ *
  *  Copyright (c) 2011, MBARI.
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions
  *  are met:
- * 
+ *
  *   * Redistributions of source code must retain the above copyright
  *     notice, this list of conditions and the following disclaimer.
  *   * Redistributions in binary form must reproduce the above
@@ -24,7 +24,7 @@
  *   * Neither the name of the TREX Project nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -43,46 +43,45 @@
 using namespace TREX::utils;
 namespace xml = boost::property_tree::xml_parser;
 
-
 namespace {
-  SingletonUse<LogManager> s_log;
+SingletonUse<LogManager> s_log;
 }
 
-void TREX::utils::ext_xml(boost::property_tree::ptree &tree, std::string const &conf, bool ahead) {
-  boost::optional<std::string> name = parse_attr< boost::optional<std::string> >(tree, conf);
-  
-  if( name ) {
+void TREX::utils::ext_xml(boost::property_tree::ptree &tree,
+                          std::string const &conf, bool ahead) {
+  std::optional<std::string> name =
+      parse_attr<std::optional<std::string>>(tree, conf);
+
+  if (name) {
     bool found;
     std::string file = s_log->use(*name, found);
-    
-    if( !found ) 
-      throw ErrnoExcept("Unable to locate file \""+(*name)+"\"");
-    
+
+    if (!found)
+      throw ErrnoExcept("Unable to locate file \"" + (*name) + "\"");
+
     boost::property_tree::ptree pt;
-    read_xml(file, pt, xml::no_comments|xml::trim_whitespace);
-    if( pt.empty() ) 
-      throw XmlError("Xml file \""+file+"\" is empty.");
-    if( pt.size()==1 )
+    read_xml(file, pt, xml::no_comments | xml::trim_whitespace);
+    if (pt.empty())
+      throw XmlError("Xml file \"" + file + "\" is empty.");
+    if (pt.size() == 1)
       pt = pt.front().second;
 
-    boost::optional<boost::property_tree::ptree &> attrs = tree.get_child_optional("<xmlattr>");
-    
-    if( attrs ) {
+    if (auto attrs = tree.get_child_optional("<xmlattr>"); attrs) {
       boost::property_tree::ptree::assoc_iterator attrs2 = pt.find("<xmlattr>");
-      if( attrs2!=pt.not_found() ) {
-        if( ahead )
-          attrs->insert(attrs->begin(), attrs2->second.begin(), attrs2->second.end());
+      if (attrs2 != pt.not_found()) {
+        if (ahead)
+          attrs->insert(attrs->begin(), attrs2->second.begin(),
+                        attrs2->second.end());
         else
-          attrs->insert(attrs->end(), attrs2->second.begin(), attrs2->second.end());
+          attrs->insert(attrs->end(), attrs2->second.begin(),
+                        attrs2->second.end());
         pt.erase(pt.to_iterator(attrs2));
       }
     }
-    
 
-    if( ahead )
+    if (ahead)
       tree.insert(tree.begin(), pt.begin(), pt.end());
-    else 
+    else
       tree.insert(tree.end(), pt.begin(), pt.end());
   }
 }
-

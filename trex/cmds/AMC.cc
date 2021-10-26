@@ -108,7 +108,7 @@ namespace {
                               "Allowed options");
   
   SingletonUse<LogManager> amc_log;
-  UNIQ_PTR<Agent> my_agent;
+  std::unique_ptr<Agent> my_agent;
  
 }
 
@@ -351,7 +351,7 @@ int main(int argc, char *argv[]) {
       <<opt<<std::endl;
       exit(1);
     }
-    clk.reset(new RealTimeClock(CHRONO::milliseconds(ms)));
+    clk.reset(new RealTimeClock(std::chrono::milliseconds(ms)));
   } else if( opt_val.count("sim") ) {
     clk.reset(new StepClock(Clock::duration_type(0),
                             opt_val["sim"].as<size_t>()));
@@ -368,7 +368,7 @@ int main(int argc, char *argv[]) {
     my_agent.reset(new Agent(opt_val["mission"].as<std::string>(), clk));
     
     // In case we did not have a clock set yet : use a 1Hz rt_clock
-    my_agent->setClock(clock_ref(new RealTimeClock(CHRONO::seconds(1))));
+    my_agent->setClock(clock_ref(new RealTimeClock(std::chrono::seconds(1))));
     
     // execute the agent
     my_agent->run();

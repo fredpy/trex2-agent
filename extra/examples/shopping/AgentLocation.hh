@@ -76,7 +76,7 @@ namespace TREX {
       void setGo(std::string origin, std::string destination);
 
       std::list<TREX::transaction::goal_id> m_pending;
-      UNIQ_PTR<TREX::transaction::Observation> m_state;
+      std::unique_ptr<TREX::transaction::Observation> m_state;
 
       /** @brief Name of the predicate At */
       static TREX::utils::Symbol const AtPred;

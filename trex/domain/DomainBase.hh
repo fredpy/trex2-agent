@@ -54,7 +54,6 @@
 
 # include <trex/utils/XmlFactory.hh>
 # include <trex/utils/ptree_io.hh>
-# include <trex/utils/platform/cpp11_deleted.hh>
 
 # include "DomainVisitor_fwd.hh"
 
@@ -414,7 +413,7 @@ namespace TREX {
        * This type defines the factory that should be manipulated
        * for parsing domains from xml.
        */
-      typedef TREX::utils::XmlFactory<DomainBase, SHARED_PTR<DomainBase> > xml_factory;
+      typedef TREX::utils::XmlFactory<DomainBase, std::shared_ptr<DomainBase> > xml_factory;
       virtual boost::property_tree::ptree build_tree() const=0;
       
     protected:
@@ -514,7 +513,7 @@ namespace TREX {
       
 # ifndef DOXYGEN
       // Following method have no code
-      DomainBase() DELETED;
+      DomainBase() =delete;
 # endif
     }; // TREX::transaction::DomainBase
     

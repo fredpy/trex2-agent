@@ -78,7 +78,7 @@ namespace TREX {
       
         signal_base              m_signal;
       private:
-        asio_signal_base() DELETED;
+        asio_signal_base() =delete;
       }; // TREX::utils::details::asio_signal_base
       
     } // TREX::utils::details

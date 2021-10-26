@@ -119,13 +119,13 @@ bool reactor_proxy::is_external(Symbol const &tl) const {
 }
 
 double reactor_proxy::tick_duration() const {
-  typedef CHRONO::duration<double> fl_secs;
-  return CHRONO::duration_cast<fl_secs>(m_impl->tickDuration()).count();
+  typedef std::chrono::duration<double> fl_secs;
+  return std::chrono::duration_cast<fl_secs>(m_impl->tickDuration()).count();
 }
 
 double reactor_proxy::as_seconds(TICK delta) const {
-  typedef CHRONO::duration<double> fl_secs;
-  return CHRONO::duration_cast<fl_secs>(m_impl->tickDuration()*delta).count();
+  typedef std::chrono::duration<double> fl_secs;
+  return std::chrono::duration_cast<fl_secs>(m_impl->tickDuration()*delta).count();
 }
 
 
@@ -368,7 +368,7 @@ py_reactor::py_reactor(xml_arg_type arg)
   try {
     boost::property_tree::ptree::value_type &node = xml_factory::node(arg);
     std::string class_name = parse_attr<std::string>(node, "python_class");
-    boost::optional<std::string> source = parse_attr< boost::optional<std::string> >(node, "file");
+    std::optional<std::string> source = parse_attr< std::optional<std::string> >(node, "file");
     
     bp::object scope_d;
 

@@ -33,7 +33,8 @@
 # POSSIBILITY OF SUCH DAMAGE.                                         #
 #######################################################################
 
-add_library(TREXagent SHARED
+trex_lib(agent)
+target_sources(agent PRIVATE
     Agent.cc
     Clock.cc
     FastClock.cc
@@ -50,10 +51,7 @@ add_library(TREXagent SHARED
     RealTimeClock.hh
     StepClock.hh
 )
-
-add_dependencies(core TREXagent)
-target_link_libraries(TREXagent TREXtransaction)
-trex_lib(TREXagent core)
+target_link_libraries(agent transaction)
 
 install(DIRECTORY . DESTINATION include/trex/agent
   FILES_MATCHING PATTERN "*.hh" PATTERN "*.tcc"

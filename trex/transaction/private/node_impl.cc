@@ -52,7 +52,7 @@ namespace {
 
 // structors
 
-details::node_impl::node_impl(WEAK_PTR<details::graph_impl> const &g):m_graph(g) {
+details::node_impl::node_impl(std::weak_ptr<details::graph_impl> const &g):m_graph(g) {
 }
 
 details::node_impl::~node_impl() {
@@ -64,7 +64,7 @@ tlog::stream details::node_impl::syslog(Symbol const &ctx, Symbol const &kind) c
   Symbol source = name();
   if( !ctx.empty() )
     source = source.str()+"."+ctx.str();
-  SHARED_PTR<graph_impl> g = graph();
+  std::shared_ptr<graph_impl> g = graph();
   
   if( g )
     return g->syslog(source, kind);
@@ -77,7 +77,7 @@ tlog::stream details::node_impl::syslog(Symbol const &ctx, Symbol const &kind) c
 }
 
 utils::LogManager &details::node_impl::manager() const {
-  SHARED_PTR<graph_impl> g = graph();
+  std::shared_ptr<graph_impl> g = graph();
 
   // Following code can appear redundant but it is future proof in the sendse it
   // handle possible case where one graph do not use the global singleton as
@@ -89,7 +89,7 @@ utils::LogManager &details::node_impl::manager() const {
 }
 
 void details::node_impl::provide(Symbol const &tl, bool read_only, bool publish_plan) {
-  SHARED_PTR<graph_impl> g = graph();
+  std::shared_ptr<graph_impl> g = graph();
   
   if( g ) {
     transaction_flags flags;
@@ -100,7 +100,7 @@ void details::node_impl::provide(Symbol const &tl, bool read_only, bool publish_
 }
 
 void details::node_impl::use(Symbol const &tl, bool read_only, bool listen_plan) {
-  SHARED_PTR<graph_impl> g = graph();
+  std::shared_ptr<graph_impl> g = graph();
   
   if( g ) {
     transaction_flags flags;
@@ -114,6 +114,6 @@ void details::node_impl::use(Symbol const &tl, bool read_only, bool listen_plan)
 
 // strand protected calls
 
-void details::node_impl::isolate(SHARED_PTR<details::graph_impl> const &g) {
+void details::node_impl::isolate(std::shared_ptr<details::graph_impl> const &g) {
   // Disable all connections
 }

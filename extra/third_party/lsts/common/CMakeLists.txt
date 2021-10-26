@@ -32,16 +32,16 @@
 # POSSIBILITY OF SUCH DAMAGE.                                          #
 ########################################################################
 
-trex_plugin(lstscommon 
-    # source
-    TimelineReporter.cc
-    TimelineProxy.cc
-    EchoTimeline.cc
+trex_plugin(LSTScommon)
+target_sources(LSTScommon PRIVATE 
+  # source
+  TimelineReporter.cc
+  TimelineProxy.cc
+  EchoTimeline.cc
     
-    # headers
-    TimelineReporter.hh 
-    TimelineProxy.hh
-    EchoTimeline.hh
-    )
-  
-  target_link_libraries(lstscommon_pg LSTSshared)
+  # headers
+  TimelineReporter.hh 
+  TimelineProxy.hh
+  EchoTimeline.hh
+)
+target_link_libraries(LSTScommon lsts)

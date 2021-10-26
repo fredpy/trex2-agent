@@ -56,7 +56,7 @@ namespace TREX {
        * @ingroup transaction
        */
       class graph_impl :boost::noncopyable,
-      public ENABLE_SHARED_FROM_THIS<graph_impl> {
+      public std::enable_shared_from_this<graph_impl> {
       public:
         typedef clock::date_type date_type;
                 
@@ -120,7 +120,7 @@ namespace TREX {
          *
          * @return The date associated to this graph
          */
-        boost::optional<date_type> get_date() const {
+        std::optional<date_type> get_date() const {
           return m_date->get_date();
         }
         
@@ -182,10 +182,10 @@ namespace TREX {
         
       private:
         
-        void declare(SHARED_PTR<node_impl> n, utils::Symbol const &name, transaction_flags flag);
-        void subscribe(SHARED_PTR<node_impl> n, utils::Symbol const &name, transaction_flags flag);
+        void declare(std::shared_ptr<node_impl> n, utils::Symbol const &name, transaction_flags flag);
+        void subscribe(std::shared_ptr<node_impl> n, utils::Symbol const &name, transaction_flags flag);
 
-        SHARED_PTR<clock>                      m_date;
+        std::shared_ptr<clock>                      m_date;
         
         /** @brief graph name local storage
          *
@@ -204,16 +204,16 @@ namespace TREX {
          * The strand which is used by this graph for accesses and updates
          * of its structure
          */
-        UNIQ_PTR<boost::asio::io_service::strand>          m_strand;
+        std::unique_ptr<boost::asio::io_service::strand>          m_strand;
 
-        std::set< SHARED_PTR<node_impl> > m_nodes;
+        std::set< std::shared_ptr<node_impl> > m_nodes;
         
-        void add_node_sync(SHARED_PTR<node_impl> n);
-        void rm_node_sync(SHARED_PTR<node_impl> n);
+        void add_node_sync(std::shared_ptr<node_impl> n);
+        void rm_node_sync(std::shared_ptr<node_impl> n);
         
         
-        void decl_sync(SHARED_PTR<node_impl> n, utils::Symbol name, transaction_flags flag);
-        void use_sync(SHARED_PTR<node_impl> n, utils::Symbol name, transaction_flags flag);
+        void decl_sync(std::shared_ptr<node_impl> n, utils::Symbol name, transaction_flags flag);
+        void use_sync(std::shared_ptr<node_impl> n, utils::Symbol name, transaction_flags flag);
         
         friend class node_impl;
       }; // TREX::transaction::details::graph_impl

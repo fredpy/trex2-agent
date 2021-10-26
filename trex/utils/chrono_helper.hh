@@ -34,107 +34,92 @@
 /** @file "trex/utils/chrono_helper.hh"
  * @brief chrono class helper utilities
  *
- * This header define utilities that helps manipulate and display chrono 
+ * This header define utilities that helps manipulate and display chrono
  * instances.
  *
  * @author Frederic Py <fpy@mbari.org>
  * @ingroup utils
  */
-#ifndef H_trex_utils_chrono_helper
-# define H_trex_utils_chrono_helper
+#pragma once
+#include <chrono>
+#include <iostream>
+#include <ostream>
 
-# include "platform/chrono.hh"
-# include "platform/cpp11_deleted.hh"
-# include <ostream>
-# include <iostream>
+namespace TREX::utils {
 
+/** @brief Human readable duration display
+ *
+ * @tparam CharT stream char type
+ * @tparam Traits stream char traits
+ * @tparam Rep duration base type
+ * @tparam Period duration precision period
+ *
+ * @param[in,out] out An output stream
+ * @param[in] d A duration
+ *
+ * Serialize the value of the duration @p d into @p out as an
+ * "human readable" value.
+ *
+ * @return @p out after the operation
+ */
+template <class CharT, class Traits, class Rep, class Period>
+std::basic_ostream<CharT, Traits> &
+display(std::basic_ostream<CharT, Traits> &out,
+        std::chrono::duration<Rep, Period> d) {
+  if (d < std::chrono::duration<Rep, Period>::zero()) {
+    d = -d;
+    out.put('-');
+  }
+  // Extract the number of seconds
+  std::chrono::seconds s = std::chrono::duration_cast<std::chrono::seconds>(d);
 
-namespace TREX {
-  namespace utils {
-    
-    /** @brief Human readable duration display
-     *
-     * @tparam CharT stream char type
-     * @tparam Traits stream char traits
-     * @tparam Rep duration base type
-     * @tparam Period duration precision period
-     *
-     * @param[in,out] out An output stream
-     * @param[in] d A duration
-     *
-     * Serialize the value of the duration @p d into @p out as an
-     * "human readable" value.
-     *
-     * @return @p out after the operation
-     */
-    template <class CharT, class Traits, class Rep, class Period>
-    std::basic_ostream<CharT, Traits> &display(std::basic_ostream<CharT, Traits> &out,
-                                               CHRONO::duration<Rep, Period> d) {
-      if( d < CHRONO::duration<Rep, Period>::zero() ) {
-        d = -d;
-        out.put('-');
+  if (s > std::chrono::seconds::zero()) {
+    d -= s;
+
+    // Extract number of minutes
+    std::chrono::minutes m =
+        std::chrono::duration_cast<std::chrono::minutes>(s);
+
+    if (m > std::chrono::minutes::zero()) {
+      s -= m;
+
+      // Extract the number of hours
+      std::chrono::hours h = std::chrono::duration_cast<std::chrono::hours>(m);
+
+      if (h > std::chrono::hours::zero()) {
+        m -= h;
+        // Display as hours:MM:SS.XXXX
+        out << h.count() << ':';
+        if (m < std::chrono::minutes(10))
+          out.put('0'); // Need 2 digits
       }
-      // Extract the number of seconds
-      CHRONO::seconds
-      s = CHRONO::duration_cast<CHRONO::seconds>(d);
-      
-      if( s>CHRONO::seconds::zero() ) {
-        d -= s;
-        
-        // Extract number of minutes
-        CHRONO::minutes
-        m = CHRONO::duration_cast<CHRONO::minutes>(s);
-        
-        if( m > CHRONO::minutes::zero() ) {
-          s -= m;
-          
-          // Extract the number of hours
-          CHRONO::hours
-          h = CHRONO::duration_cast<CHRONO::hours>(m);
-          
-          if( h > CHRONO::hours::zero() ) {
-            m -= h;
-            // Display as hours:MM:SS.XXXX
-            out<<h.count()<<':';
-            if( m < CHRONO::minutes(10) )
-              out.put('0'); // Need 2 digits
-          }
-          out<<m.count()<<':';
-          if( s < CHRONO::seconds(10) )
-            out.put('0'); // Need 2 digits
-        }
-      }
-      typedef CHRONO::duration<long double> f_secs;
-      f_secs ss = CHRONO::duration_cast<f_secs>(s);
-      ss += d;
-# ifndef CPP11_HAS_CHRONO
-      return CHRONO::duration_short(out)<<ss;
-# else
-      return out<<ss.count()<<" s";
-# endif
+      out << m.count() << ':';
+      if (s < std::chrono::seconds(10))
+        out.put('0'); // Need 2 digits
     }
-    
-    template<class Clock>
-    class chronograph :boost::noncopyable {
-    public:
-      typedef typename Clock::time_point time_point;
-      typedef typename Clock::duration   duration;
-      
-      chronograph(duration &dest):m_start(Clock::now()), output(dest) {
-        output = duration();
-      }
-      ~chronograph() {
-        output = Clock::now()-m_start;
-      }
-      
-    private:
-      time_point m_start;
-      duration &output;
-      
-      chronograph() DELETED;
-    };
-    
-  } // TREX::utils
-} // TREX
+  }
+  typedef std::chrono::duration<long double> f_secs;
+  f_secs ss = std::chrono::duration_cast<f_secs>(s);
+  ss += d;
+  return out << ss.count() << " s";
+}
 
-#endif // H_trex_utils_chrono_helper
+template <class Clock> class chronograph  {
+public:
+  typedef typename Clock::time_point time_point;
+  typedef typename Clock::duration duration;
+
+  chronograph(duration &dest) : m_start(Clock::now()), output(dest) {
+    output = duration();
+  }
+  ~chronograph() { output = Clock::now() - m_start; }
+
+private:
+  time_point m_start;
+  duration &output;
+
+  chronograph() = delete;
+  chronograph(chronograph const &) =delete;
+};
+
+} // namespace TREX::utils

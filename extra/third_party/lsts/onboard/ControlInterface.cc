@@ -11,7 +11,7 @@ using namespace TREX::LSTS;
 using namespace TREX::transaction;
 using namespace TREX::utils;
 
-namespace bfs=boost::filesystem;
+namespace bfs=std::filesystem;
 namespace xml = boost::property_tree::xml_parser;
 
 namespace
@@ -96,7 +96,7 @@ bool ControlInterface::is_open() const {
 
 // manipulators
 
-void ControlInterface::add_goal(goal_id const &g, boost::optional<std::string> const &id) {
+void ControlInterface::add_goal(goal_id const &g, std::optional<std::string> const &id) {
   {
     scoped_lock cs(m_mutex);
     m_pending_goals.insert(g);
@@ -270,7 +270,7 @@ void ControlInterface::proccess_message(std::string const &msg) {
   for( ; last!=i; ++i) {
     try {
       goal_id tmp = parse_goal(*i);
-      add_goal(tmp, TREX::utils::parse_attr< boost::optional<std::string> >(*i, "id"));
+      add_goal(tmp, TREX::utils::parse_attr< std::optional<std::string> >(*i, "id"));
       had_cmd = true;
     } catch(TREX::utils::Exception const &e) {
       syslog(log::warn)<<"Exception while building new goal: "<<e;

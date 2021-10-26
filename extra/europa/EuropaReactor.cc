@@ -77,7 +77,7 @@ EuropaReactor::EuropaReactor(TeleoReactor::xml_arg_type arg)
             parse_attr<size_t>(0, xml_factory::node(arg), "maxSteps"),
             parse_attr<size_t>(0, xml_factory::node(arg), "maxDepth")),
    m_completed_this_tick(false),
-   m_stats(manager().service()),
+   m_stats(manager().context()),
    m_old_plan_style(parse_attr<bool>(true, xml_factory::node(arg),
                                   "relation_gv")),
    m_full_log(parse_attr<bool>(false, xml_factory::node(arg),
@@ -87,8 +87,8 @@ EuropaReactor::EuropaReactor(TeleoReactor::xml_arg_type arg)
 
 
   boost::property_tree::ptree::value_type &cfg = xml_factory::node(arg);
-  boost::optional<std::string>
-    model = parse_attr< boost::optional<std::string> >(cfg, "model");
+  std::optional<std::string>
+    model = parse_attr< std::optional<std::string> >(cfg, "model");
 
   if( m_full_log )
     syslog(warn)<<"I will log all my plans as they are produced."
@@ -143,12 +143,12 @@ EuropaReactor::EuropaReactor(TeleoReactor::xml_arg_type arg)
 
   // Getting planner configuration
   std::string attr = "plan_cfg", planner_cfg, synch_cfg;
-  boost::optional<std::string> tmp = parse_attr< boost::optional<std::string> >(cfg, attr);
+  std::optional<std::string> tmp = parse_attr< std::optional<std::string> >(cfg, attr);
  
   if( !tmp ) {
     syslog(null, warn)<<"Did not find planner_cfg attribute. Looking for legacy solverConfig instead.";
     attr = "solverConfig";
-    tmp = parse_attr< boost::optional<std::string> >(cfg, attr);
+    tmp = parse_attr< std::optional<std::string> >(cfg, attr);
     if( !tmp )
       throw XmlError(cfg, "Missing plan_cfg file attribute");
   }
@@ -162,7 +162,7 @@ EuropaReactor::EuropaReactor(TeleoReactor::xml_arg_type arg)
     throw ReactorException(*this, "Unable to locate planner cfg \""+(*tmp)+"\"");
   }
   // Getting synchronizer configuration
-  tmp = parse_attr< boost::optional<std::string> >(cfg, "synch_cfg");
+  tmp = parse_attr< std::optional<std::string> >(cfg, "synch_cfg");
   if( !tmp ) {
     syslog(null, warn)<<"Did not find synch_cfg attribute. Will use plan_cfg instead.";
     synch_cfg = planner_cfg;
@@ -380,7 +380,7 @@ bool EuropaReactor::dispatch(EUROPA::TimelineId const &tl,
     std::vector<EUROPA::ConstrainedVariableId> const &attrs = tok->parameters();
 
     // Get start, duration and end
-    UNIQ_PTR<DomainBase>
+    std::unique_ptr<DomainBase>
       d_start(details::trex_domain(tok->start()->lastDomain())),
       d_duration(details::trex_domain(tok->duration()->lastDomain())),
       d_end(details::trex_domain(tok->end()->lastDomain()));
@@ -395,7 +395,7 @@ bool EuropaReactor::dispatch(EUROPA::TimelineId const &tl,
       // Exclude "implicit_var_*"
       if( 0!=(*a)->getName().toString().compare(0, implicit_var.length(), 
 						implicit_var) ) {
-	UNIQ_PTR<DomainBase> dom(details::trex_domain((*a)->lastDomain()));
+	std::unique_ptr<DomainBase> dom(details::trex_domain((*a)->lastDomain()));
 	Variable attr((*a)->getName().toString(), *dom);
 	my_goal.restrictAttribute(attr);
       }
@@ -435,7 +435,7 @@ void EuropaReactor::plan_dispatch(EUROPA::TimelineId const &tl, EUROPA::TokenId 
 void EuropaReactor::restrict_goal(Goal& goal, EUROPA::TokenId const &tok)
 {
     std::vector<EUROPA::ConstrainedVariableId> const &attrs = tok->parameters();
-    UNIQ_PTR<DomainBase>
+    std::unique_ptr<DomainBase>
         d_start(details::trex_domain(tok->start()->lastDomain())),
         d_duration(details::trex_domain(tok->duration()->lastDomain())),
         d_end(details::trex_domain(tok->end()->lastDomain()));
@@ -450,7 +450,7 @@ void EuropaReactor::restrict_goal(Goal& goal, EUROPA::TokenId const &tok)
       // ignore implicit_var
       if( 0!=(*a)->getName().toString().compare(0, implicit_var.length(), 
 						implicit_var)) {
-	UNIQ_PTR<DomainBase> dom(details::trex_domain((*a)->lastDomain()));
+	std::unique_ptr<DomainBase> dom(details::trex_domain((*a)->lastDomain()));
 	Variable attr((*a)->getName().toString(), *dom);
 	goal.restrictAttribute(attr);
       }
@@ -778,7 +778,7 @@ void EuropaReactor::notify(EUROPA::LabelStr const &object,
     // ignore implicit_var
     if( 0!=(*a)->getName().toString().compare(0, implicit_var.length(), 
 					      implicit_var) ) {
-      UNIQ_PTR<TREX::transaction::DomainBase>
+      std::unique_ptr<TREX::transaction::DomainBase>
 	dom(details::trex_domain((*a)->lastDomain()));
       TREX::transaction::Variable var((*a)->getName().toString(), *dom);
       obs.restrictAttribute(var);
@@ -844,7 +844,7 @@ void EuropaReactor::logPlan(std::string const &base_name) const {
     name = base_name;
   
   LogManager::path_type full_name = file_name(name+".dot");
-  utils::async_ofstream out(manager().service(), full_name.string());
+  utils::async_ofstream out(manager().context(), full_name.string());
   {
     utils::async_ofstream::entry e = out.new_entry();
     print_plan(e.stream(), m_old_plan_style);

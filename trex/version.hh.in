@@ -34,11 +34,10 @@
 #ifndef H_trex_version
 # define H_trex_version
 
-# define TREX_MAJOR @TREX_MAJOR@
-# define TREX_MINOR @TREX_MINOR@
-# define TREX_PATCH @TREX_PATCH@
-# define TREX_RC    @TREX_RC@
+# define TREX_MAJOR @CMAKE_PROJECT_VERSION_MAJOR@
+# define TREX_MINOR @CMAKE_PROJECT_VERSION_MINOR@
+# define TREX_PATCH @CMAKE_PROJECT_VERSION_PATCH@
 
-# define TREX_VERSION "@VERSION@"
+# define TREX_VERSION "@CMAKE_PROJECT_VERSION@"
 
 #endif // H_trex_version

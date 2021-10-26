@@ -97,7 +97,7 @@ LogClock::LogClock(bpt::ptree::value_type &node)
   }
   bpt::ptree::assoc_iterator i, last;
   boost::tie(i, last) = tks.equal_range("tick");
-  boost::optional<transaction::TICK> prev;
+  std::optional<transaction::TICK> prev;
   for(; last!=i; ++i) {
     tick_info tck(*i);
     if( tck.count>0 ) {

@@ -141,7 +141,7 @@ namespace TREX {
       }
       
       async_result<void>    m_except;
-      boost::optional<Ret> m_value;
+      std::optional<Ret> m_value;
       
       friend class details::async_task<Ret>;
     }; // TREX::utils::async_result<>

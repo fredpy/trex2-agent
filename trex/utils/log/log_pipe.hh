@@ -69,7 +69,7 @@ namespace TREX {
         
         
         Symbol m_who, m_what;
-        WEAK_PTR<details::sig_impl>         m_log;
+        std::weak_ptr<details::sig_impl>         m_log;
 	std::ostream                               &m_dest;
 	std::streambuf                             *m_initial;
 	std::string                                m_msg;

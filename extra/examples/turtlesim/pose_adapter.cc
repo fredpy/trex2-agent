@@ -21,7 +21,7 @@ namespace TREX {
 
     transaction::observation_id ros_convert_traits<turtlesim::Pose>::ros_to_trex(utils::Symbol const &timeline,
 										 ros_convert_traits<turtlesim::Pose>::message_ptr const &msg) {
-      transaction::observation_id obs = MAKE_SHARED<transaction::Observation>(timeline, utils::Symbol("Hold"));
+      transaction::observation_id obs = std::make_shared<transaction::Observation>(timeline, utils::Symbol("Hold"));
       
       obs->restrictAttribute("x", transaction::FloatDomain(msg->x));
       obs->restrictAttribute("y", transaction::FloatDomain(msg->y));

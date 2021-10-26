@@ -44,9 +44,9 @@ cpu_clock::time_point cpu_clock::now() {
   getrusage(RUSAGE_SELF, &result);
   duration utime, stime;
   
-  utime = CHRONO::duration_cast<duration>(CHRONO::seconds(result.ru_utime.tv_sec)
-                                          +CHRONO::microseconds(result.ru_utime.tv_usec));
-  stime = CHRONO::duration_cast<duration>(CHRONO::seconds(result.ru_stime.tv_sec)
-                                          +CHRONO::microseconds(result.ru_stime.tv_usec));
+  utime = std::chrono::duration_cast<duration>(std::chrono::seconds(result.ru_utime.tv_sec)
+                                          +std::chrono::microseconds(result.ru_utime.tv_usec));
+  stime = std::chrono::duration_cast<duration>(std::chrono::seconds(result.ru_stime.tv_sec)
+                                          +std::chrono::microseconds(result.ru_stime.tv_usec));
   return time_point(utime+stime);
 }

@@ -108,14 +108,12 @@ namespace TREX {
         static std::string get_str(boost::property_tree::ptree const &pt,
                                    std::string const &name) {
           std::string path("<xmlattr>."+name);
-          
-          if( AttrOptional ) {
-            boost::optional<std::string> ret=pt.get_optional<std::string>(path);
-            
-            if( ret )
+          if constexpr (AttrOptional) {
+            if(auto ret=pt.get_optional<std::string>(path); ret) {
               return *ret;
+            }
             path = name;
-          }
+          } 
           return pt.get<std::string>(path);
         }
         
@@ -127,11 +125,11 @@ namespace TREX {
          * Extracts the value of the attribute @p name from the property tree
          * @p pt
          *
-         * @pre The path @c "<xmlattr>."+@p name exists or @p Ty is a boost::optional
+         * @pre The path @c "<xmlattr>."+@p name exists or @p Ty is a std::optional
          * @pre The value of the attribute can be parsed as a @p Ty
          *
          * @return the value of this attribute
-         * @note if @p Ty is a boost::optional and the attribute @p name does
+         * @note if @p Ty is a std::optional and the attribute @p name does
          *       not exists the returned value is an empty optional
          *
          * @throw bad_string_cast Failed to convert the attribute
@@ -145,31 +143,32 @@ namespace TREX {
       
 #ifndef DOXYGEN
       template<class Ty, bool AttrOptional>
-      struct attr_helper< boost::optional<Ty>, AttrOptional > {
+      struct attr_helper< std::optional<Ty>, AttrOptional > {
         
-        static boost::optional<std::string> get_str(boost::property_tree::ptree const &pt,
+        static std::optional<std::string> get_str(boost::property_tree::ptree const &pt,
                                                     std::string const &name) {
           std::string path("<xmlattr>."+name);
           
-          if( AttrOptional ) {
-            boost::optional<std::string> ret=pt.get_optional<std::string>(path);
-            
-            if( ret )
-              return ret;
+          if constexpr ( AttrOptional ) {
+            if(auto ret=pt.get_optional<std::string>(path); ret)
+              return *ret;
             path = name;
           }
-          return pt.get_optional<std::string>(path);
+          if(auto ret = pt.get_optional<std::string>(path); ret)  {
+            return *ret;
+          }
+          return std::nullopt;
         }
         
-        static boost::optional<Ty> get(boost::property_tree::ptree const &pt,
+        static std::optional<Ty> get(boost::property_tree::ptree const &pt,
                                        std::string const &name) {
-          boost::optional<std::string> tmp = get_str(pt, name);
+          std::optional<std::string> tmp = get_str(pt, name);
           if( tmp )
-            return boost::optional<Ty>(string_cast<Ty>(*tmp));
+            return std::optional<Ty>(string_cast<Ty>(*tmp));
           else
-            return boost::optional<Ty>();
+            return std::optional<Ty>();
         }
-      }; // TREX::utils::internals::attr_helper< boost::optional<> >
+      }; // TREX::utils::internals::attr_helper< std::optional<> >
 #endif // DOXYGEN
       
     } // TREX::utils::internals
@@ -267,10 +266,10 @@ namespace TREX {
     Ty parse_attr(Ty const &on_missing,
                   boost::property_tree::ptree const &node,
                   std::string const &attr) {
-      boost::optional<Ty> ret = parse_attr< boost::optional<Ty> >(node, attr);
-      if( !ret )
-        ret.reset(on_missing);
-      return *ret;
+      std::optional<Ty> ret = parse_attr< std::optional<Ty> >(node, attr);
+      if( ret )
+        return *ret;
+      return on_missing;
     }
     
     template<class Ty>

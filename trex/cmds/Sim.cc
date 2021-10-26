@@ -70,7 +70,7 @@ namespace {
   /** @brief entry point to TREX system log */
   SingletonUse<LogManager> s_log;
   
-  UNIQ_PTR<Agent> my_agent;
+  std::unique_ptr<Agent> my_agent;
   
   po::options_description opt("Usage:\n"
                               "  sim <mission>[.cfg] [options]\n\n"

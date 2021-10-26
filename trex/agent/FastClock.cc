@@ -24,8 +24,8 @@ FastClock::FastClock(bpt::ptree::value_type &node)
    m_no_skip(!utils::parse_attr<bool>(false, node, "skip")) {
   utils::SingletonUse<Clock::xml_factory> clk_f;
   
-  CHRONO::nanoseconds ns_tick = CHRONO::nanoseconds::zero();
-  typedef boost::optional< typename CHRONO::nanoseconds::rep >
+  std::chrono::nanoseconds ns_tick = std::chrono::nanoseconds::zero();
+  typedef std::optional< typename std::chrono::nanoseconds::rep >
     value_type;
   value_type value;
   bool has_attr = false;
@@ -34,42 +34,42 @@ FastClock::FastClock(bpt::ptree::value_type &node)
   value = utils::parse_attr<value_type>(node, "nanos");
   if( value ) {
     has_attr = true;
-    ns_tick += CHRONO::nanoseconds(*value);
+    ns_tick += std::chrono::nanoseconds(*value);
   }
   
   // Get microseconds
   value = utils::parse_attr<value_type>(node, "micros");
   if( value ) {
     has_attr = true;
-    ns_tick += CHRONO::microseconds(*value);
+    ns_tick += std::chrono::microseconds(*value);
   }
   
   // Get milliseconds
   value = utils::parse_attr<value_type>(node, "millis");
   if( value ) {
     has_attr = true;
-    ns_tick += CHRONO::milliseconds(*value);
+    ns_tick += std::chrono::milliseconds(*value);
   }
   
   // Get seconds
   value = utils::parse_attr<value_type>(node, "seconds");
   if( value ) {
     has_attr = true;
-    ns_tick += CHRONO::seconds(*value);
+    ns_tick += std::chrono::seconds(*value);
   }
   
   // Get minutes
   value = utils::parse_attr<value_type>(node, "minutes");
   if( value ) {
     has_attr = true;
-    ns_tick += CHRONO::minutes(*value);
+    ns_tick += std::chrono::minutes(*value);
   }
   
   // Get hours
   value = utils::parse_attr<value_type>(node, "hours");
   if( value ) {
     has_attr = true;
-    ns_tick += CHRONO::hours(*value);
+    ns_tick += std::chrono::hours(*value);
   }
 
   if( !has_attr ) {
@@ -79,7 +79,7 @@ FastClock::FastClock(bpt::ptree::value_type &node)
     throw utils::XmlError(node, oss.str());
   }
   
-  m_freq = CHRONO::duration_cast<duration_type>(ns_tick);
+  m_freq = std::chrono::duration_cast<duration_type>(ns_tick);
 
   // Extract the clock
   boost::property_tree::ptree::iterator i = node.second.begin();
@@ -93,12 +93,12 @@ FastClock::~FastClock() {}
 
 TICK FastClock::max_tick() const {
   TICK base = m_clock->max_tick(), mine;
-  typedef typename CHRONO::duration< double, CHRONO_NS::ratio<1> > tick_rate;
+  typedef typename std::chrono::duration< double, std::ratio<1> > tick_rate;
   typedef utils::chrono_posix_convert<tick_rate> convert;
 
   double seconds = convert::to_chrono(date_type(boost::posix_time::max_date_time)-epoch()).count();
 
-  seconds /= CHRONO::duration_cast<tick_rate>(m_freq).count(); 
+  seconds /= std::chrono::duration_cast<tick_rate>(m_freq).count(); 
   mine = std::floor(seconds);
   
   // Take the smallest value between the maximum tick of the base clock and

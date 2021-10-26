@@ -61,24 +61,24 @@ namespace {
     return false;
   }
   
-  typedef CHRONO::duration<double> fl_secs;
+  typedef std::chrono::duration<double> fl_secs;
 
   double tick_duration(ta::Clock const &c) {
-    return CHRONO::duration_cast<fl_secs>(c.tickDuration()).count();
+    return std::chrono::duration_cast<fl_secs>(c.tickDuration()).count();
   }
   
   double to_seconds(ta::Clock const &c, tt::TICK t) {
-    return CHRONO::duration_cast<fl_secs>(c.tickDuration()*t).count();
+    return std::chrono::duration_cast<fl_secs>(c.tickDuration()*t).count();
   }
   
-  SHARED_PTR<ta::FastClock> fast_clock_init(ta::clock_ref const &base,
+  std::shared_ptr<ta::FastClock> fast_clock_init(ta::clock_ref const &base,
                                             std::string const &date,
                                             double secs,
 					    bool no_skip) {
     ta::Clock::date_type epoch = TREX::utils::string_cast<ta::Clock::date_type>(date);
     fl_secs my_secs(secs);
-    return MAKE_SHARED<ta::FastClock>(base, epoch,
-                                      CHRONO::duration_cast<ta::Clock::duration_type>(my_secs), no_skip);
+    return std::make_shared<ta::FastClock>(base, epoch,
+                                      std::chrono::duration_cast<ta::Clock::duration_type>(my_secs), no_skip);
   }
 }
 
@@ -127,7 +127,7 @@ void export_agent() {
   s_py_err->attach<ta::Clock::Error>(clock_e.ptr());
   
   
-  class_<ta::RealTimeClock, bases<ta::Clock>, SHARED_PTR<ta::RealTimeClock>,
+  class_<ta::RealTimeClock, bases<ta::Clock>, std::shared_ptr<ta::RealTimeClock>,
 	 boost::noncopyable>
   ("rt_clock", "real time clock at 1000Hz resolution",
    init<ta::RealTimeClock::rep const &,
@@ -142,10 +142,10 @@ void export_agent() {
                              "                        is invalid"))
   ;
   
-  implicitly_convertible<SHARED_PTR<ta::RealTimeClock>, ta::clock_ref>();
+  implicitly_convertible<std::shared_ptr<ta::RealTimeClock>, ta::clock_ref>();
   
   
-  class_<ta::FastClock, bases<ta::Clock>, SHARED_PTR<ta::FastClock>,
+  class_<ta::FastClock, bases<ta::Clock>, std::shared_ptr<ta::FastClock>,
     boost::noncopyable>
   ("fast_clock", "clock that can go faster (or slower) than its associated clock",
    no_init)
@@ -160,9 +160,9 @@ void export_agent() {
        "      for example \'2016-05-31T20:10:05+00:00\'")
   ;
   
-  implicitly_convertible<SHARED_PTR<ta::FastClock>,ta::clock_ref>();
+  implicitly_convertible<std::shared_ptr<ta::FastClock>,ta::clock_ref>();
   
-  class_<ta::StepClock, bases<ta::Clock>, SHARED_PTR<ta::StepClock>,
+  class_<ta::StepClock, bases<ta::Clock>, std::shared_ptr<ta::StepClock>,
          boost::noncopyable>("sim_clock",
                              "Simulated clock.\n"
                              "A clock that do not advance ticks in real-time\n"
@@ -174,7 +174,7 @@ void export_agent() {
                              init<unsigned int>(args("self", "nsteps")))
   ;
   
-  implicitly_convertible<SHARED_PTR<ta::StepClock>, ta::clock_ref>();
+  implicitly_convertible<std::shared_ptr<ta::StepClock>, ta::clock_ref>();
   
   class_<ta::Agent, bases<tt::graph>, boost::noncopyable>
   ("agent", "TREX agent class.\n"

@@ -59,7 +59,7 @@ namespace TREX {
         ros::NodeHandle &m_handle;
         log_fn m_log;
         
-        handle_proxy() DELETED;
+        handle_proxy() =delete;
       };
 
       

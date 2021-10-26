@@ -324,7 +324,7 @@ namespace TREX {
        * from XML.
        */
       typedef TREX::utils::XmlFactory< Predicate,
-      SHARED_PTR<Predicate> > xml_factory;
+      std::shared_ptr<Predicate> > xml_factory;
       
       /** @brief Check for predicate compatibility
        *
@@ -433,7 +433,7 @@ namespace TREX {
       
 # ifndef DOXYGEN
       // No code for following methods
-      Predicate() DELETED;
+      Predicate() =delete;
 # endif
       
     }; // TREX::transaction::Predicate

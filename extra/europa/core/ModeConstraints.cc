@@ -35,7 +35,7 @@
 #include "trex/europa/Assembly.hh"
 #include "trex/europa/bits/europa_helpers.hh"
 
-#include <trex/utils/platform/memory.hh>
+#include <memory>
 
 // include plasma header as system files in order to disable warnings
 # define TREX_PP_SYSTEM_FILE <PLASMA/TokenVariable.hh>
@@ -94,7 +94,7 @@ void CheckInternal::handleExecute() {
 	  return;
 	} else if( m_test->isSingleton() ) {
 	  // Build the new domain based on test value
-	  UNIQ_PTR<EUROPA::ObjectDomain> tmp;
+	  std::unique_ptr<EUROPA::ObjectDomain> tmp;
 	  if( m_test->isMember(true) )
 	    tmp.reset(new EUROPA::ObjectDomain(type, internals));
 	  else 
@@ -161,7 +161,7 @@ void CheckExternal::handleExecute() {
 	  return;
 	} else if( m_test->isSingleton() ) {
 	  // Build the new domain based on test value
-	  UNIQ_PTR<EUROPA::ObjectDomain> tmp;
+	  std::unique_ptr<EUROPA::ObjectDomain> tmp;
 	  if( m_test->isMember(true) )
 	    tmp.reset(new EUROPA::ObjectDomain(type, externals));
 	  else 

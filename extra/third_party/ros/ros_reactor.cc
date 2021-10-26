@@ -60,7 +60,7 @@ ros_reactor::ros_reactor(TeleoReactor::xml_arg_type arg)
   ros_reactor *me = this;
   
   itt::type i = itt::build(ixml, me);
-  SHARED_PTR<details::ros_timeline> tl;
+  std::shared_ptr<details::ros_timeline> tl;
   size_t count = 0;
   
   while( m_factory->iter_produce(i, node.second.end(), tl) ) {

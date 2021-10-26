@@ -42,7 +42,7 @@ namespace asio=boost::asio;
 
 // structors
 
-priority_strand::pimpl::pimpl(SHARED_PTR<strand_type> const &s)
+priority_strand::pimpl::pimpl(std::shared_ptr<strand_type> const &s)
 :m_strand(s), m_active(false), m_running(false) {}
 
 priority_strand::pimpl::~pimpl() {
@@ -75,7 +75,7 @@ bool priority_strand::pimpl::empty() const {
 // modifiers
 
 void priority_strand::pimpl::enqueue(priority_strand::pimpl::task_ref tsk) {
-  SHARED_PTR<pimpl> me = shared_from_this();
+  std::shared_ptr<pimpl> me = shared_from_this();
   bool should_post = false;
   
   {
@@ -102,7 +102,7 @@ void priority_strand::pimpl::clear() {
 }
 
 void priority_strand::pimpl::start() {
-  SHARED_PTR<pimpl> me = shared_from_this();
+  std::shared_ptr<pimpl> me = shared_from_this();
   bool was_active = true, queued_tasks;
   {
     boost::upgrade_lock<boost::shared_mutex> test(m_mutex);
@@ -125,7 +125,7 @@ void priority_strand::pimpl::stop() {
 // strand protected functions
 
 void priority_strand::pimpl::dequeue_sync() {
-  SHARED_PTR<pimpl> me = shared_from_this();
+  std::shared_ptr<pimpl> me = shared_from_this();
   task_ref nxt;
   bool should_post = false;
   

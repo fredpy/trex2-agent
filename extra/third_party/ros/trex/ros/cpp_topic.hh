@@ -73,7 +73,7 @@ namespace TREX {
         }
         
         void update_next(transaction::TICK date,
-                         boost::optional<transaction::Observation> const &obs,
+                         std::optional<transaction::Observation> const &obs,
                          transaction::TICK since) {
           transaction::goal_id cur;
           m_next = date+1;
@@ -194,7 +194,7 @@ namespace TREX {
         ros::Publisher m_pub;
         
         transaction::TICK m_next;
-        boost::optional<message_ptr>    m_active_cmd;
+        std::optional<message_ptr>    m_active_cmd;
         std::list<transaction::goal_id> m_pending;
         
       };
@@ -218,7 +218,7 @@ namespace TREX {
         void set_log(handle_proxy::log_fn const &) {}
         
         void update_next(transaction::TICK,
-                         boost::optional<transaction::Observation> const &,
+                         std::optional<transaction::Observation> const &,
                          transaction::TICK) {}
         transaction::TICK next() const {
           return 0;
@@ -263,7 +263,7 @@ namespace TREX {
       }
       
       void init_subscriber(ros::Subscriber &sub) {
-        WEAK_PTR<details::ros_timeline> me(shared_from_this());
+        std::weak_ptr<details::ros_timeline> me(shared_from_this());
         boost::function<void (message_ptr const &)> cb = boost::bind(&cpp_topic::message, me, _1);
         
         sub = ros().handle().subscribe(topic(), 10, cb);
@@ -283,9 +283,9 @@ namespace TREX {
         do_notify(obs);
       }
                           
-      static void message(WEAK_PTR<details::ros_timeline> p,
+      static void message(std::weak_ptr<details::ros_timeline> p,
                           message_ptr const &msg) {
-        SHARED_PTR<details::ros_timeline> ptr = p.lock();
+        std::shared_ptr<details::ros_timeline> ptr = p.lock();
         if( ptr ) {
           cpp_topic *me = dynamic_cast<cpp_topic *>(ptr.get());
           if( NULL!=me )

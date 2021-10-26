@@ -62,7 +62,7 @@ namespace tr=TREX::transaction;
 
 tr::DomainBase *TREX::europa::details::trex_domain(EUROPA::Domain const &dom) {
   EUROPA::DataTypeId const &type(dom.getDataType());
-  UNIQ_PTR<tr::DomainBase> result;
+  std::unique_ptr<tr::DomainBase> result;
 
   // There should be a less hard-coded way to do it ...
   // this current implementation is not really open to the addition of
@@ -217,7 +217,7 @@ namespace {
 
 void details::europa_domain::visit(tr::BasicInterval const *dom) {
   if( m_dom->isInterval() ) {
-    UNIQ_PTR<EUROPA::Domain> tmp(m_dom->copy());
+    std::unique_ptr<EUROPA::Domain> tmp(m_dom->copy());
     
     if( m_dom->isBool() ) {
       // Handle the boolean special case: we assume here that the T-REX 

@@ -79,7 +79,7 @@ namespace TREX {
         void flush();
         
       private:
-        SHARED_PTR<std::ofstream> m_file;
+        std::shared_ptr<std::ofstream> m_file;
       };
       
     }

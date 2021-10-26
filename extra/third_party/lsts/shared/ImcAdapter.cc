@@ -7,561 +7,510 @@
 
 #include "trex/lsts/ImcAdapter.hh"
 
-namespace TREX
-{
-  namespace LSTS
-  {
+using TREX::LSTS::ImcAdapter;
 
-    namespace {
-      
-      class graph_proxy :public ImcAdapter::tick_proxy {
-      public:
-        graph_proxy(graph const &ref):m_graph(ref) {}
-        ~graph_proxy() {}
-        
-        tick_type current_tick() {
-          return m_graph.getCurrentTick();
-        }
-        date_type tick_to_date(tick_type const &tck) {
-          return m_graph.tickToTime(tck);
-        }
-        tick_type date_to_tick(date_type const &date) {
-          return m_graph.timeToTick(date);
-        }
-        std::string date_str(tick_type const &tck) {
-          return date_export(m_graph, tck);
-        }
-        std::string duration_str(tick_type const &tck) {
-          return duration_export(m_graph, tck);
-        }
-        tick_type as_date(std::string const &date) {
-          return m_graph.as_date(date);
-        }
-        tick_type as_duration(std::string const &date) {
-          return m_graph.as_duration(date);
-        }
-        
-        utils::log::stream log(utils::Symbol const &kind) {
-          return m_graph.syslog("imc", kind);
-        }
+using TREX::transaction::Observation;
+using TREX::transaction::Goal;
+using TREX::transaction::Predicate;
+using TREX::transaction::BooleanDomain;
+using TREX::transaction::EnumDomain;
+using TREX::transaction::FloatDomain;
+using TREX::transaction::IntegerDomain;
+using TREX::transaction::StringDomain;
+using TREX::transaction::Variable;
 
-      private:
-        graph const &m_graph;
-        
-      };
-      
+using DUNE::IMC::VehicleMedium;
+using DUNE::IMC::EstimatedState;
+using DUNE::IMC::FollowRefState;
+using DUNE::IMC::PlanControlState;
+using DUNE::IMC::OperationalLimits;
+using DUNE::IMC::Announce;
+using DUNE::IMC::TrexToken;
+using DUNE::IMC::TrexAttribute;
+using DUNE::IMC::Message;
+using DUNE::IMC::ImcIridiumMessage;
+
+namespace {
+
+class graph_proxy : public ImcAdapter::tick_proxy {
+public:
+  graph_proxy(TREX::transaction::graph const &ref) : m_graph(ref) {}
+  ~graph_proxy() {}
+
+  tick_type current_tick() { return m_graph.getCurrentTick(); }
+  date_type tick_to_date(tick_type const &tck) {
+    return m_graph.tickToTime(tck);
+  }
+  tick_type date_to_tick(date_type const &date) {
+    return m_graph.timeToTick(date);
+  }
+  std::string date_str(tick_type const &tck) {
+    return date_export(m_graph, tck);
+  }
+  std::string duration_str(tick_type const &tck) {
+    return duration_export(m_graph, tck);
+  }
+  tick_type as_date(std::string const &date) { return m_graph.as_date(date); }
+  tick_type as_duration(std::string const &date) {
+    return m_graph.as_duration(date);
+  }
+
+  TREX::utils::log::stream log(TREX::utils::Symbol const &kind) {
+    return m_graph.syslog("imc", kind);
+  }
+
+private:
+  TREX::transaction::graph const &m_graph;
+};
+
+} // namespace
+
+// statics 
+
+int ImcAdapter::m_trex_id = 0, ImcAdapter::m_platf_id = 0,
+    ImcAdapter::m_iridium_req = 0;
+
+
+ImcAdapter::ImcAdapter()
+    : c_imc_header_length(sizeof(DUNE::IMC::Header)),
+      c_max_iridium_payload_length(260) {
+  m_trex_id = 65000;
+  m_platf_id = 0;
+  m_iridium_req = 0;
+  bfr = new uint8_t[65535];
+  messenger = NULL;
+}
+
+Observation ImcAdapter::vehicleMediumObservation(VehicleMedium *msg) {
+  if (msg != NULL) {
+    switch (msg->medium) {
+    case (VehicleMedium::VM_WATER):
+      return Observation("medium", "Water");
+      break;
+    case (VehicleMedium::VM_UNDERWATER):
+      return Observation("medium", "Underwater");
+      break;
+    case (VehicleMedium::VM_AIR):
+      return Observation("medium", "Air");
+      break;
+    case (VehicleMedium::VM_GROUND):
+      return Observation("medium", "Ground");
+      break;
+    default:
+      break;
     }
-    
-    int ImcAdapter::m_trex_id = 0,
-        ImcAdapter::m_platf_id = 0,
-        ImcAdapter::m_iridium_req = 0;
-    
-    ImcAdapter::ImcAdapter() :
-        c_imc_header_length(sizeof(IMC::Header)),
-        c_max_iridium_payload_length(260)
-    {
-      m_trex_id = 65000;
-      m_platf_id = 0;
-      m_iridium_req = 0;
-      bfr = new uint8_t[65535];
-      messenger = NULL;
+  }
+  return Observation("medium", "Unknown");
+}
+
+Observation ImcAdapter::estimatedStateObservation(EstimatedState *msg) {
+  if (msg == NULL)
+    return Observation("estate", "Boot");
+
+  Observation obs("estate", "Position");
+
+  setPlatformId(msg->getSource());
+
+  double latitude, longitude;
+  latitude = msg->lat;
+  longitude = msg->lon;
+  WGS84::displace(msg->x, msg->y, &latitude, &longitude);
+  obs.restrictAttribute("latitude", FloatDomain(latitude));
+  obs.restrictAttribute("longitude", FloatDomain(longitude));
+
+  // msg->toText(std::cout);
+  if (msg->depth > 0)
+    obs.restrictAttribute("z", FloatDomain(msg->depth));
+  else if (msg->alt > 0)
+    obs.restrictAttribute("z", FloatDomain(-msg->alt));
+  else if (msg->height != -1)
+    obs.restrictAttribute("z", FloatDomain(msg->height + (-msg->z)));
+
+  if (msg->depth > 0)
+    obs.restrictAttribute("depth", FloatDomain(msg->depth /*+ (- msg->z)*/));
+  if (msg->alt > 0)
+    obs.restrictAttribute("altitude", FloatDomain(msg->alt));
+  if (msg->height != -1)
+    obs.restrictAttribute("height", FloatDomain(msg->height + (-msg->z)));
+
+  return obs;
+}
+
+void ImcAdapter::setReactorGraph(transaction::graph const &g) {
+  if (NULL == m_cvt.get())
+    m_cvt.reset(new graph_proxy(g));
+}
+
+Observation ImcAdapter::followRefStateObservation(FollowRefState *msg) {
+  if (msg == NULL || msg->reference.isNull() || msg->control_src != m_trex_id ||
+      msg->state == FollowRefState::FR_TIMEOUT ||
+      msg->state == FollowRefState::FR_WAIT)
+    return Observation("reference", "Boot");
+
+  bool xy_near = (msg->proximity & FollowRefState::PROX_XY_NEAR) != 0;
+  bool z_near = (msg->proximity & FollowRefState::PROX_Z_NEAR) != 0;
+
+  Observation obs("refstate", "Going");
+
+  obs.restrictAttribute("near_z", BooleanDomain((z_near)));
+  obs.restrictAttribute("near_xy", BooleanDomain((xy_near)));
+
+  obs.restrictAttribute("latitude", FloatDomain(msg->reference->lat));
+  obs.restrictAttribute("longitude", FloatDomain(msg->reference->lon));
+
+  if (!msg->reference->z.isNull()) {
+    switch (msg->reference->z->z_units) {
+    case (DUNE::IMC::Z_DEPTH):
+      obs.restrictAttribute("z", FloatDomain(msg->reference->z->value));
+      break;
+    case (DUNE::IMC::Z_ALTITUDE):
+      obs.restrictAttribute("z", FloatDomain(-msg->reference->z->value));
+      break;
+    case (DUNE::IMC::Z_HEIGHT):
+      obs.restrictAttribute("z", FloatDomain(msg->reference->z->value));
+      break;
+    default:
+      break;
     }
+  }
 
-    Observation
-    ImcAdapter::vehicleMediumObservation(VehicleMedium * msg)
-    {
+  if (!msg->reference->speed.isNull()) {
+    obs.restrictAttribute("speed", FloatDomain((msg->reference->speed->value)));
+  }
 
-      if (msg != NULL)
-      {
-        switch (msg->medium)
-        {
-          case (VehicleMedium::VM_WATER):
-            return Observation("medium", "Water");
-            break;
-          case (VehicleMedium::VM_UNDERWATER):
-            return Observation("medium", "Underwater");
-            break;
-          case (VehicleMedium::VM_AIR):
-            return Observation("medium", "Air");
-            break;
-          case (VehicleMedium::VM_GROUND):
-            return Observation("medium", "Ground");
-            break;
-          default:
-            break;
-        }
-      }
-      return Observation("medium", "Unknown");
-    }
+  return obs;
+}
 
-    Observation
-    ImcAdapter::estimatedStateObservation(EstimatedState * msg)
-    {
-      if (msg == NULL)
-        return Observation("estate", "Boot");
+Observation ImcAdapter::planControlStateObservation(PlanControlState *msg) {
+  if (msg != NULL) {
 
-      Observation obs("estate", "Position");
-
-      setPlatformId(msg->getSource());
-
-      double latitude, longitude;
-      latitude = msg->lat;
-      longitude = msg->lon;
-      WGS84::displace(msg->x, msg->y, &latitude, &longitude);
-      obs.restrictAttribute("latitude", FloatDomain(latitude));
-      obs.restrictAttribute("longitude", FloatDomain(longitude));
-
-      //msg->toText(std::cout);
-      if (msg->depth > 0)
-        obs.restrictAttribute("z", FloatDomain(msg->depth));
-      else if (msg->alt > 0)
-        obs.restrictAttribute("z", FloatDomain(-msg->alt));
-      else if (msg->height != -1)
-        obs.restrictAttribute("z", FloatDomain(msg->height + (-msg->z)));
-
-      if (msg->depth > 0)
-        obs.restrictAttribute("depth",
-                              FloatDomain(msg->depth /*+ (- msg->z)*/));
-      if (msg->alt > 0)
-        obs.restrictAttribute("altitude", FloatDomain(msg->alt));
-      if (msg->height != -1)
-        obs.restrictAttribute("height", FloatDomain(msg->height + (-msg->z)));
-
+    if (msg->state == PlanControlState::PCS_EXECUTING &&
+        msg->plan_id == "trex_plan") {
+      Observation obs = Observation("control", "TREX");
       return obs;
     }
+    return Observation("control", "DUNE");
+  }
 
-    void ImcAdapter::setReactorGraph(graph const &g)
-    {
-      if( NULL==m_cvt.get() )
-        m_cvt.reset(new graph_proxy(g));
-    }
+  return Observation("control", "Boot");
+}
 
-    Observation
-    ImcAdapter::followRefStateObservation(FollowRefState * msg)
-    {
-      if (msg == NULL || msg->reference.isNull()
-          || msg->control_src != m_trex_id
-          || msg->state == FollowRefState::FR_TIMEOUT
-          || msg->state == FollowRefState::FR_WAIT)
-        return Observation("reference", "Boot");
+Observation ImcAdapter::opLimitsObservation(OperationalLimits *msg) {
+  if (msg == NULL)
+    return Observation("oplimits", "Boot");
 
-      bool xy_near = (msg->proximity & FollowRefState::PROX_XY_NEAR) != 0;
-      bool z_near = (msg->proximity & FollowRefState::PROX_Z_NEAR) != 0;
+  Observation obs("oplimits", "Limits");
 
-      Observation obs("refstate", "Going");
+  if (msg->mask & DUNE::IMC::OPL_MAX_DEPTH)
+    obs.restrictAttribute("max_depth", FloatDomain(msg->max_depth));
 
-      obs.restrictAttribute("near_z", BooleanDomain((z_near)));
-      obs.restrictAttribute("near_xy", BooleanDomain((xy_near)));
+  if ((msg->mask & DUNE::IMC::OPL_MAX_ALT))
+    obs.restrictAttribute("max_altitude", FloatDomain(msg->max_altitude));
 
-      obs.restrictAttribute("latitude", FloatDomain(msg->reference->lat));
-      obs.restrictAttribute("longitude", FloatDomain(msg->reference->lon));
+  if (msg->mask & DUNE::IMC::OPL_MIN_ALT)
+    obs.restrictAttribute("min_altitude", FloatDomain(msg->min_altitude));
 
-      if (!msg->reference->z.isNull())
-      {
-        switch (msg->reference->z->z_units)
-        {
-          case (Z_DEPTH):
-            obs.restrictAttribute("z", FloatDomain(msg->reference->z->value));
-            break;
-          case (Z_ALTITUDE):
-            obs.restrictAttribute("z", FloatDomain(-msg->reference->z->value));
-            break;
-          case (Z_HEIGHT):
-            obs.restrictAttribute("z", FloatDomain(msg->reference->z->value));
-            break;
-          default:
-            break;
-        }
+  if (msg->mask & DUNE::IMC::OPL_MAX_SPEED)
+    obs.restrictAttribute("max_speed", FloatDomain(msg->max_speed));
+
+  if (msg->mask & DUNE::IMC::OPL_MIN_SPEED)
+    obs.restrictAttribute("min_speed", FloatDomain(msg->min_speed));
+
+  InsideOpLimits::set_oplimits(msg);
+
+  return obs;
+}
+
+Observation ImcAdapter::announceObservation(Announce *msg) {
+  std::string system = msg->sys_name;
+  std::replace(system.begin(), system.end(), '-', '_');
+
+  double age = DUNE::Time::Clock::getSinceEpoch() - msg->getTimeStamp();
+
+  if (age > 15) {
+    Observation obs(system, "position");
+    obs.restrictAttribute("latitude", FloatDomain(msg->lat));
+    obs.restrictAttribute("longitude", FloatDomain(msg->lon));
+    obs.restrictAttribute("height", FloatDomain(msg->height));
+    return obs;
+  }
+
+  Observation obs(system, "connected");
+  obs.restrictAttribute("latitude", FloatDomain(msg->lat));
+  obs.restrictAttribute("longitude", FloatDomain(msg->lon));
+  obs.restrictAttribute("height", FloatDomain(msg->height));
+
+  return obs;
+}
+
+Goal ImcAdapter::genericGoal(TrexToken *msg, bool restrict_to_future) {
+  Goal g(msg->timeline, msg->predicate);
+
+  DUNE::IMC::MessageList<TrexAttribute>::const_iterator it;
+  for (it = msg->attributes.begin(); it != msg->attributes.end(); it++) {
+    TrexAttribute *attr = *it;
+
+    //        std::cerr<< "Parsing attribute " << attr->name
+    //          <<"\n   - min= \""<<attr->min<<'\"'
+    //          <<"\n   - max= \""<<attr->max<<'\"'<<std::endl;
+
+    if (attr->name == "start" || attr->name == "end") {
+      IntegerDomain::bound min = IntegerDomain::minus_inf,
+                           max = IntegerDomain::plus_inf;
+      if (restrict_to_future)
+        min = m_cvt->current_tick();
+      if (!attr->min.empty())
+        min = m_cvt->as_date(attr->min);
+      if (!attr->max.empty())
+        max = m_cvt->as_date(attr->max);
+
+      if (attr->name == "start")
+        g.restrictStart(IntegerDomain(min, max));
+      else
+        g.restrictEnd(IntegerDomain(min, max));
+    } else if (attr->name == "duration") {
+      try {
+        IntegerDomain::bound min = 1, max = IntegerDomain::plus_inf;
+        if (!attr->min.empty())
+          min = m_cvt->as_duration(attr->min);
+        if (!attr->max.empty())
+          max = m_cvt->as_duration(attr->max);
+
+        g.restrictDuration(IntegerDomain(min, max));
+      } catch (std::exception &e) {
+        std::cerr << "Error while parsing duration: " << e.what() << std::endl;
       }
+    } else
+      setAttribute(g, *attr);
+    //        if( g.hasAttribute(attr->name) )
+    //          std::cerr<<"  -
+    //          "<<attr->name<<"="<<g.getAttribute(attr->name).domain()<<std::endl;
+  }
 
-      if (!msg->reference->speed.isNull())
-      {
-        obs.restrictAttribute("speed",
-                              FloatDomain((msg->reference->speed->value)));
-      }
+  return g;
+}
 
-      return obs;
+void ImcAdapter::setAttribute(Predicate &pred, TrexAttribute const &attr) {
+  IntegerDomain::bound min_i, max_i;
+  FloatDomain::bound min_f, max_f;
+  // MessageList<TrexAttribute>::const_iterator it;
+  std::string min = attr.min;
+  std::string max = attr.max;
+
+  //      std::cerr<<"set attribute "<<pred.object()<<"."<<pred.predicate()<<"."
+  //      <<attr.name<<std::endl;
+
+  switch (attr.attr_type) {
+  case TrexAttribute::TYPE_STRING:
+    if (min == max && !min.empty()) {
+      pred.restrictAttribute(attr.name, StringDomain(min));
+    }
+    break;
+
+  case TrexAttribute::TYPE_BOOL:
+    if (min == max && min != "")
+      pred.restrictAttribute(attr.name,
+                             BooleanDomain(min != "false" && min != "0"));
+    else
+      pred.restrictAttribute(attr.name, BooleanDomain());
+    break;
+
+  case TrexAttribute::TYPE_INT:
+    if (min == "")
+      min_i = IntegerDomain::minus_inf;
+    else
+      min_i = strtoll(min.c_str(), NULL, 10);
+
+    if (max == "")
+      max_i = IntegerDomain::plus_inf;
+    else
+      max_i = strtoll(max.c_str(), NULL, 10);
+
+    pred.restrictAttribute(attr.name, IntegerDomain(min_i, max_i));
+    break;
+
+  case TrexAttribute::TYPE_FLOAT:
+    if (min == "")
+      min_f = FloatDomain::minus_inf;
+    else
+      min_f = strtod(min.c_str(), NULL);
+
+    if (max == "")
+      max_f = FloatDomain::plus_inf;
+    else
+      max_f = strtod(max.c_str(), NULL);
+
+    pred.restrictAttribute(attr.name, FloatDomain(min_f, max_f));
+    break;
+
+  case TrexAttribute::TYPE_ENUM:
+    if (min == max && !min.empty()) {
+      //            std::cerr<<"enum("<<attr.name<<")=\""<<min<<"\""<<std::endl;
+      pred.restrictAttribute(attr.name, EnumDomain(min));
     }
 
-    Observation
-    ImcAdapter::planControlStateObservation(PlanControlState * msg)
-    {
-      if (msg != NULL)
-      {
+    break;
 
-        if (msg->state == PlanControlState::PCS_EXECUTING
-            && msg->plan_id == "trex_plan")
-        {
-          Observation obs = Observation("control", "TREX");
-          return obs;
-        }
-        return Observation("control", "DUNE");
-      }
+  default:
+    break;
+  }
+}
 
-      return Observation("control", "Boot");
-    }
+Observation ImcAdapter::genericObservation(TREX::transaction::TICK &date, TrexToken *msg) {
+  Observation obs(msg->timeline, msg->predicate);
 
-    Observation
-    ImcAdapter::opLimitsObservation(OperationalLimits * msg)
-    {
-      if (msg == NULL)
-        return Observation("oplimits", "Boot");
+  DUNE::IMC::MessageList<TrexAttribute>::const_iterator it;
+  for (it = msg->attributes.begin(); it != msg->attributes.end(); it++) {
+    setAttribute(obs, **it);
+  }
+  std::chrono::duration<double> t_stamp(msg->getTimeStamp());
+  typedef utils::chrono_posix_convert<std::chrono::duration<double>> cvt;
+  transaction::graph::date_type pdate =
+      boost::posix_time::from_time_t(0) + cvt::to_posix(t_stamp);
 
-      Observation obs("oplimits", "Limits");
+  date = m_cvt->date_to_tick(pdate);
 
-      if (msg->mask & IMC::OPL_MAX_DEPTH)
-        obs.restrictAttribute("max_depth", FloatDomain(msg->max_depth));
+  return obs;
+}
 
-      if ((msg->mask & IMC::OPL_MAX_ALT))
-        obs.restrictAttribute("max_altitude", FloatDomain(msg->max_altitude));
+bool ImcAdapter::sendAsynchronous(Message *msg, std::string addr, int port) {
+  if (msg->getTimeStamp() <= 0)
+    msg->setTimeStamp();
 
-      if (msg->mask & IMC::OPL_MIN_ALT)
-        obs.restrictAttribute("min_altitude", FloatDomain(msg->min_altitude));
+  if (msg->getSource() <= 0 || msg->getSource() == 65535)
+    msg->setSource(m_trex_id);
+  else
+    std::cerr << "Not touching given source id (" << msg->getSource() << ")"
+              << std::endl;
 
-      if (msg->mask & IMC::OPL_MAX_SPEED)
-        obs.restrictAttribute("max_speed", FloatDomain(msg->max_speed));
+  if (messenger == NULL)
+    messenger = new ImcMessenger();
+  messenger->post(msg, port, addr);
+  return true;
+}
 
-      if (msg->mask & IMC::OPL_MIN_SPEED)
-        obs.restrictAttribute("min_speed", FloatDomain(msg->min_speed));
+bool ImcAdapter::sendViaIridium(Message *msg, const std::string address,
+                                int port) {
+  if (msg->getTimeStamp() == 0)
+    msg->setTimeStamp();
 
-      InsideOpLimits::set_oplimits(msg);
+  uint8_t buffer[65635];
+  ImcIridiumMessage *irMsg = new ImcIridiumMessage(msg);
+  irMsg->destination = msg->getDestination();
+  if (msg->getSource() == 0 || msg->getSource() == 65535) {
+    irMsg->source = m_platf_id;
+    msg->setSource(m_platf_id);
+  } else {
+    irMsg->source = msg->getSource();
+  }
 
-      return obs;
-    }
+  int len = irMsg->serialize(buffer);
 
-    Observation
-    ImcAdapter::announceObservation(Announce * msg)
-    {
-      std::string system = msg->sys_name;
-      std::replace(system.begin(), system.end(), '-', '_');
+  // message needs to be fragmented...
+  if (len > c_max_iridium_payload_length) {
+    int i;
+    DUNE::Network::Fragments frags(msg, c_max_iridium_payload_length);
+    std::cout << "Message to be sent via iridium fragmented into "
+              << frags.getNumberOfFragments() << " fragments." << std::endl;
 
-      double age = Time::Clock::getSinceEpoch() - msg->getTimeStamp();
-
-      if (age > 15)
-      {
-        Observation obs(system, "position");
-        obs.restrictAttribute("latitude", FloatDomain(msg->lat));
-        obs.restrictAttribute("longitude", FloatDomain(msg->lon));
-        obs.restrictAttribute("height", FloatDomain(msg->height));
-        return obs;
-      }
-
-      Observation obs(system, "connected");
-      obs.restrictAttribute("latitude", FloatDomain(msg->lat));
-      obs.restrictAttribute("longitude", FloatDomain(msg->lon));
-      obs.restrictAttribute("height", FloatDomain(msg->height));
-
-      return obs;
-    }
-
-    Goal
-    ImcAdapter::genericGoal(TrexToken * msg, bool restrict_to_future)
-    {
-      Goal g(msg->timeline, msg->predicate);
-
-      MessageList<TrexAttribute>::const_iterator it;
-      for (it = msg->attributes.begin(); it != msg->attributes.end(); it++)
-      {
-        TrexAttribute * attr = *it;
-
-//        std::cerr<< "Parsing attribute " << attr->name
-//          <<"\n   - min= \""<<attr->min<<'\"'
-//          <<"\n   - max= \""<<attr->max<<'\"'<<std::endl;
-
-        if (attr->name == "start" || attr->name == "end")
-        {
-          IntegerDomain::bound min = IntegerDomain::minus_inf,
-            max = IntegerDomain::plus_inf;
-          if( restrict_to_future )
-            min = m_cvt->current_tick();
-          if (!attr->min.empty())
-            min = m_cvt->as_date(attr->min);
-          if (!attr->max.empty())
-            max = m_cvt->as_date(attr->max);
-
-          if (attr->name == "start")
-            g.restrictStart(IntegerDomain(min, max));
-          else
-            g.restrictEnd(IntegerDomain(min, max));
-        }
-        else if (attr->name == "duration")
-        {
-          try {
-            IntegerDomain::bound min = 1, max = IntegerDomain::plus_inf;
-            if (!attr->min.empty())
-              min = m_cvt->as_duration(attr->min);
-            if (!attr->max.empty())
-              max = m_cvt->as_duration(attr->max);
-
-            g.restrictDuration(IntegerDomain(min, max));
-          }
-          catch (std::exception &e) {
-            std::cerr << "Error while parsing duration: " << e.what() << std::endl;
-          }
-        }
-        else
-          setAttribute(g, *attr);
-//        if( g.hasAttribute(attr->name) )
-//          std::cerr<<"  - "<<attr->name<<"="<<g.getAttribute(attr->name).domain()<<std::endl;
-        
-      }
-
-      return g;
-    }
-
-    void
-    ImcAdapter::setAttribute(Predicate &pred, TrexAttribute const &attr)
-    {
-      IntegerDomain::bound min_i, max_i;
-      FloatDomain::bound min_f, max_f;
-      //MessageList<TrexAttribute>::const_iterator it;
-      std::string min = attr.min;
-      std::string max = attr.max;
-
-//      std::cerr<<"set attribute "<<pred.object()<<"."<<pred.predicate()<<"."
-//      <<attr.name<<std::endl;
-      
-      switch (attr.attr_type)
-      {
-        case TrexAttribute::TYPE_STRING:
-          if( min==max && !min.empty() ) {
-            pred.restrictAttribute(attr.name, StringDomain(min));
-          }
-          break;
-
-        case TrexAttribute::TYPE_BOOL:
-          if (min == max && min != "")
-            pred.restrictAttribute(attr.name,
-                                   BooleanDomain(min != "false" && min != "0"));
-          else
-            pred.restrictAttribute(attr.name, BooleanDomain());
-          break;
-
-        case TrexAttribute::TYPE_INT:
-          if (min == "")
-            min_i = IntegerDomain::minus_inf;
-          else
-            min_i = strtoll(min.c_str(), NULL, 10);
-
-          if (max == "")
-            max_i = IntegerDomain::plus_inf;
-          else
-            max_i = strtoll(max.c_str(), NULL, 10);
-
-          pred.restrictAttribute(attr.name, IntegerDomain(min_i, max_i));
-          break;
-
-        case TrexAttribute::TYPE_FLOAT:
-          if (min == "")
-            min_f = FloatDomain::minus_inf;
-          else
-            min_f = strtod(min.c_str(), NULL);
-
-          if (max == "")
-            max_f = FloatDomain::plus_inf;
-          else
-            max_f = strtod(max.c_str(), NULL);
-
-          pred.restrictAttribute(attr.name, FloatDomain(min_f, max_f));
-          break;
-
-        case TrexAttribute::TYPE_ENUM:
-          if( min==max && !min.empty() ) {
-//            std::cerr<<"enum("<<attr.name<<")=\""<<min<<"\""<<std::endl;
-            pred.restrictAttribute(attr.name, EnumDomain(min));
-          }
-
-          break;
-
-        default:
-          break;
-      }
-    }
-
-    Observation
-    ImcAdapter::genericObservation(TICK &date, TrexToken * msg)
-    {
-      Observation obs(msg->timeline, msg->predicate);
-
-      MessageList<TrexAttribute>::const_iterator it;
-      for (it = msg->attributes.begin(); it != msg->attributes.end(); it++)
-      {
-        setAttribute(obs, **it);
-      }
-      CHRONO::duration<double> t_stamp(msg->getTimeStamp());
-      typedef chrono_posix_convert< CHRONO::duration<double> > cvt;
-      graph::date_type
-        pdate = boost::posix_time::from_time_t(0)+cvt::to_posix(t_stamp);
-      
-      date = m_cvt->date_to_tick(pdate);
-      
-      return obs;
-    }
-
-    bool
-    ImcAdapter::sendAsynchronous(Message * msg, std::string addr, int port)
-    {
-       if (msg->getTimeStamp() <= 0)
-         msg->setTimeStamp();
-
-       if (msg->getSource() <= 0 || msg->getSource() == 65535)
-         msg->setSource(m_trex_id);
-       else
-         std::cerr << "Not touching given source id (" << msg->getSource() << ")" << std::endl;
-
-       if (messenger == NULL)
-        messenger = new ImcMessenger();
-      messenger->post(msg, port, addr);
-      return true;
-    }
-
-    bool
-    ImcAdapter::sendViaIridium(Message * msg, const std::string address,
-        int port)
-    {
-      if (msg->getTimeStamp() == 0)
-    	  msg->setTimeStamp();
-
-      uint8_t buffer[65635];
-      ImcIridiumMessage * irMsg = new ImcIridiumMessage(msg);
+    for (i = 0; i < frags.getNumberOfFragments(); i++) {
+      ImcIridiumMessage *irMsg = new ImcIridiumMessage(frags.getFragment(i));
+      uint8_t buff[512];
       irMsg->destination = msg->getDestination();
-      if (msg->getSource() == 0 || msg->getSource() == 65535) {
-        irMsg->source = m_platf_id;
-        msg->setSource(m_platf_id);
-      }
-      else {
-        irMsg->source = msg->getSource();
-      }
-
-      int len = irMsg->serialize(buffer);
-
-      // message needs to be fragmented...
-      if (len > c_max_iridium_payload_length)
-      {
-        int i;
-        DUNE::Network::Fragments frags(msg, c_max_iridium_payload_length);
-        std::cout << "Message to be sent via iridium fragmented into "
-            << frags.getNumberOfFragments() << " fragments." << std::endl;
-
-        for (i = 0; i < frags.getNumberOfFragments(); i++)
-        {
-          ImcIridiumMessage * irMsg = new ImcIridiumMessage(
-              frags.getFragment(i));
-          uint8_t buff[512];
-          irMsg->destination = msg->getDestination();
-          irMsg->source = msg->getSource();
-          int length = irMsg->serialize(buff);
-          IridiumMsgTx * tx = new IridiumMsgTx();
-          tx->ttl = 1800; // try sending this update for 30 minutes
-          tx->data.assign(buff, buff + length);
-          tx->setTimeStamp();
-          tx->req_id = (++m_iridium_req) % 65535;
-          if (!send(tx, address, port))
-            return false;
-        }
-        return true;
-      }
-      else
-      {
-        IridiumMsgTx * tx = new IridiumMsgTx();
-        tx->setSource(msg->getSource());
-        tx->setTimeStamp();
-        tx->ttl = 1800;
-        tx->data.assign(buffer, buffer + len);
-        tx->req_id = (++m_iridium_req) % 65535;
-        return send(tx, address, port);
-      }
-    }
-
-    Message *
-    ImcAdapter::pollAsynchronous()
-    {
-      if (messenger == NULL)
-        messenger = new ImcMessenger();
-      return messenger->receive();
-    }
-
-    bool
-    ImcAdapter::bindSynchronous(int port)
-    {
-      sock_receive.bind(port, Address::Any, true);
-      m_poll.add(sock_receive);
-
-      return true;
-    }
-
-    Message *
-    ImcAdapter::pollSynchronous()
-    {
-      if (m_poll.poll(0))
-      {
-        Address addr;
-        uint16_t rv = sock_receive.read(bfr, 65535, &addr);
-        IMC::Message * msg = IMC::Packet::deserialize(bfr, rv);
-        return msg;
-      }
-      return NULL;
-    }
-
-    bool
-    ImcAdapter::sendSynchronous(Message * msg, std::string addr, int port)
-    {
-      if (msg->getTimeStamp() <= 0)
-         msg->setTimeStamp();
-
-      if (msg->getSource() <= 0 || msg->getSource() == 65535)
-        msg->setSource(m_trex_id);
-      else
-        std::cerr << "Not touching given source id (" << msg->getSource() << ")" << std::endl;
-
-      DUNE::Utils::ByteBuffer bb;
-      try
-      {
-        IMC::Packet::serialize(msg, bb);
-
-        return sock_send.write(bb.getBuffer(), msg->getSerializationSize(),
-                               Address(addr.c_str()), port);
-      }
-      catch (std::runtime_error& e)
-      {
-        std::cerr << "ERROR: " << ": " << e.what() << "\n";
+      irMsg->source = msg->getSource();
+      int length = irMsg->serialize(buff);
+      DUNE::IMC::IridiumMsgTx *tx = new DUNE::IMC::IridiumMsgTx();
+      tx->ttl = 1800; // try sending this update for 30 minutes
+      tx->data.assign(buff, buff + length);
+      tx->setTimeStamp();
+      tx->req_id = (++m_iridium_req) % 65535;
+      if (!send(tx, address, port))
         return false;
-      }
-      return true;
     }
+    return true;
+  } else {
+    DUNE::IMC::IridiumMsgTx *tx = new DUNE::IMC::IridiumMsgTx();
+    tx->setSource(msg->getSource());
+    tx->setTimeStamp();
+    tx->ttl = 1800;
+    tx->data.assign(buffer, buffer + len);
+    tx->req_id = (++m_iridium_req) % 65535;
+    return send(tx, address, port);
+  }
+}
 
-    bool
-    ImcAdapter::bindAsynchronous(int port)
-    {
-      if (messenger != NULL)
-        unbindAsynchronous();
+Message *ImcAdapter::pollAsynchronous() {
+  if (messenger == NULL)
+    messenger = new ImcMessenger();
+  return messenger->receive();
+}
 
-      messenger = new ImcMessenger();
-      messenger->startListening(port);
+bool ImcAdapter::bindSynchronous(int port) {
+  sock_receive.bind(port, DUNE::Network::Address::Any, true);
+  m_poll.add(sock_receive);
 
-      return true;
-    }
+  return true;
+}
 
-    bool
-    ImcAdapter::unbindAsynchronous()
-    {
-      if (messenger != NULL)
-      {
-        messenger->stopListening();
-        delete messenger;
-      }
-      messenger = NULL;
-      return true;
-    }
+Message *ImcAdapter::pollSynchronous() {
+  if (m_poll.poll(0)) {
+    DUNE::Network::Address addr;
+    uint16_t rv = sock_receive.read(bfr, 65535, &addr);
+    auto *msg = DUNE::IMC::Packet::deserialize(bfr, rv);
+    return msg;
+  }
+  return NULL;
+}
 
-    bool
-    ImcAdapter::unbindSynchronous()
-    {
-      m_poll.remove(sock_receive);
+bool ImcAdapter::sendSynchronous(Message *msg, std::string addr, int port) {
+  if (msg->getTimeStamp() <= 0)
+    msg->setTimeStamp();
 
-      //sock_receive.delFromPoll(iom);
-      return true;
-    }
+  if (msg->getSource() <= 0 || msg->getSource() == 65535)
+    msg->setSource(m_trex_id);
+  else
+    std::cerr << "Not touching given source id (" << msg->getSource() << ")"
+              << std::endl;
+
+  DUNE::Utils::ByteBuffer bb;
+  try {
+    DUNE::IMC::Packet::serialize(msg, bb);
+
+    return sock_send.write(bb.getBuffer(), msg->getSerializationSize(),
+                           DUNE::Network::Address(addr.c_str()), port);
+  } catch (std::runtime_error &e) {
+    std::cerr << "ERROR: "
+              << ": " << e.what() << "\n";
+    return false;
+  }
+  return true;
+}
+
+bool ImcAdapter::bindAsynchronous(int port) {
+  if (messenger != NULL)
+    unbindAsynchronous();
+
+  messenger = new ImcMessenger();
+  messenger->startListening(port);
+
+  return true;
+}
+
+bool ImcAdapter::unbindAsynchronous() {
+  if (messenger != NULL) {
+    messenger->stopListening();
+    delete messenger;
+  }
+  messenger = NULL;
+  return true;
+}
+
+bool ImcAdapter::unbindSynchronous() {
+  m_poll.remove(sock_receive);
+
+  // sock_receive.delFromPoll(iom);
+  return true;
+}
 //
 //    bool
 //    ImcAdapter::startDiscovery()
@@ -588,185 +537,140 @@ namespace TREX
 //      return false;
 //    }
 
-    bool
-    ImcAdapter::variableToImc(Variable const &v, TrexAttribute * attr)
-    {
-      Symbol t = v.domain().getTypeName();
-      attr->name = v.name().str();
+bool ImcAdapter::variableToImc(Variable const &v, TrexAttribute *attr) {
+  utils::Symbol t = v.domain().getTypeName();
+  attr->name = v.name().str();
 
-      if (attr->name == "start" || attr->name == "end")
-      {
-        attr->attr_type = TrexAttribute::TYPE_STRING;
-        IntegerDomain const &id =
-            dynamic_cast<IntegerDomain const &>(v.domain());
-        if (id.isSingleton())
-        {
-          std::string s = m_cvt->date_str(id.lowerBound());
-          attr->min = s;
-          attr->max = s;
-        }
-        else
-        {
-          if (id.hasUpper())
-          {
-            std::string s = m_cvt->date_str(id.upperBound());
-            attr->max = s;
-          }
-          if (id.hasLower())
-          {
-            std::string s = m_cvt->date_str(id.lowerBound());
-            attr->min = s;
-          }
-        }
-        return true;
+  if (attr->name == "start" || attr->name == "end") {
+    attr->attr_type = TrexAttribute::TYPE_STRING;
+    IntegerDomain const &id = dynamic_cast<IntegerDomain const &>(v.domain());
+    if (id.isSingleton()) {
+      std::string s = m_cvt->date_str(id.lowerBound());
+      attr->min = s;
+      attr->max = s;
+    } else {
+      if (id.hasUpper()) {
+        std::string s = m_cvt->date_str(id.upperBound());
+        attr->max = s;
       }
-      else if (attr->name == "duration")
-      {
-        attr->attr_type = TrexAttribute::TYPE_STRING;
-        IntegerDomain const &id =
-            dynamic_cast<IntegerDomain const &>(v.domain());
-        if (id.isSingleton())
-        {
-          std::string s = m_cvt->duration_str(id.lowerBound());
-          attr->min = s;
-          attr->max = s;
-        }
-        else
-        {
-          if (id.hasUpper())
-          {
-            std::string s = m_cvt->duration_str(id.upperBound().value() + 1);
-            attr->max = s;
-          }
-          if (id.hasLower())
-          {
-            std::string s = m_cvt->duration_str(id.lowerBound().value() - 1);
-            attr->min = s;
-          }
-        }
-        return true;
+      if (id.hasLower()) {
+        std::string s = m_cvt->date_str(id.lowerBound());
+        attr->min = s;
       }
-      else if (t.str() == "float")
-      {
-        attr->attr_type = TrexAttribute::TYPE_FLOAT;
-      }
-      else if (t.str() == "int")
-      {
-        attr->attr_type = TrexAttribute::TYPE_INT;
-      }
-      else if (t.str() == "bool")
-      {
-        attr->attr_type = TrexAttribute::TYPE_BOOL;
-      }
-      else if (t.str() == "string")
-      {
-        attr->attr_type = TrexAttribute::TYPE_STRING;
-      }
-      else if (t.str() == "enum")
-      {
-        attr->attr_type = TrexAttribute::TYPE_ENUM;
-      } else {
-        if( v.domain().isEnumerated() ) {
-          log(utils::log::warn)<<"Unknown enum type "<<t<<" for attribute "<<attr->name;
-          // set unknown as enum for now
-          attr->attr_type = TrexAttribute::TYPE_ENUM;
-        } else {
-          log(utils::log::error)<<"Unknown interval type "<<t<<" for attribute "<<attr->name;
-          return false;
-        }
-      }
-
-      if (v.domain().isSingleton())
-      {
-        attr->max = v.domain().getStringSingleton();
-        attr->min = v.domain().getStringSingleton();
-      }
-      else
-      { // if (v.domain().isFull()) {
-        attr->max = "";
-        attr->min = "";
-      }
-      return true;
     }
-
-    void
-    ImcAdapter::asImcMessage(TICK date, Predicate const &obs, TrexToken * result)
-    {
-      bool duration_full = true, end_deduced = true;
-      
-      result->timeline = obs.object().str();
-      result->predicate = obs.predicate().str();
-      result->attributes.clear();
-
-      std::list<TREX::utils::Symbol> attrs;
-
-      
-      obs.listAttributes(attrs);
-      std::list<TREX::utils::Symbol>::iterator it;
-      
-      if( obs.has_temporal_scope() ) {
-        IntegerDomain duration(Goal::s_durationDomain);
-        
-        // check if duration is the default [1, +inf]
-        duration.restrictWith(obs.getAttribute(Goal::s_durationName).domain());
-        duration_full = duration.equals(Goal::s_durationDomain);
-      
-        // check if the end is directly deduced from start+duration
-        IntegerDomain start(Goal::s_dateDomain);
-          
-        start.restrictWith(obs.getAttribute(Goal::s_startName).domain());
-        Goal test("foo", "bar");
-        test.restrictTime(start, duration, Goal::s_dateDomain);
-        end_deduced = test.getEnd().equals(obs.getAttribute(Goal::s_endName).domain());
+    return true;
+  } else if (attr->name == "duration") {
+    attr->attr_type = TrexAttribute::TYPE_STRING;
+    IntegerDomain const &id = dynamic_cast<IntegerDomain const &>(v.domain());
+    if (id.isSingleton()) {
+      std::string s = m_cvt->duration_str(id.lowerBound());
+      attr->min = s;
+      attr->max = s;
+    } else {
+      if (id.hasUpper()) {
+        std::string s = m_cvt->duration_str(id.upperBound().value() + 1);
+        attr->max = s;
       }
-      
-      
-      for (it = attrs.begin(); it != attrs.end(); it++)
-      {
-        TrexAttribute attr;
-        Variable v = obs.getAttribute(*it);
-        // test if the domain is not restricted
-        bool full;
-        // special case for duration which is [1, +inf]
-        if( v.name()==Goal::s_durationName )
-          full = duration_full;
-        else if( v.name()==Goal::s_endName )
-          full = end_deduced;
-        else
-          full = v.domain().isFull();
-        
-        // Do not add domains that are not restricted
-        if( !full ) {
-          if( variableToImc(v, &attr) )
-            result->attributes.push_back(attr);
-        }
+      if (id.hasLower()) {
+        std::string s = m_cvt->duration_str(id.lowerBound().value() - 1);
+        attr->min = s;
       }
-      
-      boost::posix_time::time_duration
-        time = m_cvt->tick_to_date(date)-boost::posix_time::from_time_t(0);
-      
-      long double val = time.total_milliseconds();
-      val /= 1000.0;
-      result->setTimeStamp(static_cast<double>(val));
-      result->setSource(m_trex_id);
     }
-
-    void
-    ImcAdapter::setTrexId(int trex_id)
-    {
-      m_trex_id = trex_id;
-    }
-
-    void
-    ImcAdapter::setPlatformId(int platf_id)
-    {
-      m_platf_id = platf_id;
-    }
-
-    ImcAdapter::~ImcAdapter()
-    {
-      unbind();
+    return true;
+  } else if (t.str() == "float") {
+    attr->attr_type = TrexAttribute::TYPE_FLOAT;
+  } else if (t.str() == "int") {
+    attr->attr_type = TrexAttribute::TYPE_INT;
+  } else if (t.str() == "bool") {
+    attr->attr_type = TrexAttribute::TYPE_BOOL;
+  } else if (t.str() == "string") {
+    attr->attr_type = TrexAttribute::TYPE_STRING;
+  } else if (t.str() == "enum") {
+    attr->attr_type = TrexAttribute::TYPE_ENUM;
+  } else {
+    if (v.domain().isEnumerated()) {
+      log(utils::log::warn)
+          << "Unknown enum type " << t << " for attribute " << attr->name;
+      // set unknown as enum for now
+      attr->attr_type = TrexAttribute::TYPE_ENUM;
+    } else {
+      log(utils::log::error)
+          << "Unknown interval type " << t << " for attribute " << attr->name;
+      return false;
     }
   }
+
+  if (v.domain().isSingleton()) {
+    attr->max = v.domain().getStringSingleton();
+    attr->min = v.domain().getStringSingleton();
+  } else { // if (v.domain().isFull()) {
+    attr->max = "";
+    attr->min = "";
+  }
+  return true;
 }
 
+void ImcAdapter::asImcMessage(transaction::TICK date, Predicate const &obs,
+                              TrexToken *result) {
+  bool duration_full = true, end_deduced = true;
+
+  result->timeline = obs.object().str();
+  result->predicate = obs.predicate().str();
+  result->attributes.clear();
+
+  std::list<TREX::utils::Symbol> attrs;
+
+  obs.listAttributes(attrs);
+  std::list<TREX::utils::Symbol>::iterator it;
+
+  if (obs.has_temporal_scope()) {
+    IntegerDomain duration(Goal::s_durationDomain);
+
+    // check if duration is the default [1, +inf]
+    duration.restrictWith(obs.getAttribute(Goal::s_durationName).domain());
+    duration_full = duration.equals(Goal::s_durationDomain);
+
+    // check if the end is directly deduced from start+duration
+    IntegerDomain start(Goal::s_dateDomain);
+
+    start.restrictWith(obs.getAttribute(Goal::s_startName).domain());
+    Goal test("foo", "bar");
+    test.restrictTime(start, duration, Goal::s_dateDomain);
+    end_deduced =
+        test.getEnd().equals(obs.getAttribute(Goal::s_endName).domain());
+  }
+
+  for (it = attrs.begin(); it != attrs.end(); it++) {
+    TrexAttribute attr;
+    Variable v = obs.getAttribute(*it);
+    // test if the domain is not restricted
+    bool full;
+    // special case for duration which is [1, +inf]
+    if (v.name() == Goal::s_durationName)
+      full = duration_full;
+    else if (v.name() == Goal::s_endName)
+      full = end_deduced;
+    else
+      full = v.domain().isFull();
+
+    // Do not add domains that are not restricted
+    if (!full) {
+      if (variableToImc(v, &attr))
+        result->attributes.push_back(attr);
+    }
+  }
+
+  boost::posix_time::time_duration time =
+      m_cvt->tick_to_date(date) - boost::posix_time::from_time_t(0);
+
+  long double val = time.total_milliseconds();
+  val /= 1000.0;
+  result->setTimeStamp(static_cast<double>(val));
+  result->setSource(m_trex_id);
+}
+
+void ImcAdapter::setTrexId(int trex_id) { m_trex_id = trex_id; }
+
+void ImcAdapter::setPlatformId(int platf_id) { m_platf_id = platf_id; }
+
+ImcAdapter::~ImcAdapter() { unbind(); }

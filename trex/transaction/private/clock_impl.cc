@@ -54,7 +54,7 @@ bool details::clock::started() const {
   return m_started;
 }
 
-boost::optional<details::clock::date_type> details::clock::read_date() const {
+std::optional<details::clock::date_type> details::clock::read_date() const {
   boost::shared_lock<mutex_type> lock(m_mutex);
   return m_date;
 }
@@ -62,10 +62,9 @@ boost::optional<details::clock::date_type> details::clock::read_date() const {
 // modifiers
 
 void details::clock::set_date(details::clock::date_type const &val) {
-  boost::function<void ()> fn(boost::bind(&clock::set_date_sync,
-                                          shared_from_this(), val));
-  
-  utils::strand_run(m_strand, fn);
+  utils::strand_run(m_strand, [me=shared_from_this(), val] {
+    me->set_date_sync(val);
+  });
 }
 
 void details::clock::set_started(bool flag) {
@@ -73,8 +72,9 @@ void details::clock::set_started(bool flag) {
   //       thread starvation. It may be better to just do the
   //       update call directly instread of transiting through
   //       a strand
-  m_strand.dispatch(boost::bind(&clock::set_start_sync,
-                                shared_from_this(), flag));
+  m_strand.dispatch([me=shared_from_this(), flag] {
+    me->set_start_sync(flag);
+  });
 }
 
 // strand protected methods

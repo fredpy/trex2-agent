@@ -51,19 +51,9 @@ if(NOT DUNE_INCLUDE_DIR)
     "Set your DUNE_HOME where dune is installed.")
 endif(NOT DUNE_INCLUDE_DIR)
 
-include_directories(${DUNE_INCLUDE_DIR})
-include_directories(${EUROPA_INCLUDE_DIRS})
-include_directories(${CMAKE_SOURCE_DIR}/extra/europa ${CMAKE_BINARY_DIR}/trex/europa)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/shared)
-
-install(FILES ${DUNE_CORE_LIB} DESTINATION lib)
-#pic_protect(${DUNE_CORE_LIB})
-#message(STATUS "PIC protection: ${DUNE_CORE_LIB}")
-
-
 add_subdirectory(shared)
 add_subdirectory(common)
 add_subdirectory(onboard)
 add_subdirectory(shoreside)
 
-trex_cfg(cfg ${TREX_SHARED})
+install(DIRECTORY cfg DESTINATION shared/trex)

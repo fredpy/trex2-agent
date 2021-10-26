@@ -9,8 +9,11 @@
 #define DUMMYOP_HH_
 
 # include <trex/transaction/TeleoReactor.hh>
-# include <DUNE/DUNE.hpp>
 # include"SharedEnvironment.hh"
+
+# define DUNE_HEADER <DUNE/DUNE.hpp>
+# include <trex/lsts/bits/dune_include.hh>
+
 
 namespace TREX {
   /** @brief lsts plug-in

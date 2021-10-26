@@ -49,7 +49,7 @@ namespace TREX {
        *
        * @author Frederic Py <fredpy@gmail.com>
        */
-      class clock :boost::noncopyable,public ENABLE_SHARED_FROM_THIS<clock> {
+      class clock :boost::noncopyable,public std::enable_shared_from_this<clock> {
         /** @brief Underlying mutex used
          *
          * This is the type of mutex used by this class to protect access
@@ -104,7 +104,7 @@ namespace TREX {
          *
          * @sa clock::set_date(date_type const &)
          */
-        boost::optional<date_type> get_date() const {
+        std::optional<date_type> get_date() const {
           return read_date();
         }
         
@@ -142,7 +142,7 @@ namespace TREX {
         mutable mutex_type               m_mutex;
         
         bool                       m_started;
-        boost::optional<date_type> m_date;
+        std::optional<date_type> m_date;
         
         /** @brief Get current date
          *
@@ -152,7 +152,7 @@ namespace TREX {
          *       the proper access control allowing concurrent
          *       reads but blocked by a single write
          */
-        boost::optional<date_type> read_date() const;
+        std::optional<date_type> read_date() const;
         
         /** @brief Update clock date
          *
@@ -183,7 +183,7 @@ namespace TREX {
         void set_start_sync(bool flag);
         
         // following methods have puposedly no code
-        clock() DELETED;
+        clock() =delete;
       }; // TREX::transaction::details::clock
       
     } // TREX::transaction::details

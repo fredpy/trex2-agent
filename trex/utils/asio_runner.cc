@@ -44,12 +44,12 @@ using namespace boost::asio;
 namespace {
   
 #if !defined(CPP11_HAS_CHRONO) && defined(BOOST_CHRONO_HAS_HREAD_CLOCK)
-  typedef CHRONO::thread_clock perf_clock;
+  typedef std::chrono::thread_clock perf_clock;
 #else
   typedef cpu_clock perf_clock;
 #endif
   
-  typedef CHRONO::high_resolution_clock rt_clock;
+  typedef std::chrono::high_resolution_clock rt_clock;
 
 
   class timing_thread_log {
@@ -89,11 +89,11 @@ namespace {
 
 asio_runner::asio_runner() {
   // Create a work for maintaining our service 
-  m_active.reset(new io_service::work(m_io));
+  m_active.reset(new io_context::work(m_io));
 }
 
 asio_runner::asio_runner(size_t n_threads) {
-  m_active.reset(new io_service::work(m_io));
+  m_active.reset(new io_context::work(m_io));
   if( n_threads>0 )
     thread_count(n_threads);
 }

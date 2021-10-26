@@ -68,7 +68,7 @@ namespace TREX {
         virtual void add_goal(transaction::goal_id g) {}
         virtual void remove_goal(transaction::goal_id g) {}
         
-        boost::optional<transaction::Observation> const &last_obs() const {
+        std::optional<transaction::Observation> const &last_obs() const {
           return m_last_obs;
         }
         transaction::TICK obs_since() const {
@@ -88,10 +88,10 @@ namespace TREX {
         bool handle_request(transaction::goal_id g);
         void handle_recall(transaction::goal_id g);
         
-        boost::optional<transaction::Observation> m_last_obs;
+        std::optional<transaction::Observation> m_last_obs;
         transaction::TICK                         m_obs_since;
         
-        static void async_exec(WEAK_PTR<ros_timeline> me,
+        static void async_exec(std::weak_ptr<ros_timeline> me,
                                boost::function<void (cpp_topic_base *)> fn);
         
       }; // TREX::ROS::details::cpp_topic_base

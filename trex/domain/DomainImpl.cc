@@ -102,7 +102,7 @@ double TREX::transaction::ceil(double d, size_t places) {
 
 BooleanDomain::BooleanDomain(boost::property_tree::ptree::value_type &node)
   :BasicInterval(node), m_full(true) {
-  boost::optional<int> val = parse_attr< boost::optional<int> >(node, "value");
+  std::optional<int> val = parse_attr< std::optional<int> >(node, "value");
   if( val ) {
     m_val = (0!=val);
     m_full = false;

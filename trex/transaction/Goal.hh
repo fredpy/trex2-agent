@@ -308,7 +308,7 @@ namespace TREX {
      * @ingroup transaction
      * @relates class Goal
      */
-    typedef SHARED_PTR<Goal> goal_id;
+    typedef std::shared_ptr<Goal> goal_id;
     
   } // TREX::transaction
 } // TREX

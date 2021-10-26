@@ -33,85 +33,79 @@
 # POSSIBILITY OF SUCH DAMAGE.                                         #
 #######################################################################
 
+########################################################################
+# Europa                                                               #
+########################################################################
+find_package(Europa
+  COMPONENTS PlanDatabase ConstraintEngine TemporalNetwork Utils TinyXml 
+  NDDL RulesEngine Solvers System)
+if(NOT EUROPA_FOUND)
+  message(FATAL_ERROR "Failed to find Europa while WITH_EUROPA is ON")
+endif(NOT EUROPA_FOUND)
 
+if(EUROPA_HAVE_EFFECT)
+  # generate lightswitch.nddl for europa 2.6
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cfg/lightswitch_26.nddl
+    ${CMAKE_CURRENT_BINARY_DIR}/cfg/lightswitch.nddl COPYONLY)
+else(EUROPA_HAVE_EFFECT)
+  message(WARNING "Your europa version appears to be older than 2.6."
+    "Some new trex features have been disabled.")
+  # generate lightswitch.nddl for europa 2.5
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cfg/lightswitch_25.nddl
+    ${CMAKE_CURRENT_BINARY_DIR}/cfg/lightswitch.nddl COPYONLY)    
+endif(EUROPA_HAVE_EFFECT)
 
-if(WITH_EUROPA) 
+# install lightswitch.nddl
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cfg/lightswitch.nddl
+    DESTINATION shared/trex/cfg)
 
-  if(EUROPA_HAVE_EFFECT)
-    # generate lightswitch.nddl for europa 2.6
-    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cfg/lightswitch_26.nddl
-      ${CMAKE_CURRENT_BINARY_DIR}/cfg/lightswitch.nddl COPYONLY)
-  else(EUROPA_HAVE_EFFECT)
-    message(WARNING "Your europa version appears to be older than 2.6."
-      "Some new trex features have been disabled.")
-    # generate lightswitch.nddl for europa 2.5
-    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cfg/lightswitch_25.nddl
-      ${CMAKE_CURRENT_BINARY_DIR}/cfg/lightswitch.nddl COPYONLY)    
-  endif(EUROPA_HAVE_EFFECT)
-
-  # install lightswitch.nddl
-  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cfg/lightswitch.nddl
-    DESTINATION ${TREX_SHARED}/cfg)
-  set_property(GLOBAL APPEND PROPERTY ${PROJECT_NAME}_CFGS 
-    ${CMAKE_CURRENT_BINARY_DIR}/cfg)
-  
-  # plan archival options
-  
+# plan archival options
   set(EUROPA_ARCHIVALValues "EuropaDefault;Greedy;None")
 
-  set(EUROPA_ARCHIVAL "Greedy" CACHE STRING
+set(EUROPA_ARCHIVAL "Greedy" CACHE STRING
     "Europa archival technique used (${EUROPA_ARCHIVALValues})")
 
-
-  set_property(CACHE EUROPA_ARCHIVAL 
+set_property(CACHE EUROPA_ARCHIVAL 
     PROPERTY STRINGS ${EUROPA_ARCHIVALValues})
+mark_as_advanced(EUROPA_ARCHIVAL)
 
-  mark_as_advanced(EUROPA_ARCHIVAL)
 
-  # Check if valid option
-  list(FIND EUROPA_ARCHIVALValues ${EUROPA_ARCHIVAL} 
+# Check if valid option
+list(FIND EUROPA_ARCHIVALValues ${EUROPA_ARCHIVAL} 
     EUROPA_ARCHIVAL_VALID)
 
-  if(EUROPA_ARCHIVAL_VALID LESS 0) 
-    message(ERROR "EUROPA_ARCHIVAL='${EUROPA_ARCHIVAL}' is not a valid option.\n"
+if(EUROPA_ARCHIVAL_VALID LESS 0) 
+  message(ERROR "EUROPA_ARCHIVAL='${EUROPA_ARCHIVAL}' is not a valid option.\n"
       "Please select one of : ${EUROPA_ARCHIVALValues}")
-  else(EUROPA_ARCHIVAL_VALID LESS 0)
-    message(STATUS "EUROPA_ARCHIVAL='${EUROPA_ARCHIVAL}'")
-  endif(EUROPA_ARCHIVAL_VALID LESS 0)
+else(EUROPA_ARCHIVAL_VALID LESS 0)
+  message(STATUS "EUROPA_ARCHIVAL='${EUROPA_ARCHIVAL}'")
+endif(EUROPA_ARCHIVAL_VALID LESS 0)
 
-  
-  include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-  include_directories(${EUROPA_INCLUDE_DIRS})
-  include_directories(${CMAKE_BINARY_DIR} ${CMAKE_BINARY_DIR}/trex/europa)
+add_subdirectory(core)
 
-  add_subdirectory(core)
-  
-  trex_plugin(europa europa_plugin.cc
-    EuropaReactor.cc
-    extensions/Bind.cc
-    extensions/DoNotMatchFilter.cc
-    extensions/extensions.cc
-    extensions/EarliestFirstFlawManager.cc
-    extensions/GoalFilter.cc
-    extensions/Numeric.cc
-    extensions/Trigonometry.cc
-    extensions/Exponent.cc
-    # headers
-    EuropaReactor.hh
-    extensions/interv_patch.hh
-    extensions/Bind.hh
-    extensions/DoNotMatchFilter.hh
-    extensions/EarliestFirstFlawManager.hh
-    extensions/GoalFilter.hh
-    extensions/Numeric.hh
-    extensions/Trigonometry.hh
-    extensions/Exponent.hh
-    )
-  target_link_libraries(europa_pg TREXeuropa_core TREXtransaction)
+trex_plugin(europa)
+target_sources(europa PRIVATE
+  europa_plugin.cc
+  EuropaReactor.cc
+  extensions/Bind.cc
+  extensions/DoNotMatchFilter.cc
+  extensions/extensions.cc
+  extensions/EarliestFirstFlawManager.cc
+  extensions/GoalFilter.cc
+  extensions/Numeric.cc
+  extensions/Trigonometry.cc
+  extensions/Exponent.cc
+  # headers
+  EuropaReactor.hh
+  extensions/interv_patch.hh
+  extensions/Bind.hh
+  extensions/DoNotMatchFilter.hh
+  extensions/EarliestFirstFlawManager.hh
+  extensions/GoalFilter.hh
+  extensions/Numeric.hh
+  extensions/Trigonometry.hh
+  extensions/Exponent.hh
+)
+target_link_libraries(europa europa_core transaction)
 
-  install(DIRECTORY trex/ DESTINATION include/trex/
-    FILES_MATCHING PATTERN "*.hh" PATTERN "*.tcc"
-    PATTERN "private" EXCLUDE
-    PATTERN ".svn" EXCLUDE)
-
-endif(WITH_EUROPA)
+install(DIRECTORY cfg DESTINATION shared/trex)

@@ -35,7 +35,8 @@
 option(WITH_LSTS_SHORESIDE "Enable LSTS shore-side plug-in" OFF)
 
 if(WITH_LSTS_SHORESIDE)
-  trex_plugin(lstsshore 
+  trex_plugin(LSTSshore)
+  target_sources(LSTSshore PRIVATE 
     # source
     DTAReactor.cc
     PositionUpdater.cc 
@@ -45,7 +46,6 @@ if(WITH_LSTS_SHORESIDE)
     DTAReactor.hh
     PositionUpdater.hh
     YesMan.hh 
-    )
-  
-  target_link_libraries(lstsshore_pg LSTSshared)
+  )
+  target_link_libraries(LSTSshore lsts)
 endif(WITH_LSTS_SHORESIDE)

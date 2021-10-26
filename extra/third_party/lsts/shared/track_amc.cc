@@ -54,10 +54,10 @@
 namespace {
 #ifdef HAS_CLOCK_MONOTONIC_RAW
   struct raw_clock {
-    typedef CHRONO::nanoseconds          duration;
+    typedef std::chrono::nanoseconds          duration;
     typedef duration::rep                rep;
     typedef duration::period             period;
-    typedef CHRONO::time_point<raw_clock> time_point;
+    typedef std::chrono::time_point<raw_clock> time_point;
     
     static const bool is_steady = true;
     
@@ -77,7 +77,7 @@ namespace {
   
 #else // HAS_CLOCK_MONOTONIC_RAW
   
-  typedef CHRONO::high_resolution_clock raw_clock;
+  typedef std::chrono::high_resolution_clock raw_clock;
   
   std::string const raw_name("hires");
 
@@ -120,14 +120,14 @@ int main(int argc, char **argv) {
   
   char stats_buff[BUFF_SIZE+1];
   stats_buff[BUFF_SIZE] = '\0';
-  boost::optional<CHRONO::nanoseconds> prev_date, prev_raw, prev_stat, prev_dune;
+  std::optional<std::chrono::nanoseconds> prev_date, prev_raw, prev_stat, prev_dune;
   
   while(1) {
     std::ifstream in(path.c_str());
     
-    CHRONO::system_clock::time_point st = CHRONO::system_clock::now();
+    std::chrono::system_clock::time_point st = std::chrono::system_clock::now();
     raw_clock::time_point raw = raw_clock::now();
-    CHRONO::nanoseconds dune(DUNE::Time::Clock::getNsec());
+    std::chrono::nanoseconds dune(DUNE::Time::Clock::getNsec());
 
     if( !in.good() ) {
       std::cerr<<"Failed to open "<<path<<std::endl;
@@ -156,18 +156,18 @@ int main(int argc, char **argv) {
       stime *= ns_fact;
     
       
-      CHRONO::nanoseconds
-        rt = CHRONO::duration_cast<CHRONO::nanoseconds>(st.time_since_epoch()),
-        rtc = CHRONO::duration_cast<CHRONO::nanoseconds>(raw.time_since_epoch()),
+      std::chrono::nanoseconds
+        rt = std::chrono::duration_cast<std::chrono::nanoseconds>(st.time_since_epoch()),
+        rtc = std::chrono::duration_cast<std::chrono::nanoseconds>(raw.time_since_epoch()),
         ut(utime), st(stime);
       
       unsigned long long pcpu = 0;
       long double speed = 1.0, dune_speed = 1.0;
       
       if( prev_date ) {
-        CHRONO::nanoseconds dt = rt, dts = ut+st, dtr = rtc, dtd = dune;
+        std::chrono::nanoseconds dt = rt, dts = ut+st, dtr = rtc, dtd = dune;
         dt -= *prev_date;
-        if( dt>CHRONO::nanoseconds::zero() ) {
+        if( dt>std::chrono::nanoseconds::zero() ) {
           dts -= *prev_stat;
           pcpu = (100 * dts.count())/dt.count();
 
@@ -193,7 +193,7 @@ int main(int argc, char **argv) {
       prev_dune = dune;
       struct timespec rq, rm;
       rq.tv_sec = 0;
-      rq.tv_nsec = CHRONO::duration_cast<CHRONO::nanoseconds>(CHRONO::milliseconds(100)).count(); // wake up every 100ms or so
+      rq.tv_nsec = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::milliseconds(100)).count(); // wake up every 100ms or so
       nanosleep(&rq, &rm);
     }
     

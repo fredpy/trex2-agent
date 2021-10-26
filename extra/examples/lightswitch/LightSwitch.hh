@@ -100,7 +100,7 @@ namespace TREX {
       void setValue(bool val);
       
       std::list<TREX::transaction::goal_id> m_pending;
-      UNIQ_PTR<TREX::transaction::Observation> m_light_state;
+      std::unique_ptr<TREX::transaction::Observation> m_light_state;
 
       /** @brief Name of the predicate on */
       static TREX::utils::Symbol const onPred;

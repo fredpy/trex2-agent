@@ -54,9 +54,9 @@ namespace details {
       boost::tie(fn, h) = get_task();
       if( fn && h ) {
         wrapper cancel;
-        ERROR_CODE ec = make_error_code(ERRC::operation_canceled);
+        std::error_code ec = make_error_code(std::errc::operation_canceled);
         
-        cancel.set_exception(boost::copy_exception(SYSTEM_ERROR(ec)));
+        cancel.set_exception(boost::copy_exception(std::system_error(ec)));
         handling(h, cancel);
       }
     }
@@ -103,7 +103,7 @@ namespace details {
         // silently ignore exceptions from handlers
       }
     }
-    async_task() DELETED;
+    async_task() =delete;
   };
   
   

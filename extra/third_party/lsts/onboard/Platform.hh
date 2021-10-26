@@ -20,15 +20,18 @@
 # include <trex/domain/EnumDomain.hh>
 # include <boost/thread/thread.hpp>
 
-# include <DUNE/DUNE.hpp>
-# include <DUNE/Math/Angles.hpp>
-# include <DUNE/Coordinates/WGS84.hpp>
-
 # include <trex/lsts/EuropaExtensions.hh>
 # include <trex/lsts/ImcAdapter.hh>
 # include "../shared/LstsReactor.hh"
 # include "ControlInterface.hh"
 # include "SharedEnvironment.hh"
+
+# define DUNE_HEADER <DUNE/DUNE.hpp>
+# include <trex/lsts/bits/dune_include.hh>
+# define DUNE_HEADER <DUNE/Math/Angles.hpp>
+# include <trex/lsts/bits/dune_include.hh>
+# define DUNE_HEADER <DUNE/Coordinates/WGS84.hpp>
+# include <trex/lsts/bits/dune_include.hh>
 
 
 using namespace TREX::transaction;
@@ -87,7 +90,7 @@ namespace TREX {
       void handleTrexOperation(TrexOperation trexOp);
       void enqueueGoalToken(std::string goal_id, TrexToken token);
       void postObservationToken(TrexToken token);
-      typedef std::map<std::string, SHARED_PTR<Observation> > obs_map;
+      typedef std::map<std::string, std::shared_ptr<Observation> > obs_map;
       typedef std::map<std::string, Announce *> m_links;
       obs_map postedObservations;
       void handleEntityStates(std::vector<IMC::EntityState> entityStates, IMC::EntityList lastEntityList);
@@ -142,7 +145,7 @@ namespace TREX {
       IMC::Reference goingRef;
       bool m_reference_initialized;
 
-      boost::function<bool (goal_id)> m_going_platform;
+      std::function<bool (goal_id)> m_going_platform;
 
       /** @brief map of received messages (aggregated) */
       std::map<uint16_t, IMC::Message *> aggregate;

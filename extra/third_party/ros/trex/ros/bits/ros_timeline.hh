@@ -51,10 +51,10 @@ namespace TREX {
     namespace details {
       
       class ros_timeline :boost::noncopyable,
-      public ENABLE_SHARED_FROM_THIS<ros_timeline> {
+      public std::enable_shared_from_this<ros_timeline> {
       public:
-        typedef SHARED_PTR<ros_timeline> pointer;
-        // TODO: find a way to replace ros_reactor * by WEAK_PTR
+        typedef std::shared_ptr<ros_timeline> pointer;
+        // TODO: find a way to replace ros_reactor * by std::weak_ptr
         typedef utils::XmlFactory<ros_timeline, pointer, ros_reactor *> xml_factory;
         typedef xml_factory::argument_type                              xml_arg;
         
@@ -115,7 +115,7 @@ namespace TREX {
         bool const m_init;
         bool m_undefined, m_updated;
         
-        ros_timeline() DELETED;
+        ros_timeline() =delete;
         
         friend class ros_reactor;
       };

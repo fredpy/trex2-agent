@@ -124,7 +124,7 @@ namespace TREX {
      * @relates class Observation
      * @sa goal_id
      */
-    typedef SHARED_PTR<Observation> observation_id;
+    typedef std::shared_ptr<Observation> observation_id;
     
   } // TREX::transaction
 } // TREX

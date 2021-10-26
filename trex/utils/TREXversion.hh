@@ -88,14 +88,18 @@ namespace TREX {
      * Checks if this version is a release cnadidate or not
      * @sa rc_number()
      */
-    static bool is_release_candidate();
+    [[deprecated]] static bool is_release_candidate() {
+      return false;
+    }
     /** @brief release cancdidate version 
      *
      * @return The release candidate version number for this version or 0
      *   if this version is not an RC
      * @sa is_release_candidate()
      */
-    static unsigned rc_number();
+    [[deprecated]] static unsigned rc_number() {
+      return 0;
+    }
 
     /** @brief Human readable version
      * 
@@ -113,10 +117,6 @@ namespace TREX {
     static std::string str();
 
     static std::string full_str();
-
-    static bool svn_info();
-    static std::string svn_root();
-    static std::string svn_revision();
     
     static bool git_info();
     static std::string git_branch();

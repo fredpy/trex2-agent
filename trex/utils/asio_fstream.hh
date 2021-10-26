@@ -34,28 +34,26 @@
 #ifndef H_trex_utils_asio_fstream
 # define H_trex_utils_asio_fstream
 
-# include "platform/memory.hh"
-# include "platform/cpp11_deleted.hh"
 # include "SharedVar.hh"
 # include "asio_runner.hh"
-
-# include <boost/ref.hpp>
 # include <boost/iostreams/stream.hpp>
+# include <boost/asio/io_context_strand.hpp>
 
 # include <string>
+# include <memory>
 # include <fstream>
 
 namespace TREX {
   namespace utils {
     
     template<class Worker>
-    class stranded_service :public boost::asio::io_service::service {
+    class stranded_service :public boost::asio::io_context::service {
     public:
-      static boost::asio::io_service::id id;
-      typedef SHARED_PTR<boost::asio::io_service::work> work_ref;
+      static boost::asio::io_context::id id;
+      typedef std::shared_ptr<boost::asio::io_context::work> work_ref;
       
-      explicit stranded_service(boost::asio::io_service &io)
-      :boost::asio::io_service::service(io),m_strand(io) {}
+      explicit stranded_service(boost::asio::io_context &io)
+      :boost::asio::io_context::service(io),m_strand(io) {}
       
       ~stranded_service() {
         shutdown_service();
@@ -73,8 +71,8 @@ namespace TREX {
       work_ref reserve() {
         work_ref ret = m_work.lock();
         if( !ret ) {
-          boost::asio::io_service &io = get_io_service();
-          ret = MAKE_SHARED<boost::asio::io_service::work>(boost::ref(io));
+          auto &io = get_io_context();
+          ret = std::make_shared<boost::asio::io_context::work>(std::ref(io));
           m_work = ret;
         }
         return ret;
@@ -93,12 +91,12 @@ namespace TREX {
     private:
       void shutdown_service() {}
       
-      WEAK_PTR<boost::asio::io_service::work> m_work;
-      boost::asio::io_service::strand m_strand;
+      std::weak_ptr<boost::asio::io_context::work> m_work;
+      boost::asio::io_context::strand m_strand;
     };
     
     template<class Worker>
-    boost::asio::io_service::id stranded_service<Worker>::id;
+    boost::asio::io_context::id stranded_service<Worker>::id;
 
     
     /** @brief Asynchronous text output stream
@@ -108,14 +106,14 @@ namespace TREX {
      * manage by a single strand service eensuring that all the ourtputs are 
      * written in a sequence with limited risk of IO block in the main thread.
      */
-    class async_ofstream :boost::noncopyable {
+    class async_ofstream  {
       class pimpl;
     public:
       typedef stranded_service<pimpl> service;
       
-      explicit async_ofstream(boost::asio::io_service &service)
+      explicit async_ofstream(boost::asio::io_context &service)
       :m_io(service) {}
-      async_ofstream(boost::asio::io_service &service, std::string const &fname)
+      async_ofstream(boost::asio::io_context &service, std::string const &fname)
       :m_io(service) {
         open(fname);
       }
@@ -144,10 +142,10 @@ namespace TREX {
         std::streamsize write(char_type const *s, std::streamsize n);
 
       private:
-        explicit entry_sink(SHARED_PTR<pimpl> const &dest);
+        explicit entry_sink(std::shared_ptr<pimpl> const &dest);
         void flush();
         
-        mutable SHARED_PTR<pimpl> m_dest;
+        mutable std::shared_ptr<pimpl> m_dest;
         mutable std::string       m_cache;
         
         friend class entry;
@@ -176,12 +174,12 @@ namespace TREX {
         void flush();
         
       private:
-        explicit entry(SHARED_PTR<pimpl> const &dest);
+        explicit entry(std::shared_ptr<pimpl> const &dest);
         
-        mutable UNIQ_PTR<entry_impl> m_out;
+        mutable std::unique_ptr<entry_impl> m_out;
         
         friend class async_ofstream;
-        entry() DELETED;
+        entry() =delete;
       };
     
       entry new_entry();
@@ -193,8 +191,8 @@ namespace TREX {
       }
       
     private:
-      boost::asio::io_service &m_io;
-      SHARED_PTR<pimpl>        m_impl;
+      boost::asio::io_context &m_io;
+      std::shared_ptr<pimpl>        m_impl;
     };
     
     

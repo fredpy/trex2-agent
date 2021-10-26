@@ -181,7 +181,7 @@ namespace TREX {
         LogNormal,   //!< Normal level
         LogExtensive //!< High verbosity (usually for debugging)
       };
-      typedef boost::filesystem::path path_type;
+      typedef std::filesystem::path path_type;
       
       /** @brief Logging path
        * This method indicates in which directory log files
@@ -270,8 +270,8 @@ namespace TREX {
       size_t thread_count(size_t n, bool override_hw=false) {
         return m_io.thread_count(n, override_hw);
       }
-      boost::asio::io_service &service() {
-        return m_io.service();
+      boost::asio::io_context &context() {
+        return m_io.context();
       }
       
       
@@ -394,8 +394,8 @@ namespace TREX {
       
       /** @brief syslog text log file */
       log::text_log   m_syslog;
-      SHARED_PTR<log::out_file> m_trex_log;
-      SHARED_PTR<log::log_pipe> m_out, m_err, m_log;
+      std::shared_ptr<log::out_file> m_trex_log;
+      std::shared_ptr<log::log_pipe> m_out, m_err, m_log;
       
       /** @brief verbosity level */
       LogLevel    m_level;

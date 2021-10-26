@@ -55,7 +55,7 @@
 #include <boost/system/error_code.hpp>
 
 using namespace TREX::utils; 
-using namespace boost::filesystem;
+using namespace std::filesystem;
 
 
 /*
@@ -64,7 +64,7 @@ using namespace boost::filesystem;
 
 // structors :
 
-LogManager::LogManager():m_inited(false), m_syslog(m_io.service()), m_level(TREX_LOG_LEVEL) {
+LogManager::LogManager():m_inited(false), m_syslog(m_io.context()), m_level(TREX_LOG_LEVEL) {
   // Disabled following code as it is not thread safe
   /*
   // Capture standard output and error in TREX.log

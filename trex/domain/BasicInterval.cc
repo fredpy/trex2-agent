@@ -47,14 +47,14 @@ namespace bpt=boost::property_tree;
 
 void BasicInterval::completeParsing(bpt::ptree::value_type &node) {
   // Try for a singleton first 
-  boost::optional<std::string> 
-    val = TREX::utils::parse_attr< boost::optional<std::string> >(node.second, "value");
+  std::optional<std::string> 
+    val = TREX::utils::parse_attr< std::optional<std::string> >(node.second, "value");
   if( val ) {
     parseSingleton(*val);
   } else {
-    boost::optional< std::string >
-      lo = TREX::utils::parse_attr< boost::optional<std::string> >(node.second, "min"),
-      hi = TREX::utils::parse_attr< boost::optional<std::string> >(node.second, "max");
+    std::optional< std::string >
+      lo = TREX::utils::parse_attr< std::optional<std::string> >(node.second, "min"),
+      hi = TREX::utils::parse_attr< std::optional<std::string> >(node.second, "max");
 
     if( lo ) 
       parseLower(*lo);

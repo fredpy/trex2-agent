@@ -41,7 +41,8 @@ install(
   DESTINATION include/trex/europa/bits
   )
 
-add_library(TREXeuropa_core SHARED
+trex_lib(europa_core)
+target_sources(europa_core PRIVATE
   Assembly.cc
   core.cc
   CurrentState.cc
@@ -61,28 +62,31 @@ add_library(TREXeuropa_core SHARED
   private/Schema.hh
   private/TimePoint.hh
   private/UpdateFlawIterator.hh
-  ../trex/europa/Assembly.hh
-  ../trex/europa/config.hh
-  ../trex/europa/DeliberationFilter.hh
-  ../trex/europa/EuropaEntity.hh
-  ../trex/europa/EuropaException.hh
-  ../trex/europa/EuropaPlugin.hh
-  ../trex/europa/ModeConstraints.hh
-  ../trex/europa/ReactorConstraint.hh
-  ../trex/europa/ReactorPropagator.hh
-  ../trex/europa/SynchronizationManager.hh
-  ../trex/europa/TimeConstraints.hh
-  ../trex/europa/TrexThreatDecisionPoint.hh
-  ../trex/europa/bits/europa_convert.hh
-  ../trex/europa/bits/europa_helpers.hh
-  ../trex/europa/bits/system_header.hh
+  trex/europa/Assembly.hh
+  trex/europa/config.hh
+  trex/europa/DeliberationFilter.hh
+  trex/europa/EuropaEntity.hh
+  trex/europa/EuropaException.hh
+  trex/europa/EuropaPlugin.hh
+  trex/europa/ModeConstraints.hh
+  trex/europa/ReactorConstraint.hh
+  trex/europa/ReactorPropagator.hh
+  trex/europa/SynchronizationManager.hh
+  trex/europa/TimeConstraints.hh
+  trex/europa/TrexThreatDecisionPoint.hh
+  trex/europa/bits/europa_convert.hh
+  trex/europa/bits/europa_helpers.hh
+  trex/europa/bits/system_header.hh
   ${CMAKE_BINARY_DIR}/trex/europa/bits/europa_config.hh
 )
-
-target_link_libraries(TREXeuropa_core ${EUROPA_LIBRARIES} TREXdomain
-  ${Boost_REGEX_LIBRARY})
-
-trex_add_path_filter(TREXeuropa_core ..)
-trex_add_path_filter(TREXeuropa_core ${CMAKE_BINARY_DIR})
-trex_lib(TREXeuropa_core extra)
-
+target_link_libraries(europa_core ${EUROPA_LIBRARIES} domain Boost::regex)
+target_include_directories(europa_core PRIVATE
+  ${CMAKE_CURRENT_BINARY_DIR}
+  ${CMAKE_CURRENT_SOURCE_DIR}/trex/europa
+PUBLIC
+  ${EUROPA_INCLUDE_DIRS}
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+  $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>
+  $<INSTALL_INTERFACE:include>
+)
+install(DIRECTORY trex DESTINATION include/)

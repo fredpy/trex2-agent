@@ -19,9 +19,12 @@
 
 # include "../shared/LstsReactor.hh"
 
-# include <DUNE/DUNE.hpp>
-# include <DUNE/Math/Angles.hpp>
-# include <DUNE/Coordinates/WGS84.hpp>
+# define DUNE_HEADER <DUNE/DUNE.hpp>
+# include <trex/lsts/bits/dune_include.hh>
+# define DUNE_HEADER <DUNE/Math/Angles.hpp>
+# include <trex/lsts/bits/dune_include.hh>
+# define DUNE_HEADER <DUNE/Coordinates/WGS84.hpp>
+# include <trex/lsts/bits/dune_include.hh>
 
 using namespace TREX::transaction;
 using namespace TREX::utils;

@@ -59,7 +59,7 @@ namespace {
     } else if( date.is_special() ) {
       return false;
     } else {
-      typedef TREX::utils::chrono_posix_convert< CHRONO::duration<EUROPA::edouble::basis_type> > convert;
+      typedef TREX::utils::chrono_posix_convert< std::chrono::duration<EUROPA::edouble::basis_type> > convert;
       seconds = convert::to_chrono(date.time_of_day()).count();
       days = (int)date.date().day_of_year();
       years = (int)date.date().year();
@@ -70,8 +70,8 @@ namespace {
   Assembly::pdate europa_to_date(EUROPA::edouble seconds,
 				 EUROPA::eint    days,
 				 EUROPA::eint    years) {    
-    typedef TREX::utils::chrono_posix_convert< CHRONO::duration<EUROPA::edouble::basis_type> > convert;
-    CHRONO::duration<EUROPA::edouble::basis_type> time_of_day(EUROPA::cast_basis(seconds));
+    typedef TREX::utils::chrono_posix_convert< std::chrono::duration<EUROPA::edouble::basis_type> > convert;
+    std::chrono::duration<EUROPA::edouble::basis_type> time_of_day(EUROPA::cast_basis(seconds));
 
     Assembly::pdate::date_type jan_1st(EUROPA::cast_basis(years), 1, 1);
     return Assembly::pdate(jan_1st,

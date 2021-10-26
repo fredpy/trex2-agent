@@ -75,7 +75,7 @@ unsigned int StepClock::selectStep(unsigned int stepsPerTick) {
 }
 
 unsigned int StepClock::parseStep(boost::property_tree::ptree &steps) {
-  boost::optional<size_t> val = parse_attr< boost::optional<size_t> >(steps, "steps");
+  std::optional<size_t> val = parse_attr< std::optional<size_t> >(steps, "steps");
   if( val ) 
     return selectStep(*val);
   else {

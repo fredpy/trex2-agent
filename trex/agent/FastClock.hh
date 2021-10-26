@@ -41,7 +41,7 @@ namespace TREX {
       date_type     m_epoch;
       duration_type m_freq;
       bool const    m_no_skip;
-      boost::optional<transaction::TICK> m_real_prev;
+      std::optional<transaction::TICK> m_real_prev;
       transaction::TICK m_prev;
       
       duration_type getSleepDelay() const {

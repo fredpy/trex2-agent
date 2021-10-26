@@ -60,10 +60,10 @@ namespace TREX {
      */
     class ros_clock {
     public:
-      typedef CHRONO::nanoseconds           duration;
+      typedef std::chrono::nanoseconds           duration;
       typedef duration::rep                 rep;
       typedef duration::period              period;
-      typedef CHRONO::time_point<ros_clock>  time_point;
+      typedef std::chrono::time_point<ros_clock>  time_point;
 
       /** @brief steady clock flag
        *
@@ -84,7 +84,7 @@ namespace TREX {
   namespace agent {
 
     template<>
-    Clock::duration_type rt_clock<CHRONO_NS::milli, ROS::ros_clock>::doSleep() {
+    Clock::duration_type rt_clock<std::milli, ROS::ros_clock>::doSleep() {
       Clock::duration_type delay = getSleepDelay();
       ::ros::Duration ros_dt;
       ros_dt.fromNSec(delay.count());
@@ -116,7 +116,7 @@ namespace TREX {
      * @ingroup ros
      * @author Frederic Py <fpy@mbari.org>
      */
-    typedef agent::rt_clock<CHRONO_NS::milli, ros_clock> clock;
+    typedef agent::rt_clock<std::milli, ros_clock> clock;
 
   } // TREX::ROS
 } // TREX

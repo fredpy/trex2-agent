@@ -42,9 +42,8 @@
 # define H_trex_utils_log_entry
 
 # include "log_fwd.hh"
-# include "../platform/memory.hh"
-
-# include <boost/optional.hpp>
+# include <memory>
+# include <optional>
 
 namespace TREX {
   namespace utils {
@@ -98,7 +97,7 @@ namespace TREX {
 	 * The type used to refer to an entry. This typ[e is the 
 	 * expected argument of log message handlers.
 	 */
-        typedef SHARED_PTR<entry> pointer;
+        typedef std::shared_ptr<entry> pointer;
         
 	/** @brief Desturctor */
         ~entry() {}
@@ -179,7 +178,7 @@ namespace TREX {
         size_type write(char_type const *s, size_type n);
         
         
-        boost::optional<date_type> const m_date;
+        std::optional<date_type> const m_date;
         id_type const m_source;
         id_type const m_kind;
         msg_type m_content;

@@ -56,15 +56,6 @@ unsigned short version::release_number() {
   return TREX_PATCH;
 }
 
-bool version::is_release_candidate() {
-  return rc_number()>0;
-}
-
-unsigned version::rc_number() {
-  return TREX_RC;
-}
-
-
 unsigned long version::number() {
   unsigned long version = major_number();
   version = 100*version + minor_number();
@@ -74,18 +65,6 @@ unsigned long version::number() {
 
 std::string version::str() {
   return TREX_VERSION;
-}
-
-bool version::svn_info() {
-  return false;
-}
-
-std::string version::svn_root() {
-  return std::string();
-}
-
-std::string version::svn_revision() {
-  return std::string();
 }
 
 bool version::git_info() {

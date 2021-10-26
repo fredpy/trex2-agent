@@ -160,7 +160,7 @@ namespace TREX {
        * @sa class TREX::utils::list_set
        */
       typedef utils::list_set<
-      reactor_id_traits< SHARED_PTR<TeleoReactor> > > reactor_set;
+      reactor_id_traits< std::shared_ptr<TeleoReactor> > > reactor_set;
       
       
       /** @brief timeline client helper

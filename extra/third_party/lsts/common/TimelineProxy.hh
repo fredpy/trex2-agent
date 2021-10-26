@@ -11,7 +11,6 @@
 # include <trex/transaction/TeleoReactor.hh>
 # include <trex/utils/Plugin.hh>
 # include <trex/utils/LogManager.hh>
-# include <DUNE/DUNE.hpp>
 # include <trex/lsts/ImcAdapter.hh>
 
 namespace TREX {
@@ -31,10 +30,10 @@ namespace TREX {
       bool synchronize();
 
       // called when a goal is requested
-      void handleRequest(goal_id const &g);
+      void handleRequest(transaction::goal_id const &g);
 
       // called when an observation is posted
-      void notify(Observation const &obs);
+      void notify(transaction::Observation const &obs);
 
       /**
        * @brief should this reactor be used for posting goals (true) or observations (false)?

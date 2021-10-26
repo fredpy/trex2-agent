@@ -58,7 +58,7 @@
 namespace TREX {
   namespace agent {
     
-    typedef SHARED_PTR<Clock> clock_ref;
+    typedef std::shared_ptr<Clock> clock_ref;
     
     /** @brief TREX agent
      *

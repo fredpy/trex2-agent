@@ -12,7 +12,8 @@
 # define TREX_PP_SYSTEM_FILE <PLASMA/Domain.hh>
 # include <trex/europa/bits/system_header.hh>
 # include <trex/utils/SharedVar.hh>
-# include <DUNE/DUNE.hpp>
+# define DUNE_HEADER <DUNE/DUNE.hpp>
+# include "bits/dune_include.hh"
 
 //# include <boost/polygon/polygon.hpp>
 

@@ -287,9 +287,9 @@ size_t python_topic::to_trex(transaction::Predicate &pred, path_alias path,
               long double value = py::extract<long double>(attr.attr("to_time")()),
                 now = py::extract<long double>(m_ros_time.attr("now")().attr("to_time")());
               TICK date = reactor().getCurrentTick();
-              CHRONO::duration<long double> tmp(value-now);
+              std::chrono::duration<long double> tmp(value-now);
               ros_reactor::duration_type
-                delta = CHRONO::duration_cast<ros_reactor::duration_type>(tmp);
+                delta = std::chrono::duration_cast<ros_reactor::duration_type>(tmp);
               
               // TODO: ensure that tick is properly rounded
               date += delta.count()/reactor().tickDuration().count();
@@ -298,8 +298,8 @@ size_t python_topic::to_trex(transaction::Predicate &pred, path_alias path,
               add_attr(local, "date");
               ++ret;
             } else if( m_python->is_instance(attr, m_ros_duration) ) {
-              CHRONO::duration<long double> val(py::extract<long double>(attr.attr("to_sec")()));
-              ros_reactor::duration_type dur = CHRONO::duration_cast<ros_reactor::duration_type>(val);
+              std::chrono::duration<long double> val(py::extract<long double>(attr.attr("to_sec")()));
+              ros_reactor::duration_type dur = std::chrono::duration_cast<ros_reactor::duration_type>(val);
               TICK value = dur.count()/reactor().tickDuration().count();
               // TODO: ensure that duration is properly set to the floor
               pred.restrictAttribute(local.trex(),
@@ -359,12 +359,12 @@ size_t python_topic::to_msg(Predicate const &pred, boost::python::object &msg) {
           long double now = py::extract<long double>(m_ros_time.attr("now")().attr("to_time")());
           graph::duration_type delta = reactor().tickDuration() * (trex_date-trex_now);
           
-          now += CHRONO::duration_cast< CHRONO::duration<long double> >(delta).count();
+          now += std::chrono::duration_cast< std::chrono::duration<long double> >(delta).count();
           val = m_ros_time(now);
         } else if( i->second=="duration" ) {
           TICK trex_dur = dom.getTypedSingleton<IntegerDomain::base_type, false>();
           graph::duration_type rt_dur = reactor().tickDuration()*trex_dur;
-          long double ros_dur = CHRONO::duration_cast< CHRONO::duration<long double> >(rt_dur).count();
+          long double ros_dur = std::chrono::duration_cast< std::chrono::duration<long double> >(rt_dur).count();
       
           val = m_ros_duration(ros_dur);
         } else if( i->second==IntegerDomain::type_name ) {

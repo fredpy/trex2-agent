@@ -160,7 +160,7 @@ void details::Schema::registerFunction(Assembly const &assembly, EUROPA::CFuncti
 std::string details::Schema::use(std::string file, bool &found) {
   include_map::iterator i = m_includes.find(file);
   if( m_includes.end()==i ) {
-    boost::filesystem::path p = m_log->use(file, found);
+    std::filesystem::path p = m_log->use(file, found);
     if( found ) {
       m_includes.insert(include_map::value_type(file, p));
       

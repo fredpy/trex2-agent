@@ -11,7 +11,6 @@
 # include <trex/transaction/TeleoReactor.hh>
 # include <trex/utils/Plugin.hh>
 # include <trex/utils/LogManager.hh>
-# include <DUNE/DUNE.hpp>
 # include <trex/lsts/ImcAdapter.hh>
 # include "../shared/LstsReactor.hh"
 

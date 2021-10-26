@@ -8,7 +8,6 @@
 #ifndef POSITIONUPDATER_HPP_
 #define POSITIONUPDATER_HPP_
 
-# include <DUNE/DUNE.hpp>
 # include <trex/lsts/ImcAdapter.hh>
 # include <trex/transaction/TeleoReactor.hh>
 # include <trex/utils/Plugin.hh>

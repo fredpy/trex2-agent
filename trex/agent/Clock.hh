@@ -135,7 +135,7 @@ namespace TREX {
        * @return tick duration
        */
       virtual duration_type tickDuration() const {
-        return CHRONO::seconds(1);
+        return std::chrono::seconds(1);
       }
       virtual TREX::transaction::TICK timeToTick(date_type const &date) const {
         return initialTick()+(dur_converter::to_chrono(date-epoch()).count()/tickDuration().count());
@@ -179,7 +179,7 @@ namespace TREX {
       virtual std::string duration_str(TREX::transaction::TICK dur) const;
       
       /** @brief XML factory for clocks. */
-      typedef TREX::utils::XmlFactory<Clock, SHARED_PTR<Clock> > xml_factory;
+      typedef TREX::utils::XmlFactory<Clock, std::shared_ptr<Clock> > xml_factory;
       
       /** @brief Clock basic information
        *
@@ -238,7 +238,7 @@ namespace TREX {
        * @a sleepSeconds
        */
       explicit Clock(duration_type const &sleep)
-      :m_sleep(sleep), m_started(false), m_data(m_log->service()) {}
+      :m_sleep(sleep), m_started(false), m_data(m_log->context()) {}
       
       /** @brief Internal start method
        *

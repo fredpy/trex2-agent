@@ -124,9 +124,9 @@ namespace TREX {
      * @ingroup transactions
      */
     class graph :boost::noncopyable {
-      SHARED_PTR<details::graph_impl> m_impl;
+      std::shared_ptr<details::graph_impl> m_impl;
     public:
-      typedef CHRONO::nanoseconds        duration_type;
+      typedef std::chrono::nanoseconds        duration_type;
       typedef boost::posix_time::ptime   date_type;
       
       /** @brief reactor ID type
@@ -173,7 +173,7 @@ namespace TREX {
        * A factory used ot produce new reactor in a graph using XML
        * input.
        */
-      typedef TREX::utils::XmlFactory<TeleoReactor, SHARED_PTR<TeleoReactor>,
+      typedef TREX::utils::XmlFactory<TeleoReactor, std::shared_ptr<TeleoReactor>,
       graph *> xml_factory;
       
       /** @brief Reverse of a reactor graph
@@ -519,7 +519,7 @@ namespace TREX {
        * @sa timeToTick(time_t, suseconds_t) const
        */
       virtual duration_type tickDuration() const {
-        return CHRONO::seconds(1);
+        return std::chrono::seconds(1);
       }
       /** @brief convert real-time into a TICK
        *
